@@ -1,0 +1,539 @@
+/* =========================
+   HERO SECTION
+========================= */
+
+.hero {
+    width: 100%;
+    min-height: 635px;
+  
+    position: relative;
+  
+    background: #ffffff;
+  
+    overflow: hidden;
+  
+    font-family: "Poppins", sans-serif;
+  
+    box-sizing: border-box;
+  }
+  
+  
+  /* =========================
+     HERO CONTENT
+  ========================= */
+  
+  .hero-content {
+    width: 100%;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  
+    position: relative;
+  
+    z-index: 5;
+  
+    padding-top: 62px;
+  
+    text-align: center;
+  }
+  
+  
+  /* =========================
+     HEADING
+  ========================= */
+  
+  .hero-content h1 {
+    margin: 0;
+  
+    color: #171A1FFF;
+  
+    font-size: 56px;
+  
+    font-weight: 700;
+  
+    line-height: 1.15;
+  
+    letter-spacing: 1.5px;
+  }
+  
+  
+  /* Purple word */
+  
+  .hero-content h1 span {
+    color: #8555d5;
+  }
+  
+  
+  /* =========================
+     DESCRIPTION
+  ========================= */
+  
+  .hero-content p {
+    margin: 24px 0 0;
+  
+    color: #6E7787FF;
+  
+    font-size: 16px;
+  
+    font-weight: 400;
+  
+    line-height: 1.7;
+  
+    max-width: 900px;
+  }
+  
+  
+  /* =========================
+     GET STARTED BUTTON
+  ========================= */
+  
+  .hero-btn {
+    width: 200px;
+    height: 52px;
+    padding: 0 20px;
+    margin-top: 20px;
+  
+    border: none;
+  
+    border-radius: 12px;
+  
+    background: #8659D3FF;
+  
+    color: #ffffff;
+  
+    font-family: "Poppins", sans-serif;
+  
+    font-size: 18px;
+  
+    font-weight: 500;
+  
+    cursor: pointer;
+  
+    transition: 0.2s ease;
+  }
+  
+  
+  .hero-btn:hover {
+    background: #7644CDFF;
+  
+    transform: translateY(-1px);
+  }
+  
+  
+  /* =========================
+     ILLUSTRATION AREA
+  ========================= */
+  
+  .hero-illustration {
+    width: 500px;
+    height: 300px;
+  
+    position: relative;
+  
+    margin: 8px auto 0;
+  }
+  
+  
+  /* =========================
+     MAIN IMAGE
+  ========================= */
+  
+  .hero-main-image {
+    width: 647px;
+    height: 288px;  
+    position: absolute;
+    top: 0;
+  
+    left: 35%;
+  
+    bottom: 0;
+  
+    transform: translateX(-50%);
+  
+    z-index: 3;
+  
+    object-fit: contain;
+  }
+  
+  
+  /* =========================
+     DOT PATTERN
+  ========================= */
+  
+  .hero-dots {
+    width: 260px;
+    height: 200px;
+  
+    position: absolute;
+  
+    right: 25px;
+    top: 18px;
+  
+    background-image: radial-gradient(
+      #d8c5f5 2px,
+      transparent 2px
+    );
+  
+    background-size: 16px 16px;
+  
+    z-index: 1;
+  
+    opacity: 0.9;
+  }
+  
+  
+  /* =========================
+     CLOCK ICON
+  ========================= */
+  
+  .hero-clock {
+    width: 48px;
+    height: 48px;
+  
+    position: absolute;
+  
+    left: 62px;
+    top: 50px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    background: #8555d5;
+  
+    border-radius: 50%;
+  
+    z-index: 5;
+  }
+  
+  
+  .hero-clock span {
+    color: #ffffff;
+  
+    font-size: 29px;
+  
+    line-height: 1;
+  
+    transform: rotate(-15deg);
+  }
+  
+  
+  /* =========================
+     HEART ICON
+  ========================= */
+  
+  .hero-heart {
+    width: 42px;
+    height: 42px;
+  
+    position: absolute;
+  
+    right: 38px;
+    top: 52px;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  
+    background: #ff8a00;
+  
+    border-radius: 50%;
+  
+    z-index: 5;
+  }
+  
+  
+  .hero-heart span {
+    color: #ffffff;
+  
+    font-size: 28px;
+  
+    line-height: 1;
+  }
+  
+  
+  /* =========================
+     PROFILE IMAGES
+  ========================= */
+  
+  .hero-profile {
+    position: absolute;
+  
+    border-radius: 50%;
+  
+    overflow: hidden;
+  
+    z-index: 10;
+  }
+  
+  
+  .hero-profile img {
+    width: 100%;
+    height: 100%;
+  
+    object-fit: cover;
+  
+    display: block;
+  }
+  
+  
+  /* Left profile */
+  
+  .hero-profile-left {
+    width: 48px;
+    height: 48px;
+  
+    top: 72px;
+    left: 10%;
+  }
+  
+  
+  /* Right profile */
+  
+  .hero-profile-right {
+    width: 48px;
+    height: 48px;
+  
+    top: 72px;
+    right: 10%;
+  }
+  
+  
+  /* Small profile */
+  
+  .hero-profile-small {
+    width: 36px;
+    height: 36px;
+  
+    top: 250px;
+    right: 17%;
+  }
+  
+  
+  /* =========================
+     RESPONSIVE
+  ========================= */
+  
+  @media (max-width: 1100px) {
+  
+    .hero-content {
+      padding-top: 55px;
+    }
+  
+    .hero-content h1 {
+      font-size: 40px;
+    }
+  
+    .hero-profile-left {
+      left: 7%;
+    }
+  
+    .hero-profile-right {
+      right: 7%;
+    }
+  
+    .hero-profile-small {
+      right: 12%;
+    }
+  }
+  
+  
+  /* =========================
+     TABLET
+  ========================= */
+  
+  @media (max-width: 768px) {
+  
+    .hero {
+      min-height: 650px;
+    }
+  
+  
+    .hero-content {
+      padding: 55px 20px 0;
+    }
+  
+  
+    .hero-content h1 {
+      font-size: 34px;
+  
+      letter-spacing: -0.8px;
+    }
+  
+  
+    .hero-content p {
+      max-width: 600px;
+  
+      font-size: 10px;
+  
+      line-height: 1.6;
+    }
+  
+  
+    .hero-content p br {
+      display: none;
+    }
+  
+  
+    .hero-illustration {
+      width: 450px;
+  
+      margin-top: 10px;
+    }
+  
+  
+    .hero-main-image {
+      width: 310px;
+    }
+  
+  
+    .hero-profile-left {
+      left: 5%;
+  
+      top: 85px;
+    }
+  
+  
+    .hero-profile-right {
+      right: 5%;
+  
+      top: 85px;
+    }
+  
+  
+    .hero-profile-small {
+      right: 8%;
+  
+      top: 280px;
+    }
+  }
+  
+  
+  /* =========================
+     MOBILE
+  ========================= */
+  
+  @media (max-width: 500px) {
+  
+    .hero {
+      min-height: 600px;
+    }
+  
+  
+    .hero-content {
+      padding: 45px 15px 0;
+    }
+  
+  
+    .hero-content h1 {
+      font-size: 28px;
+  
+      line-height: 1.2;
+    }
+  
+  
+    .hero-content p {
+      margin-top: 18px;
+  
+      font-size: 9px;
+    }
+  
+  
+    .hero-btn {
+      width: 115px;
+      height: 38px;
+  
+      margin-top: 18px;
+  
+      font-size: 10px;
+    }
+  
+  
+    .hero-illustration {
+      width: 100%;
+  
+      height: 270px;
+  
+      margin-top: 10px;
+    }
+  
+  
+    .hero-main-image {
+      width: 270px;
+  
+      bottom: 0;
+    }
+  
+  
+    .hero-dots {
+      width: 190px;
+      height: 150px;
+  
+      right: 5%;
+  
+      top: 25px;
+  
+      background-size: 13px 13px;
+    }
+  
+  
+    .hero-clock {
+      width: 40px;
+      height: 40px;
+  
+      left: 12%;
+  
+      top: 55px;
+    }
+  
+  
+    .hero-clock span {
+      font-size: 24px;
+    }
+  
+  
+    .hero-heart {
+      width: 38px;
+      height: 38px;
+  
+      right: 10%;
+  
+      top: 75px;
+    }
+  
+  
+    .hero-heart span {
+      font-size: 24px;
+    }
+  
+  
+    .hero-profile-left {
+      width: 38px;
+      height: 38px;
+  
+      left: 4%;
+  
+      top: 90px;
+    }
+  
+  
+    .hero-profile-right {
+      width: 38px;
+      height: 38px;
+  
+      right: 4%;
+  
+      top: 90px;
+    }
+  
+  
+    .hero-profile-small {
+      width: 30px;
+      height: 30px;
+  
+      right: 12%;
+  
+      top: 270px;
+    }
+  }
