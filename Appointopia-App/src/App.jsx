@@ -4,6 +4,7 @@ import Navbar from "./component/Navbar/Navbar";
 import SignUp from "./component/AuthPage/SignUp";
 import SignIn from "./component/AuthPage/SignIn";
 import Hero from "./component/Hero/Hero";
+import Footer from "./component/Footer/Footer";
 
 function App() {
   return (
@@ -17,6 +18,8 @@ function App() {
           <>
             <Navbar />
             <Hero/>
+
+            <Footer/>
            
           </>
         }
