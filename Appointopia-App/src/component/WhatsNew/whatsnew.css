@@ -1,0 +1,141 @@
+.whats-new{
+    width: 100%;
+    background-color: #fff;
+    padding: 80px 20px;
+    box-sizing: border-box;
+}
+.whats-new-container{
+    width: 100%;
+    max-width: 1230px;
+    margin: 0 auto;
+}
+.whats-new-container > h2{
+   margin: 0 0 55px;
+   text-align: center;
+   font-family: "Poppins", sans-serif;
+   font-size: 48px;
+   line-height: 1.2;
+   font-weight: 700;
+   color: #17181e;
+}
+
+.blog-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+.blog-card{
+    overflow: hidden;
+    background-color: #f9f9fb;
+    border-radius: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.blog-card:hover {
+    transform: translateY(-5px);
+  
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+  .blog-image{
+    width: 100%;
+    height: 264px;
+    overflow: hidden;
+  }
+
+  .blog-image img{
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    object-position: center;
+    transform: scale(1.15);
+    transition: transform 0.4s ease;
+  }
+  .blog-card:hover .blog-image img {
+    transform: scale(1.2);
+  }
+  .blog-content{
+    min-height: 145px;
+    padding: 27px 25px 24px;
+    box-sizing: border-box;
+  }
+  .blog-content h3 {
+    margin: 0 0 18px;
+  
+    font-family: "Poppins", sans-serif;
+    font-size: 17px;
+    line-height: 1.55;
+    font-weight: 700;
+  
+    color: #8555d5;
+  }
+  
+  
+  /* Date */
+  
+  .blog-content p {
+    margin: 0;
+  
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  
+    color: #70727c;
+  }
+  
+  
+  /* =========================
+     TABLET
+  ========================= */
+  
+  @media (max-width: 900px) {
+  
+    .whats-new {
+      padding: 65px 25px;
+    }
+  
+    .whats-new-container > h2 {
+      font-size: 40px;
+      margin-bottom: 40px;
+    }
+  
+    .blog-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+  }
+  
+  
+  /* =========================
+     MOBILE
+  ========================= */
+  
+  @media (max-width: 600px) {
+  
+    .whats-new {
+      padding: 50px 20px;
+    }
+  
+    .whats-new-container > h2 {
+      font-size: 32px;
+      margin-bottom: 30px;
+    }
+  
+    .blog-grid {
+      grid-template-columns: 1fr;
+      gap: 25px;
+    }
+  
+    .blog-image {
+      height: 230px;
+    }
+  
+    .blog-content {
+      min-height: auto;
+      padding: 22px 20px;
+    }
+  
+    .blog-content h3 {
+      font-size: 16px;
+    }
+  
+  }

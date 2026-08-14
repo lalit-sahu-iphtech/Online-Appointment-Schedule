@@ -12,6 +12,11 @@
   
     box-sizing: border-box;
   }
+  .logo-link{
+    
+    text-decoration: none;
+
+  }
   
   
   /* =========================

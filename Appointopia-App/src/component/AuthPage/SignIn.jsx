@@ -71,7 +71,8 @@ export default function SignIn() {
 
       {/* Logo */}
       <div className="auth-logo">
-
+        
+        <Link to="/"className="logo-link">
         <div className="auth-logo-icon">
           <img
             src={logo}
@@ -80,6 +81,9 @@ export default function SignIn() {
         </div>
 
         <h2>Appointopia</h2>
+        </Link>
+
+       
 
       </div>
 

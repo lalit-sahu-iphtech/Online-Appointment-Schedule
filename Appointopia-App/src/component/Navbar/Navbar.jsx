@@ -5,10 +5,12 @@ export default function Navbar() {
     <nav className="navbar">
       
       {/* Logo */}
-      <div className="nav-left">
+     <Link to="/" className="logo-link">
+     <div className="nav-left">
         {/* <div className="logo-icon">▦</div> */}
         <h1>Appointopia</h1>
       </div>
+     </Link>
 
       {/* Navigation */}
       <div className="nav-mid">

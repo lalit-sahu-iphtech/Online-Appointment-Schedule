@@ -5,6 +5,11 @@ import SignUp from "./component/AuthPage/SignUp";
 import SignIn from "./component/AuthPage/SignIn";
 import Hero from "./component/Hero/Hero";
 import Footer from "./component/Footer/Footer";
+import Statistics from "./component/Statistics/Statistics";
+import Scheduling from "./component/Scheduling/Scheduling";
+import GetStarted from "./component/GetStarted/GetStarted";
+import FAQ from "./component/Faq/Faq";
+import WhatsNew from "./component/WhatsNew/WhatsNew";
 
 function App() {
   return (
@@ -18,6 +23,12 @@ function App() {
           <>
             <Navbar />
             <Hero/>
+            <br /><br /><br />
+            <Statistics/>
+            <Scheduling/>
+            <GetStarted/>
+            <FAQ/>
+            <WhatsNew/>
 
             <Footer/>
            

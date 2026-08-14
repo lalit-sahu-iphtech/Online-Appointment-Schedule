@@ -80,11 +80,17 @@ export default function SignUp() {
 
       {/* Logo */}
       <div className="auth-logo">
+        <Link to="/" className="logo-link">
         <div className="auth-logo-icon">
           <img src={logo} alt="Appointopia" />
         </div>
-
-        <h2>Appointopia</h2>
+        
+       
+          <h2>Appointopia</h2>
+        </Link>
+        
+       
+        
       </div>
 
       {/* Shapes */}
