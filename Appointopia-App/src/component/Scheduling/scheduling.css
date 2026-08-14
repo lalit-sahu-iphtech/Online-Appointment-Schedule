@@ -1,0 +1,981 @@
+/* =================================================
+   MAIN SECTION
+================================================= */
+
+.scheduling-section {
+    width: 100%;
+  
+    background: #ffffff;
+  
+    padding: 65px 0 90px;
+  
+    font-family: "Poppins", sans-serif;
+  
+    box-sizing: border-box;
+  }
+  
+  
+  /* =================================================
+     COMMON CONTAINER
+  ================================================= */
+  
+  .scheduling-container {
+    width: 82%;
+  
+    max-width: 1470px;
+  
+    min-height: 390px;
+  
+    margin: 0 auto;
+  
+    display: grid;
+  
+    grid-template-columns: 1fr 1fr;
+  
+    align-items: center;
+  
+    column-gap: 40px;
+  }
+  
+  
+  /* =================================================
+     TEXT
+  ================================================= */
+  
+  .scheduling-text {
+    padding-left: 5px;
+  }
+  
+  
+  .scheduling-text h2 {
+    margin: 0;
+  
+    color: #15171d;
+  
+    font-size: 40px;
+  
+    line-height: 1.32;
+  
+    font-weight: 700;
+  }
+  
+  
+  .scheduling-text h2 span {
+    color: #8555d5;
+  }
+  
+  
+  .scheduling-text p {
+    margin: 18px 0 22px;
+  
+    color: #858b9b;
+  
+    font-size: 16px;
+  
+    line-height: 1.6;
+  
+    font-weight: 400;
+  }
+  
+  
+  /* =================================================
+     LEARN MORE
+  ================================================= */
+  
+  .learn-more-btn {
+    border: none;
+  
+    padding: 11px 18px;
+  
+    border-radius: 9px;
+  
+    background: #f5efff;
+  
+    color: #8555d5;
+  
+    font-family: "Poppins", sans-serif;
+  
+    font-size: 14px;
+  
+    font-weight: 500;
+  
+    cursor: pointer;
+  
+    transition: 0.2s ease;
+  }
+  
+  
+  .learn-more-btn:hover {
+    background: #8555d5;
+  
+    color: #ffffff;
+  }
+  
+  
+  /* =================================================
+     SMART VISUAL
+  ================================================= */
+  
+  .smart-visual {
+    position: relative;
+  
+    width: 100%;
+  
+    height: 390px;
+  }
+  
+  
+  /* =================================================
+     SMART DOTS
+  ================================================= */
+  
+  .smart-dots {
+    position: absolute;
+  
+    width: 285px;
+  
+    height: auto;
+  
+    top: 80px;
+  
+    left: 10px;
+  
+    z-index: 1;
+  
+    opacity: 0.8;
+  }
+  
+  
+  /* =================================================
+     SMART PERSON
+  ================================================= */
+  
+  .smart-person {
+    position: absolute;
+  
+    width: 220px;
+  
+    height: auto;
+  
+    right: 40px;
+  
+    bottom: 0;
+  
+    z-index: 3;
+  }
+  
+  
+  /* =================================================
+     MEETING CARD
+  ================================================= */
+  
+  .meeting-card {
+    position: absolute;
+  
+    width: 275px;
+  
+    min-height: 170px;
+  
+    top: 15px;
+  
+    left: 70px;
+  
+    padding: 12px;
+  
+    background: #ffffff;
+  
+    border-radius: 10px;
+  
+    box-shadow:
+      0 7px 20px rgba(0, 0, 0, 0.12);
+  
+    box-sizing: border-box;
+  
+    z-index: 4;
+  }
+  
+  
+  /* =================================================
+     DATE
+  ================================================= */
+  
+  .meeting-date {
+    width: 38px;
+  
+    height: 38px;
+  
+    margin: 0 auto 12px;
+  
+    border: 1.5px solid #8555d5;
+  
+    border-radius: 50%;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    color: #8555d5;
+  
+    font-size: 13px;
+  
+    font-weight: 500;
+  }
+  
+  
+  /* =================================================
+     MEETING ROW
+  ================================================= */
+  
+  .meeting-row {
+    height: 40px;
+  
+    padding: 0 12px;
+  
+    border-radius: 5px;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    gap: 14px;
+  
+    color: #ffffff;
+  
+    box-sizing: border-box;
+  
+    margin-top: 8px;
+  }
+  
+  
+  .meeting-row span {
+    font-size: 11px;
+  
+    white-space: nowrap;
+  }
+  
+  
+  .meeting-row strong {
+    font-size: 13px;
+  
+    font-weight: 600;
+  
+    white-space: nowrap;
+  }
+  
+  
+  /* Weekly */
+  
+  .weekly {
+    background: #8555d5;
+  }
+  
+  
+  /* Monthly */
+  
+  .monthly {
+    background: #ff7900;
+  }
+  
+  
+  /* =================================================
+     AUTOMATICALLY
+  ================================================= */
+  
+  .automatically {
+    position: absolute;
+  
+    top: 35px;
+  
+    right: -5px;
+  
+    padding: 7px 12px;
+  
+    background: #ffffff;
+  
+    border: 1px solid #8555d5;
+  
+    border-radius: 8px;
+  
+    color: #8555d5;
+  
+    font-size: 11px;
+  
+    font-weight: 500;
+  
+    z-index: 5;
+  }
+  
+  
+  /* =================================================
+     CHECK ICON
+  ================================================= */
+  
+  .smart-check {
+    position: absolute;
+  
+    right: -20px;
+  
+    top: 125px;
+  
+    width: 45px;
+  
+    height: 45px;
+  
+    border: 2px solid #287bd3;
+  
+    border-radius: 50%;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    color: #287bd3;
+  
+    background: #ffffff;
+  
+    font-size: 19px;
+  
+    z-index: 5;
+  }
+  
+  
+  /* =================================================
+     SHARE CONTAINER
+  ================================================= */
+  
+  .share-container {
+    margin-top: 40px;
+  }
+  
+  
+  /* =================================================
+     SHARE VISUAL
+  ================================================= */
+  
+  .share-visual {
+    position: relative;
+  
+    width: 100%;
+  
+    height: 390px;
+  }
+  
+  
+  /* =================================================
+     SHARE DOTS
+  ================================================= */
+  
+  .share-dots {
+    position: absolute;
+  
+    width: 280px;
+  
+    height: auto;
+  
+    top: 55px;
+  
+    right: 220px;
+  
+    z-index: 1;
+  
+    opacity: 0.8;
+  }
+  
+  
+  /* =================================================
+     SHARE PERSON
+  ================================================= */
+  
+  .share-person {
+    position: absolute;
+  
+    width: 185px;
+  
+    height: auto;
+  
+    left: 55px;
+  
+    bottom: 0;
+  
+    z-index: 3;
+  }
+  
+  
+  /* =================================================
+     PROFILE IMAGES
+  ================================================= */
+  
+  .profile {
+    position: absolute;
+  
+    width: 35px;
+  
+    height: 35px;
+  
+    object-fit: cover;
+  
+    border-radius: 50%;
+  
+    border: 2px solid #ffffff;
+  
+    box-shadow:
+      0 2px 8px rgba(0, 0, 0, 0.1);
+  
+    z-index: 4;
+  }
+  
+  
+  /* Profile positions */
+  
+  .profile-one {
+    top: 65px;
+  
+    left: 250px;
+    background: #FFD9B4FF; 
+  }
+  
+  
+  .profile-two {
+    top: 120px;
+  
+    left: 185px;
+    background-color:  #BCD8F4FF;
+  }
+  
+  
+  .profile-three {
+    top: 115px;
+  
+    left: 335px;
+    background: #DACDF2FF;
+  }
+  
+  
+  /* =================================================
+     SHARE CARD
+  ================================================= */
+  
+  .share-card {
+    position: absolute;
+  
+    width: 340px;
+  
+    min-height: 115px;
+  
+    left: 120px;
+  
+    bottom: 55px;
+  
+    padding: 18px;
+  
+    background: #ffffff;
+  
+    border-radius: 12px;
+  
+    box-shadow:
+      0 7px 20px rgba(0, 0, 0, 0.12);
+  
+    box-sizing: border-box;
+  
+    z-index: 5;
+  }
+  
+  
+  .share-card h4 {
+    margin: 0 0 14px;
+  
+    color: #303440;
+  
+    font-size: 15px;
+  
+    font-weight: 600;
+  }
+  
+  
+  /* =================================================
+     SHARE CARD BOTTOM
+  ================================================= */
+  
+  .share-card-bottom {
+    width: 100%;
+  
+    height: 38px;
+  
+    padding: 0 7px;
+  
+    border-radius: 8px;
+  
+    background: #f3f4f6;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    gap: 12px;
+  
+    box-sizing: border-box;
+  }
+  
+  
+  /* Link */
+  
+  .share-card-bottom a {
+    color: #2985d8;
+  
+    font-size: 12px;
+  
+    text-decoration: underline;
+  
+    white-space: nowrap;
+  }
+  
+  
+  /* Copy */
+  
+  .copy-link {
+    border: none;
+  
+    background: transparent;
+  
+    color: #8555d5;
+  
+    font-family: "Poppins", sans-serif;
+  
+    font-size: 11px;
+  
+    cursor: pointer;
+  
+    white-space: nowrap;
+  }
+  
+  
+  /* Share */
+  
+  .share-btn {
+    margin-left: auto;
+  
+    border: none;
+  
+    padding: 8px 12px;
+  
+    border-radius: 8px;
+  
+    background: #8555d5;
+  
+    color: #ffffff;
+  
+    font-family: "Poppins", sans-serif;
+  
+    font-size: 11px;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    gap: 6px;
+  
+    cursor: pointer;
+  
+    white-space: nowrap;
+  }
+  
+  
+  .share-btn svg {
+    font-size: 9px;
+  }
+  
+  
+  /* =================================================
+     SHARE TEXT
+  ================================================= */
+  
+  .share-text {
+    padding-left: 25px;
+  }
+  
+  
+  /* =================================================
+     TABLET
+  ================================================= */
+  
+  @media (max-width: 1100px) {
+  
+    .scheduling-container {
+      width: 90%;
+  
+      column-gap: 15px;
+    }
+  
+  
+    .scheduling-text h2 {
+      font-size: 34px;
+    }
+  
+  
+    .scheduling-text p {
+      font-size: 14px;
+    }
+  
+  
+    .smart-person {
+      width: 190px;
+  
+      right: 20px;
+    }
+  
+  
+    .meeting-card {
+      left: 40px;
+  
+      width: 250px;
+    }
+  
+  
+    .share-person {
+      width: 165px;
+  
+      left: 25px;
+    }
+  
+  
+    .share-card {
+      left: 80px;
+  
+      width: 310px;
+    }
+  
+  
+    .profile-one {
+      left: 205px;
+    }
+  
+  
+    .profile-two {
+      left: 145px;
+    }
+  
+  
+    .profile-three {
+      left: 285px;
+    }
+  
+  }
+  
+  
+  /* =================================================
+     MOBILE
+  ================================================= */
+  
+  @media (max-width: 750px) {
+  
+    .scheduling-section {
+      padding: 45px 0 60px;
+    }
+  
+  
+    .scheduling-container {
+      width: 90%;
+  
+      display: flex;
+  
+      flex-direction: column;
+  
+      min-height: auto;
+  
+      gap: 35px;
+    }
+  
+  
+    .scheduling-text {
+      width: 100%;
+  
+      padding: 0;
+  
+      order: 1;
+    }
+  
+  
+    .smart-visual {
+      width: 100%;
+  
+      height: 360px;
+  
+      order: 2;
+    }
+  
+  
+    .scheduling-text h2 {
+      font-size: 30px;
+    }
+  
+  
+    .scheduling-text p {
+      font-size: 14px;
+    }
+  
+  
+    .scheduling-text p br {
+      display: none;
+    }
+  
+  
+    /* Smart image */
+  
+    .smart-person {
+      width: 175px;
+  
+      right: 0;
+    }
+  
+  
+    .smart-dots {
+      width: 230px;
+  
+      left: 10px;
+  
+      top: 100px;
+    }
+  
+  
+    .meeting-card {
+      width: 235px;
+  
+      left: 15px;
+  
+      top: 25px;
+    }
+  
+  
+    .meeting-row {
+      gap: 8px;
+    }
+  
+  
+    .meeting-row strong {
+      font-size: 11px;
+    }
+  
+  
+    .automatically {
+      right: 0;
+  
+      top: 55px;
+    }
+  
+  
+    .smart-check {
+      right: -5px;
+  
+      top: 145px;
+  
+      width: 38px;
+  
+      height: 38px;
+    }
+  
+  
+    /* Share */
+  
+    .share-container {
+      margin-top: 75px;
+    }
+  
+  
+    .share-visual {
+      width: 100%;
+  
+      height: 360px;
+  
+      order: 2;
+    }
+  
+  
+    .share-text {
+      order: 1;
+  
+      padding: 0;
+    }
+  
+  
+    .share-person {
+      width: 145px;
+  
+      left: 0;
+    }
+  
+  
+    .share-dots {
+      width: 220px;
+  
+      right: 5px;
+  
+      top: 65px;
+    }
+  
+  
+    .share-card {
+      width: 275px;
+  
+      left: 60px;
+  
+      bottom: 55px;
+    }
+  
+  
+    .profile {
+      width: 30px;
+  
+      height: 30px;
+    }
+  
+  
+    .profile-one {
+      top: 75px;
+  
+      left: 195px;
+    }
+  
+  
+    .profile-two {
+      top: 125px;
+  
+      left: 145px;
+    }
+  
+  
+    .profile-three {
+      top: 120px;
+  
+      left: 255px;
+    }
+  
+  }
+  
+  
+  /* =================================================
+     SMALL MOBILE
+  ================================================= */
+  
+  @media (max-width: 450px) {
+  
+    .scheduling-text h2 {
+      font-size: 26px;
+    }
+  
+  
+    .smart-visual,
+    .share-visual {
+      height: 320px;
+    }
+  
+  
+    .smart-person {
+      width: 145px;
+  
+      right: 0;
+    }
+  
+  
+    .smart-dots {
+      width: 190px;
+  
+      left: 0;
+    }
+  
+  
+    .meeting-card {
+      width: 210px;
+  
+      left: 0;
+    }
+  
+  
+    .meeting-row {
+      padding: 0 8px;
+  
+      gap: 6px;
+    }
+  
+  
+    .meeting-row span {
+      font-size: 9px;
+    }
+  
+  
+    .meeting-row strong {
+      font-size: 10px;
+    }
+  
+  
+    .automatically {
+      font-size: 9px;
+  
+      padding: 6px 8px;
+    }
+  
+  
+    .share-person {
+      width: 120px;
+    }
+  
+  
+    .share-dots {
+      width: 180px;
+    }
+  
+  
+    .share-card {
+      width: 235px;
+  
+      left: 35px;
+  
+      padding: 13px;
+    }
+  
+  
+    .share-card h4 {
+      font-size: 13px;
+    }
+  
+  
+    .share-card-bottom {
+      gap: 5px;
+    }
+  
+  
+    .share-card-bottom a {
+      font-size: 9px;
+    }
+  
+  
+    .copy-link {
+      font-size: 9px;
+    }
+  
+  
+    .share-btn {
+      padding: 7px 8px;
+  
+      font-size: 9px;
+    }
+  
+  
+    .profile-one {
+      left: 160px;
+    }
+  
+  
+    .profile-two {
+      left: 110px;
+    }
+  
+  
+    .profile-three {
+      left: 210px;
+    }
+  
+  }
