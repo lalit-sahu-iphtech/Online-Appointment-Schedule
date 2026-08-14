@@ -1,0 +1,290 @@
+.get-started{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    position: relative;
+    width: calc(100% - 16%);
+    max-width: 1080px;
+    min-height: 342px;
+    margin: 80px auto;
+    background-color: #8555d5;
+    border-radius: 22px;
+    overflow: hidden;
+
+}
+.get-started-content{
+    position: relative;
+    z-index: 5;
+    width: 70%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.get-started-content h2{
+    margin: 0 0 25px;
+    color: #fff;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1.1;
+}
+.get-started-content p{
+    width: 80%;
+    max-width: 550px;
+    margin: 0 0 25px;
+    color: #DEE1E6FF;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.55;
+}
+.cta-signup-btn{
+    border: none;
+    background-color: #fff;
+    color: #30333d;
+    padding: 13px 27px;
+    border-radius: 10px;
+    font-family: "Poppins", sans-serif;
+
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.cta-signup-btn:hover{
+    transform: translateY(-2px);
+
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+
+}
+
+.cta-profile{
+    position: absolute;
+    z-index: 4;
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.35);
+
+}
+.cta-profile-one {
+    left: 45px;
+    top: 62px;
+    background: #DACDF2FF;
+    
+  }
+  
+  
+  /* TOP RIGHT PROFILE */
+  
+  .cta-profile-two {
+    right: 105px;
+    top: 40px;
+    background: #DACDF2FF;
+  }
+  
+  
+  /* BOTTOM RIGHT PROFILE */
+  
+  .cta-profile-three {
+    right: 100px;
+    bottom: 45px;
+    background: #FFD9B4FF;
+    width: 50px;
+    height: 50px;
+  }
+  .cta-top-shape{
+    position: absolute;
+    top: 0;
+    right: 0;
+
+    width: 73px;
+    height: 78px;
+    background-color: rgba(255, 255, 255, 0.18);
+    border-radius: 0 0 0 22px;
+    z-index: 2;
+
+  }
+  .cta-bottom-shape {
+    position: absolute;
+  
+    left: 0;
+    bottom: 0;
+  
+    width: 203px;
+    height: 90px;
+  
+    background: rgba(255, 255, 255, 0.18);
+  
+    border-radius: 0 22px 0 0;
+  
+    z-index: 2;
+  }
+ 
+
+  @media (max-width: 900px) {
+
+    .get-started {
+      width: calc(100% - 10%);
+  
+      min-height: 330px;
+  
+      margin: 60px auto;
+    }
+  
+    .get-started-content {
+      width: 75%;
+    }
+  
+    .get-started-content h2 {
+      font-size: 38px;
+    }
+  
+    .get-started-content p {
+      width: 85%;
+      
+      font-size: 14px;
+    }
+  
+    .cta-profile-one {
+      left: 30px;
+      top: 55px;
+    }
+  
+    .cta-profile-two {
+      right: 70px;
+      top: 35px;
+    }
+  
+    .cta-profile-three {
+      right: 65px;
+      bottom: 35px;
+    }
+  }
+  
+  
+  /* =========================
+     MOBILE
+  ========================= */
+  
+  @media (max-width: 600px) {
+  
+    .get-started {
+      width: calc(100% - 30px);
+  
+      min-height: 400px;
+  
+      margin: 50px auto;
+  
+      border-radius: 18px;
+    }
+  
+    .get-started-content {
+      width: 90%;
+  
+      padding: 30px 10px;
+    }
+  
+    .get-started-content h2 {
+      font-size: 32px;
+  
+      margin-bottom: 18px;
+    }
+  
+    .get-started-content p {
+      width: 100%;
+  
+      font-size: 13px;
+  
+      line-height: 1.6;
+  
+      margin-bottom: 22px;
+    }
+  
+    .cta-signup-btn {
+      padding: 11px 25px;
+  
+      font-size: 14px;
+    }
+  
+  
+    /* Profiles */
+  
+    .cta-profile {
+      width: 48px;
+      height: 48px;
+  
+      border-width: 3px;
+    }
+  
+    .cta-profile-one {
+      left: 20px;
+      top: 30px;
+    }
+  
+    .cta-profile-two {
+      right: 25px;
+      top: 25px;
+    }
+  
+    .cta-profile-three {
+      right: 25px;
+      bottom: 25px;
+  
+      width: 42px;
+      height: 42px;
+    }
+  
+  
+    /* Shapes */
+  
+    .cta-top-shape {
+      width: 55px;
+      height: 55px;
+  
+      border-radius: 0 0 0 16px;
+    }
+  
+    .cta-bottom-shape {
+      width: 130px;
+      height: 65px;
+  
+      border-radius: 0 18px 0 0;
+    }
+  }
+  
+  
+  /* =========================
+     SMALL MOBILE
+  ========================= */
+  
+  @media (max-width: 400px) {
+  
+    .get-started {
+      min-height: 380px;
+    }
+  
+    .get-started-content h2 {
+      font-size: 28px;
+    }
+  
+    .get-started-content p {
+      font-size: 12px;
+    }
+  
+    .cta-profile-one {
+      left: 15px;
+      top: 25px;
+    }
+  
+    .cta-profile-two {
+      right: 18px;
+      top: 20px;
+    }
+  
+    .cta-profile-three {
+      right: 18px;
+      bottom: 20px;
+    }
+  }
