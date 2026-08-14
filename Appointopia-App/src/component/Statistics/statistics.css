@@ -1,0 +1,246 @@
+/* =========================
+   STATISTICS SECTION
+========================= */
+
+.statistics {
+    width: 100%;
+  
+    background: #ffffff;
+  
+    padding: 45px 0 65px;
+  
+    font-family: "Poppins", sans-serif;
+  
+    box-sizing: border-box;
+  }
+  
+  
+  /* =========================
+     CONTAINER
+  ========================= */
+  
+  .statistics-container {
+    width: 82%;
+  
+    max-width: 1470px;
+  
+    margin: 0 auto;
+  
+    display: grid;
+  
+    grid-template-columns: repeat(4, 1fr);
+  
+    gap: 30px;
+  }
+  
+  
+  /* =========================
+     CARD
+  ========================= */
+  
+  .stat-card {
+    min-height: 250px;
+  
+    border-radius: 12px;
+  
+    display: flex;
+  
+    flex-direction: column;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    text-align: center;
+  
+    box-sizing: border-box;
+  
+    transition: transform 0.2s ease;
+  }
+  
+  
+  .stat-card:hover {
+    transform: translateY(-4px);
+  }
+  
+  
+  /* =========================
+     ICON
+  ========================= */
+  
+  .stat-icon {
+    height: 55px;
+  
+    display: flex;
+  
+    align-items: center;
+  
+    justify-content: center;
+  
+    margin-bottom: 50px;
+  }
+  
+  
+  .stat-icon svg {
+    width: 52px;
+  
+    height: 52px;
+  
+    stroke-width: 1.5;
+  }
+  
+  
+  /* =========================
+     NUMBER
+  ========================= */
+  
+  .stat-card h2 {
+    margin: 0 0 8px;
+  
+    font-size: 32px;
+    color: #8659D3FF;
+  
+    line-height: 1;
+  
+    font-weight: 700;
+  }
+  
+  
+  /* =========================
+     TITLE
+  ========================= */
+  
+  .stat-card p {
+    margin: 0;
+  
+    color: #303440;
+  
+    font-size: 20px;
+  
+    font-weight: 400;
+  
+    line-height: 1.4;
+  }
+  
+  
+  /* =========================
+     CARD 1
+  ========================= */
+  
+  .users-card {
+    background: #f6f3fcff;
+  }
+  
+  .users-card .stat-icon,
+  .users-card h2 {
+    color: #8659D3FF;
+  }
+  
+  
+  /* =========================
+     CARD 2
+  ========================= */
+  
+  .meeting-card-st {
+    background: #fff7f0ff;
+  }
+  
+  .meeting-card-st .stat-icon,
+  .meeting-card-st h2 {
+    color: #ff7f00ff;
+  }
+  
+  
+  /* =========================
+     CARD 3
+  ========================= */
+  
+  .business-card {
+    background: #ebfdfdff;
+  }
+  
+  .business-card .stat-icon,
+  .business-card h2 {
+    color: #0ea5a8ff;
+  }
+  
+  
+  /* =========================
+     CARD 4
+  ========================= */
+  
+  .time-card {
+    background: #f2F7FDFF;
+  }
+  
+  .time-card .stat-icon,
+  .time-card h2 {
+    color: #237BD3FF;
+  }
+  
+  
+  /* =========================
+     TABLET
+  ========================= */
+  
+  @media (max-width: 1000px) {
+  
+    .statistics {
+      padding: 35px 0 50px;
+    }
+  
+    .statistics-container {
+      width: 90%;
+  
+      grid-template-columns: repeat(2, 1fr);
+  
+      gap: 20px;
+    }
+  
+    .stat-card {
+      min-height: 220px;
+    }
+  
+  }
+  
+  
+  /* =========================
+     MOBILE
+  ========================= */
+  
+  @media (max-width: 600px) {
+  
+    .statistics {
+      padding: 25px 0 40px;
+    }
+  
+    .statistics-container {
+      width: 90%;
+  
+      grid-template-columns: 1fr;
+  
+      gap: 16px;
+    }
+  
+    .stat-card {
+      min-height: 190px;
+    }
+  
+    .stat-icon {
+      margin-bottom: 15px;
+    }
+  
+    .stat-icon svg {
+      width: 45px;
+      height: 45px;
+    }
+  
+    .stat-card h2 {
+      font-size: 32px;
+    }
+  
+    .stat-card p {
+      font-size: 17px;
+    }
+  
+  }
