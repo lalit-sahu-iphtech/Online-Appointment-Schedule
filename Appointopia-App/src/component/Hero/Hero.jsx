@@ -8,7 +8,7 @@ import profile2 from "../../assets/hero/j1.jpg";
 import profile3 from "../../assets/hero/B1.jpg";
 import heroImg from "../../assets/hero/hero.png";
 import dotImg from "../../assets/images/dotImg.png";
-
+import { Link } from "react-router-dom";
 
 
 export default function Hero() {
@@ -50,10 +50,12 @@ export default function Hero() {
           reminders and can sync across multiple devices, ensuring you stay
           on top of your schedule
         </p>
-
+        <Link to="/calendar">
+        
         <button className="hero-btn">
           Get started
         </button>
+        </Link>
 
       </div>
 
