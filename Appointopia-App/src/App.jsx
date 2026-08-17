@@ -10,6 +10,8 @@ import Scheduling from "./component/Scheduling/Scheduling";
 import GetStarted from "./component/GetStarted/GetStarted";
 import FAQ from "./component/Faq/Faq";
 import WhatsNew from "./component/WhatsNew/WhatsNew";
+import Calendar from "./component/Calendar/Calendar";
+import CalendarPage from "./pages/CalendarPage/CalendarPage";
 
 function App() {
   return (
@@ -30,11 +32,15 @@ function App() {
             <FAQ/>
             <WhatsNew/>
 
+           
+
             <Footer/>
            
           </>
         }
       />
+
+      <Route path="/calendar"element={ <CalendarPage/>}/>
 
 
       {/* Sign Up */}
