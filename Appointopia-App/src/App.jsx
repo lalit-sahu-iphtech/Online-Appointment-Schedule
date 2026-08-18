@@ -12,6 +12,8 @@ import FAQ from "./component/Faq/Faq";
 import WhatsNew from "./component/WhatsNew/WhatsNew";
 import Calendar from "./component/Calendar/Calendar";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
+import AppointmentSchedulePage from "./pages/AppointmentSchedulePage/AppointmentSchedulePage";
+import WorkflowsPage from "./pages/WorkflowsPage/WorkflowsPage";
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
       />
 
       <Route path="/calendar"element={ <CalendarPage/>}/>
+      <Route path="/appointment-schedule"element={ <AppointmentSchedulePage/>}/>
+      <Route path="/workflows"element={ <WorkflowsPage/>}/>
 
 
       {/* Sign Up */}
