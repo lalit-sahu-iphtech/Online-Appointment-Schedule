@@ -1,0 +1,95 @@
+/* src/pages/WorkflowsPage/WorkflowsPage.css */
+
+/* =====================================================
+   WORKFLOWS PAGE — layout shell only
+===================================================== */
+
+.workflows-page {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background: #ffffff;
+    font-family: "Poppins", sans-serif;
+    overflow: hidden;
+  }
+  
+  /* Sidebar */
+  .workflows-page > .sidebar {
+    width: 208px;
+    height: 100vh;
+    flex-shrink: 0;
+  }
+  
+  /* Main */
+  .workflows-page .workflows-main {
+    flex: 1;
+    min-width: 0;
+    height: 100vh;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  
+  /* Content scroll area */
+  .workflows-page .workflows-content {
+    width: 100%;
+    height: 100%;
+    padding: 24px 32px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+  
+  /* Scrollbar */
+  .workflows-page .workflows-content::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .workflows-page .workflows-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .workflows-page .workflows-content::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+  }
+  
+  .workflows-page .workflows-content::-webkit-scrollbar-thumb:hover {
+    background: #b8bbc1;
+  }
+  
+  /* =====================================================
+     RESPONSIVE
+  ===================================================== */
+  
+  @media (max-width: 1000px) {
+    .workflows-page > .sidebar {
+      width: 200px;
+      flex-basis: 200px;
+    }
+  
+    .workflows-page .workflows-content {
+      padding: 20px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .workflows-page > .sidebar {
+      width: 75px;
+      flex-basis: 75px;
+    }
+  
+    .workflows-page .workflows-content {
+      padding: 16px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .workflows-page > .sidebar {
+      width: 60px;
+      flex-basis: 60px;
+    }
+  
+    .workflows-page .workflows-content {
+      padding: 12px;
+    }
+  }
