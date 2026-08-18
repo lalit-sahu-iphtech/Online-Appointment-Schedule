@@ -1,0 +1,510 @@
+/* src/component/Workflows/Workflows.css */
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.workflows-topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+  }
+  
+  .workflows-topbar h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 700;
+    color: #171a1f;
+  }
+  
+  .workflows-topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .workflows-create-btn {
+    height: 42px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    background-color: #8659d3;
+    color: white;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .workflows-create-btn span {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  
+  .workflows-create-btn:hover {
+    background-color: #7544c8;
+  }
+  
+  .workflows-topbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .workflows-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background-color: #f3f4f6;
+    color: #667085;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s ease;
+    position: relative;
+  }
+  
+  .workflows-icon-btn:hover {
+    background-color: #e7e8eb;
+  }
+  
+  .workflows-notification-dot {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 8px;
+    height: 8px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 2px solid #f3f4f6;
+  }
+  
+  .workflows-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    margin-left: 4px;
+  }
+  
+  .workflows-avatar-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: cover;
+    color: #8659d3;
+  }
+  
+  .workflows-avatar-chevron {
+    font-size: 11px;
+    color: #667085;
+  }
+  
+  /* =====================================================
+     TABS + FILTER ROW
+  ===================================================== */
+  
+  .workflows-tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 16px;
+    /* border-bottom: 1px solid #eef0f3; */
+  }
+  
+  .workflows-tabs {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+  
+  .workflows-tab {
+    background: none;
+    border: none;
+    padding: 0 0 12px 0;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: #8a8f98;
+    cursor: pointer;
+    position: relative;
+    transition: color 0.2s ease;
+  }
+  
+  .workflows-tab:hover {
+    color: #4b4f57;
+  }
+  
+  .workflows-tab.active {
+    color: #8659d3;
+    font-weight: 600;
+  }
+  
+  .workflows-tab.active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: #8659d3;
+    border-radius: 2px;
+  }
+  
+  .workflows-filter-wrap {
+    position: relative;
+  }
+  
+  .workflows-filter-btn {
+    height: 36px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #4b4f57;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .workflows-filter-btn:hover,
+  .workflows-filter-btn.open {
+    background: #f9fafb;
+    border-color: #d1d5db;
+  }
+  
+  .workflows-filter-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 15;
+  }
+  
+  .workflows-filter-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    width: 200px;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(23, 26, 31, 0.1);
+    padding: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    z-index: 20;
+    animation: workflows-filter-in 0.15s ease;
+  }
+  
+  @keyframes workflows-filter-in {
+    from {
+      opacity: 0;
+      transform: translateY(-4px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .workflows-filter-menu button {
+    text-align: left;
+    padding: 9px 10px;
+    border: none;
+    background: transparent;
+    border-radius: 6px;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    color: #4b4f57;
+    cursor: pointer;
+    transition: 0.15s ease;
+  }
+  
+  .workflows-filter-menu button:hover {
+    background: #f3f4f6;
+  }
+  
+  .workflows-filter-menu button.active {
+    background: #f3f0ff;
+    color: #8659d3;
+    font-weight: 600;
+  }
+  
+  /* =====================================================
+     SEARCH BAR
+  ===================================================== */
+  
+  .workflows-search-bar {
+    margin-bottom: 16px;
+  }
+  
+  .workflows-search-bar input {
+    width: 100%;
+    max-width: 350px;
+    height: 38px;
+    padding: 0 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    outline: none;
+    font-size: 13px;
+    background: #f9fafb;
+    font-family: "Poppins", sans-serif;
+    transition: 0.2s ease;
+  }
+  
+  .workflows-search-bar input:focus {
+    border-color: #8659d3;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(134, 89, 211, 0.1);
+  }
+  
+  .workflows-search-bar input::placeholder {
+    color: #a8adb7;
+  }
+  
+  /* =====================================================
+     WORKFLOWS CONTAINER
+  ===================================================== */
+  
+  .workflows-container {
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 14px;
+    padding: 26px 28px 30px;
+    min-height: calc(100vh - 220px);
+    box-sizing: border-box;
+  }
+  
+  /* =====================================================
+     SECTION HEADER (plain, with collapse chevron)
+  ===================================================== */
+  
+  .workflows-section {
+    margin-bottom: 30px;
+  }
+  
+  .workflows-section:last-child {
+    margin-bottom: 0;
+  }
+  
+  .workflows-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  
+  .workflows-section-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    color: #171a1f;
+  }
+  
+  .workflows-section-collapse {
+    width: 26px;
+    height: 26px;
+    border: none;
+    background: transparent;
+    color: #8a8f98;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: 0.2s ease;
+  }
+  
+  .workflows-section-collapse:hover {
+    background: #f3f4f6;
+    color: #4b4f57;
+  }
+  
+  .workflows-section-collapse.collapsed svg {
+    transform: rotate(180deg);
+  }
+  
+  .workflows-section-collapse svg {
+    transition: transform 0.2s ease;
+  }
+  
+  /* =====================================================
+     WORKFLOWS GRID
+  ===================================================== */
+  
+  .workflows-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  
+  /* =====================================================
+     SHOW MORE BUTTON
+  ===================================================== */
+  
+  .workflows-show-more {
+    /* text-align: center; */
+    margin-top: 20px;
+  }
+  
+  .workflows-show-more button {
+    padding: 9px 26px;
+    border: 1px solid #d9c9f5;
+    border-radius: 20px;
+    background: transparent;
+    color: #8659d3;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: 0.2s ease;
+  }
+  
+  .workflows-show-more button:hover {
+    background: #f3f0ff;
+  }
+  
+  /* =====================================================
+     EMPTY STATE
+  ===================================================== */
+  
+  .workflows-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: #667085;
+  }
+  
+  .workflows-empty p {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  /* =====================================================
+     RESPONSIVE
+  ===================================================== */
+  
+  @media (max-width: 1000px) {
+    .workflows-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .workflows-topbar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  
+    .workflows-topbar h1 {
+      font-size: 24px;
+    }
+  
+    .workflows-topbar-right {
+      width: 100%;
+      justify-content: flex-start;
+    }
+  
+    .workflows-create-btn {
+      height: 38px;
+      padding: 0 14px;
+      font-size: 13px;
+    }
+  
+    .workflows-icon-btn {
+      width: 34px;
+      height: 34px;
+      font-size: 13px;
+    }
+  
+    .workflows-avatar-icon {
+      width: 30px;
+      height: 30px;
+    }
+  
+    .workflows-topbar-icons .workflows-icon-btn:nth-child(3) {
+      display: none;
+    }
+  
+    .workflows-tabs-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+  
+    .workflows-container {
+      padding: 18px;
+    }
+  
+    .workflows-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  
+    .workflows-section-title {
+      font-size: 14px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .workflows-topbar h1 {
+      font-size: 20px;
+    }
+  
+    .workflows-topbar-right {
+      gap: 8px;
+    }
+  
+    .workflows-create-btn {
+      height: 34px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+  
+    .workflows-icon-btn {
+      width: 30px;
+      height: 30px;
+      font-size: 12px;
+    }
+  
+    .workflows-avatar-icon {
+      width: 28px;
+      height: 28px;
+    }
+  
+    .workflows-notification-dot {
+      width: 6px;
+      height: 6px;
+      top: 6px;
+      right: 6px;
+    }
+  
+    .workflows-topbar-icons .workflows-icon-btn:nth-child(2),
+    .workflows-topbar-icons .workflows-icon-btn:nth-child(3) {
+      display: none;
+    }
+  
+    .workflows-container {
+      padding: 14px;
+    }
+  
+    .workflows-show-more button {
+      font-size: 12px;
+      padding: 7px 18px;
+    }
+  }

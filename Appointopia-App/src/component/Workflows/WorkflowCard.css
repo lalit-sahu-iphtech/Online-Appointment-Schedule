@@ -1,0 +1,139 @@
+/* src/component/Workflows/WorkflowCard.css */
+
+.workflow-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+    display: flex;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid #f0f1f3;
+    transition: all 0.2s ease;
+  }
+  
+  .workflow-card:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+    transform: translateY(-2px);
+  }
+  
+  /* Left accent border — color depends on category */
+  .workflow-card-left-border {
+    width: 6px;
+    flex-shrink: 0;
+  }
+  
+  .card-before .workflow-card-left-border {
+    background-color: #00a896;
+  }
+  
+  .card-after .workflow-card-left-border {
+    background-color: #7b2cbf;
+  }
+  
+  /* Body */
+  .workflow-card-body {
+    flex: 1;
+    min-width: 0;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .workflow-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  
+  .workflow-card-title-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+  
+  .workflow-card-title {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1f242d;
+  }
+  
+  .workflow-card-description {
+    margin: 0;
+    font-size: 12px;
+    color: #6c757d;
+    line-height: 1.5;
+  }
+  
+  /* Icon */
+  .workflow-card-icon {
+    flex-shrink: 0;
+  }
+  
+  .workflow-card-icon img {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+  }
+  
+  /* Use workflow pill button */
+  .workflow-card-use-btn {
+    align-self: flex-start;
+    height: 32px;
+    padding: 0 16px;
+    border-radius: 16px;
+    border: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .card-before .workflow-card-use-btn {
+    background-color: #c0f2ee;
+    color: #007a6e;
+  }
+  
+  .card-before .workflow-card-use-btn:hover {
+    background-color: #adede8;
+  }
+  
+  .card-after .workflow-card-use-btn {
+    background-color: #f1e4ff;
+    color: #6a1b9a;
+  }
+  
+  .card-after .workflow-card-use-btn:hover {
+    background-color: #e6d3fe;
+  }
+  
+  /* =====================================================
+     RESPONSIVE
+  ===================================================== */
+  
+  @media (max-width: 500px) {
+    .workflow-card-body {
+      padding: 14px 16px;
+    }
+  
+    .workflow-card-title {
+      font-size: 14px;
+    }
+  
+    .workflow-card-description {
+      font-size: 11px;
+    }
+  
+    .workflow-card-icon img {
+      width: 32px;
+      height: 32px;
+    }
+  
+    .workflow-card-use-btn {
+      font-size: 11px;
+      height: 28px;
+    }
+  }

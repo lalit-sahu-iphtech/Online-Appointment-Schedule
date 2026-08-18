@@ -1,0 +1,1226 @@
+/* =========================================
+   OVERLAY
+========================================= */
+
+.create-appointment-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  background: rgba(33, 35, 42, 0.43);
+
+  z-index: 9999;
+
+  display: flex;
+
+  justify-content: flex-end;
+}
+
+
+/* =========================================
+   RIGHT DRAWER
+========================================= */
+
+.create-appointment-drawer {
+  width: 522px;
+
+  max-width: 100%;
+
+  height: 100vh;
+
+  background: #ffffff;
+
+  display: flex;
+
+  flex-direction: column;
+
+  box-shadow:
+    -5px 0 25px rgba(0, 0, 0, 0.08);
+
+  animation: drawerSlideIn 0.25s ease-out;
+}
+
+
+/* =========================================
+   DRAWER ANIMATION
+========================================= */
+
+@keyframes drawerSlideIn {
+
+  from {
+    transform: translateX(100%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.create-drawer-header {
+  height: 72px;
+
+  flex-shrink: 0;
+
+  padding: 0 28px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  border-bottom: 1px solid #e4e5e8;
+
+  box-sizing: border-box;
+}
+
+.create-drawer-header h2 {
+  margin: 0;
+
+  font-size: 22px;
+
+  line-height: 1;
+
+  font-weight: 750;
+
+  color: #202127;
+}
+
+
+/* =========================================
+   CLOSE BUTTON
+========================================= */
+
+.create-close-btn {
+  width: 34px;
+  height: 34px;
+
+  border: none;
+
+  border-radius: 50%;
+
+  background: #f3f4f6;
+
+  color: #69717e;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  font-size: 14px;
+
+  transition: 0.2s ease;
+}
+
+.create-close-btn:hover {
+  background: #e9e9ec;
+
+  color: #333842;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
+
+.create-drawer-body {
+  flex: 1;
+
+  overflow-y: auto;
+
+  padding: 23px 28px 30px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   GENERAL INFORMATION
+========================================= */
+
+.general-information {
+  width: 100%;
+}
+
+.general-title {
+  display: flex;
+
+  align-items: center;
+
+  gap: 11px;
+
+  margin-bottom: 26px;
+}
+
+.general-title svg {
+  color: #8755d5;
+
+  font-size: 18px;
+}
+
+.general-title h3 {
+  margin: 0;
+
+  color: #202127;
+
+  font-size: 18px;
+
+  font-weight: 750;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.form-field {
+  min-width: 0;
+
+  margin-bottom: 22px;
+}
+
+.form-field label {
+  display: block;
+
+  margin-bottom: 6px;
+
+  color: #424751;
+
+  font-size: 12px;
+
+  line-height: 1.2;
+
+  font-weight: 400;
+}
+
+
+/* =========================================
+   INPUT
+========================================= */
+
+.form-field input,
+.form-field textarea,
+.form-field select {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: none;
+
+  outline: none;
+
+  background: #f1f2f4;
+
+  color: #30343b;
+
+  border-radius: 11px;
+
+  font-size: 12px;
+
+  font-family: inherit;
+
+  transition: 0.2s ease;
+}
+
+.form-field input {
+  height: 32px;
+
+  padding: 0 11px;
+}
+
+.form-field textarea {
+  min-height: 118px;
+
+  padding: 9px 11px;
+
+  line-height: 1.45;
+
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
+  background: #ececf0;
+
+  box-shadow:
+    0 0 0 1px rgba(135, 85, 213, 0.25);
+}
+
+
+/* =========================================
+   TWO COLUMN ROW
+========================================= */
+
+.form-row {
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    minmax(0, 1fr);
+
+  column-gap: 20px;
+}
+
+
+/* =========================================
+   INPUT WITH ICON
+========================================= */
+
+.input-with-icon {
+  position: relative;
+
+  width: 100%;
+}
+
+.input-with-icon input {
+  padding-right: 35px;
+}
+
+.input-with-icon svg {
+  position: absolute;
+
+  right: 12px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #4f5764;
+
+  font-size: 12px;
+
+  pointer-events: none;
+}
+
+.input-with-icon .copy-link-icon {
+  cursor: pointer;
+
+  pointer-events: auto;
+}
+
+
+/* =========================================
+   SELECT WITH ICON (dropdowns)
+========================================= */
+
+.select-with-icon {
+  position: relative;
+
+  width: 100%;
+}
+
+.select-with-icon select {
+  height: 32px;
+
+  padding: 0 30px 0 11px;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  cursor: pointer;
+}
+
+.select-with-icon svg {
+  position: absolute;
+
+  right: 11px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #4f5764;
+
+  font-size: 10px;
+
+  pointer-events: none;
+}
+
+
+/* =========================================
+   EVENT COLOR
+========================================= */
+
+.event-color-field {
+  overflow: hidden;
+}
+
+.color-options {
+  height: 32px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 13px;
+}
+
+.color-option {
+  width: 22px;
+  height: 22px;
+
+  flex-shrink: 0;
+
+  border: 2px solid transparent;
+
+  border-radius: 50%;
+
+  cursor: pointer;
+
+  position: relative;
+
+  transition: 0.2s ease;
+}
+
+.color-option:hover {
+  transform: scale(1.08);
+}
+
+.color-option.selected {
+  border-color: white;
+
+  outline: 2px solid #69717c;
+
+  outline-offset: 1px;
+}
+
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.description-field {
+  margin-top: 2px;
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.create-drawer-footer {
+  height: 80px;
+
+  flex-shrink: 0;
+
+  border-top: 1px solid #e1e2e6;
+
+  background: #ffffff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding: 0 28px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================
+   NEXT / SAVE BUTTON
+========================================= */
+
+.next-button {
+  height: 39px;
+
+  min-width: 81px;
+
+  border: none;
+
+  border-radius: 10px;
+
+  background: #8755d5;
+
+  color: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 15px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+
+  margin-left: auto;
+}
+
+.next-button:hover {
+  background: #7647c5;
+
+  transform: translateY(-1px);
+}
+
+.next-button svg {
+  font-size: 12px;
+}
+
+
+/* =========================================
+   BACK BUTTON
+========================================= */
+
+.back-button {
+  height: 39px;
+
+  min-width: 81px;
+
+  border: 1px solid #e4e5e8;
+
+  border-radius: 10px;
+
+  background: #ffffff;
+
+  color: #6b46c1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  padding: 0 15px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.back-button:hover {
+  background: #f6f3fc;
+}
+
+.back-button svg {
+  font-size: 12px;
+}
+
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+.create-drawer-body::-webkit-scrollbar {
+  width: 5px;
+}
+
+.create-drawer-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.create-drawer-body::-webkit-scrollbar-thumb {
+  background: #d5d6da;
+
+  border-radius: 10px;
+}
+
+
+/* =========================================================
+   STEP 2 — SCHEDULE
+========================================================= */
+
+.schedule-step {
+  width: 100%;
+}
+
+
+/* APPOINTMENT SUMMARY CHIP */
+
+.appointment-summary-chip {
+  background: #e9f8f8;
+
+  border: 1px solid #16a6ad33;
+
+  border-radius: 11px;
+
+  padding: 10px 14px;
+
+  margin-bottom: 24px;
+}
+
+.summary-label {
+  display: block;
+
+  font-size: 11px;
+
+  color: #5f7373;
+
+  margin-bottom: 4px;
+}
+
+.summary-value {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.summary-value svg {
+  font-size: 15px;
+}
+
+.summary-value strong {
+  font-size: 14px;
+
+  color: #16a6ad;
+}
+
+
+/* SCHEDULE TITLE */
+
+.schedule-title {
+  margin-bottom: 20px;
+}
+
+
+/* SECTION LABEL (shared) */
+
+.section-label {
+  display: block;
+
+  color: #202127;
+
+  font-size: 13px;
+
+  font-weight: 650;
+
+  margin-bottom: 12px;
+}
+
+
+/* INVITEES CAN SELECT */
+
+.invitees-select-field {
+  margin-bottom: 22px;
+}
+
+.invitees-option-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  margin-bottom: 12px;
+}
+
+.radio-dot {
+  width: 18px;
+  height: 18px;
+
+  flex-shrink: 0;
+
+  border-radius: 50%;
+
+  border: 1.5px solid #c7c9cf;
+
+  background: #ffffff;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  position: relative;
+
+  transition: 0.2s ease;
+}
+
+.radio-dot.checked {
+  border-color: #16a6ad;
+}
+
+.radio-dot.checked::after {
+  content: "";
+
+  position: absolute;
+
+  inset: 3px;
+
+  border-radius: 50%;
+
+  background: #16a6ad;
+}
+
+.days-count-input {
+  width: 60px;
+
+  height: 32px;
+
+  border: none;
+
+  outline: none;
+
+  background: #f1f2f4;
+
+  border-radius: 9px;
+
+  text-align: center;
+
+  font-size: 12px;
+
+  font-family: inherit;
+
+  color: #30343b;
+}
+
+.days-count-input:disabled {
+  opacity: 0.45;
+}
+
+.unit-select {
+  width: 96px;
+}
+
+.unit-select select {
+  height: 32px;
+}
+
+.into-future-text {
+  font-size: 12px;
+
+  color: #4f5764;
+}
+
+
+/* DURATION + TIMEZONE ROW */
+
+.schedule-row {
+  margin-bottom: 26px;
+}
+
+
+/* ADD TO MONTH */
+
+.target-month-field {
+  margin-bottom: 26px;
+}
+
+
+/* GENERAL AVAILABILITY */
+
+.availability-field {
+  margin-bottom: 22px;
+}
+
+.availability-row {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 16px;
+
+  padding: 10px 0;
+
+  border-bottom: 1px solid #f0f0f2;
+}
+
+.availability-row:last-child {
+  border-bottom: none;
+}
+
+.day-label {
+  width: 34px;
+
+  flex-shrink: 0;
+
+  padding-top: 7px;
+
+  font-size: 12px;
+
+  font-weight: 650;
+
+  color: #202127;
+}
+
+.slots-column {
+  flex: 1;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+}
+
+.slot-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.time-input-wrap {
+  position: relative;
+
+  flex: 1;
+
+  min-width: 0;
+}
+
+.time-input-wrap input {
+  width: 100%;
+
+  height: 32px;
+
+  box-sizing: border-box;
+
+  border: none;
+
+  outline: none;
+
+  background: #f1f2f4;
+
+  color: #30343b;
+
+  border-radius: 9px;
+
+  font-size: 12px;
+
+  font-family: inherit;
+
+  padding: 0 28px 0 11px;
+}
+
+.time-input-wrap input:focus {
+  background: #ececf0;
+
+  box-shadow:
+    0 0 0 1px rgba(135, 85, 213, 0.25);
+}
+
+.time-input-wrap svg {
+  position: absolute;
+
+  right: 10px;
+
+  top: 50%;
+
+  transform: translateY(-50%);
+
+  color: #4f5764;
+
+  font-size: 11px;
+
+  pointer-events: none;
+}
+
+.slot-arrow {
+  flex-shrink: 0;
+
+  font-size: 10px;
+
+  color: #9a9fa8;
+}
+
+.remove-slot-btn,
+.add-slot-btn {
+  width: 26px;
+  height: 26px;
+
+  flex-shrink: 0;
+
+  border: none;
+
+  border-radius: 50%;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  font-size: 10px;
+
+  transition: 0.2s ease;
+}
+
+.remove-slot-btn {
+  background: #fdeeee;
+
+  color: #e5484d;
+}
+
+.remove-slot-btn:hover {
+  background: #fadcdc;
+}
+
+.add-slot-btn {
+  background: #8755d5;
+
+  color: #ffffff;
+}
+
+.add-slot-btn:hover {
+  background: #7647c5;
+}
+
+.unavailable-row {
+  flex: 1;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  padding-top: 5px;
+}
+
+.unavailable-text {
+  font-size: 12px;
+
+  color: #a3a7ae;
+}
+
+
+/* ADD WORKFLOW */
+
+.add-workflow-box {
+  width: 100%;
+
+  box-sizing: border-box;
+
+  border: 1.5px dashed #c9aef0;
+
+  border-radius: 12px;
+
+  background: #faf7fe;
+
+  padding: 16px 18px;
+
+  cursor: pointer;
+
+  text-align: center;
+
+  transition: 0.2s ease;
+}
+
+.add-workflow-box:hover {
+  background: #f4edfc;
+}
+
+.add-workflow-title {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  color: #8755d5;
+
+  font-size: 13px;
+
+  font-weight: 650;
+
+  margin-bottom: 4px;
+}
+
+.add-workflow-box p {
+  margin: 0;
+
+  font-size: 11.5px;
+
+  line-height: 1.5;
+
+  color: #7d8492;
+}
+
+
+/* =========================================================
+   STEP 3 — REVIEW INFORMATION
+========================================================= */
+
+.review-step {
+  width: 100%;
+}
+
+.review-section {
+  margin-bottom: 30px;
+}
+
+.review-section .general-title {
+  margin-bottom: 20px;
+}
+
+.review-grid {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  column-gap: 20px;
+
+  row-gap: 20px;
+
+  margin-bottom: 20px;
+}
+
+.review-field {
+  min-width: 0;
+}
+
+.review-field.full-field {
+  margin-top: 4px;
+}
+
+.review-field label {
+  display: flex;
+
+  align-items: center;
+
+  gap: 7px;
+
+  margin-bottom: 6px;
+
+  color: #7d8492;
+
+  font-size: 12px;
+}
+
+.review-field label svg {
+  font-size: 11px;
+
+  color: #8755d5;
+}
+
+.review-value {
+  font-size: 13.5px;
+
+  font-weight: 650;
+
+  color: #202127;
+}
+
+.review-link {
+  display: inline-block;
+
+  color: #2f80d7;
+
+  text-decoration: underline;
+
+  cursor: pointer;
+}
+
+.review-color-dot {
+  width: 20px;
+  height: 20px;
+
+  border-radius: 50%;
+}
+
+.review-description {
+  font-weight: 400;
+
+  line-height: 1.55;
+
+  color: #424751;
+}
+
+
+/* AVAILABILITY RECAP */
+
+.availability-review-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 8px;
+
+  margin-top: 4px;
+}
+
+.availability-review-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 16px;
+
+  padding: 9px 14px;
+
+  border-radius: 9px;
+}
+
+.availability-review-row.has-slot {
+  background: #f4effc;
+}
+
+.review-day-label {
+  width: 32px;
+
+  flex-shrink: 0;
+
+  font-size: 12px;
+
+  font-weight: 700;
+
+  color: #8755d5;
+}
+
+.availability-review-row:not(.has-slot) .review-day-label {
+  color: #202127;
+}
+
+.review-slots {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.review-slot-time {
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-size: 12.5px;
+
+  font-weight: 600;
+
+  color: #30343b;
+}
+
+.review-slot-arrow {
+  font-size: 9px;
+
+  color: #9a9fa8;
+}
+
+.review-unavailable {
+  font-size: 12.5px;
+
+  color: #a3a7ae;
+}
+
+
+/* =========================================
+   TABLET
+========================================= */
+
+@media (max-width: 700px) {
+
+  .create-appointment-drawer {
+    width: 480px;
+  }
+
+  .create-drawer-header {
+    padding: 0 22px;
+  }
+
+  .create-drawer-body {
+    padding: 22px;
+  }
+
+  .create-drawer-footer {
+    padding: 0 22px;
+  }
+
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 520px) {
+
+  .create-appointment-drawer {
+    width: 100%;
+  }
+
+  .create-drawer-header {
+    height: 65px;
+
+    padding: 0 18px;
+  }
+
+  .create-drawer-header h2 {
+    font-size: 19px;
+  }
+
+  .create-drawer-body {
+    padding: 20px 18px;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+
+    column-gap: 0;
+  }
+
+  .form-field {
+    margin-bottom: 18px;
+  }
+
+  .create-drawer-footer {
+    height: 70px;
+
+    padding: 0 18px;
+  }
+
+  .availability-row {
+    flex-direction: column;
+
+    gap: 8px;
+  }
+
+  .day-label {
+    padding-top: 0;
+  }
+
+  .slot-row {
+    flex-wrap: wrap;
+  }
+
+  .review-grid {
+    grid-template-columns: 1fr;
+
+    row-gap: 16px;
+  }
+
+  .availability-review-row {
+    flex-wrap: wrap;
+  }
+
+}
