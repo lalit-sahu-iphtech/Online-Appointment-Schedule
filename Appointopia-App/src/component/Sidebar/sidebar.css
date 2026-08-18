@@ -16,11 +16,26 @@
     box-sizing: border-box;
 
     background: #ffffff;
-    /* border-right: 1px solid #f0f0f0; */
+    border: none;
 
     font-family: "Poppins", sans-serif;
 
     overflow: hidden;
+}
+
+
+/* =========================
+   LINK RESET
+   (Link renders an <a> — without this it inherits the
+   browser default blue/underline look)
+========================= */
+
+.sidebar-link {
+    display: block;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
 }
 
 
@@ -32,16 +47,7 @@
     width: 100%;
     margin-bottom: 28px;
 }
-.logo-link {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  
-    text-decoration: none;
-    color: inherit;
-  
-    cursor: pointer;
-  }
+
 .logo-icon {
     display: flex;
     align-items: center;
@@ -50,9 +56,10 @@
 }
 
 .logo-icon img {
-    width: 28px;
+    width: 38px;
     height: 28px;
     object-fit: contain;
+    flex-shrink: 0;
 }
 
 .logo-icon span {
@@ -95,14 +102,16 @@
     transition: all 0.2s ease;
 }
 
-.sidebar-icon {
-    font-size: 20px;
-    flex-shrink: 0;
-}
-
 .sidebar-item:hover {
     background: #f4effd;
     color: #8555d5;
+}
+
+.sidebar-icon {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    flex-shrink: 0;
 }
 
 
@@ -124,10 +133,10 @@
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .sidebar-item-active .sidebar-icon {
-    font-size: 20px;
     color: #ffffff;
 }
 
@@ -246,6 +255,8 @@
         height: 42px;
     }
     .sidebar-icon {
+        width: 18px;
+        height: 18px;
         font-size: 18px;
     }
     .happy-hour-card {

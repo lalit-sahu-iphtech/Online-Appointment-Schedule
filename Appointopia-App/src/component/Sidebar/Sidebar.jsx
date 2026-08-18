@@ -1,47 +1,48 @@
+// src/component/Sidebar/Sidebar.jsx
+import { Link, useLocation } from "react-router-dom";
 import { FaCalendarAlt } from "react-icons/fa";
 import { MdEventNote } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
 
 import logo from "../../assets/images/logo.png";
 import happyPerson from "../../assets/images/calendar.png";
-import { Link } from "react-router-dom";
 
 import "./sidebar.css";
 
+const menuItems = [
+  { path: "/calendar", label: "Calendar", icon: FaCalendarAlt },
+  { path: "/appointment-schedule", label: "Appointment Schedule", icon: MdEventNote },
+  { path: "/workflows", label: "Workflows", icon: BiGitBranch },
+];
+
 export default function Sidebar() {
+  const location = useLocation();
+
   return (
     <aside className="sidebar">
-
       {/* Logo */}
       <div className="sidebar-logo">
-      <Link to="/" className="logo-link">
-        <div className="logo-icon">
-          <img src={logo} alt="Appointopia" />
-          <span>Appointopia</span>
-         
-        </div>
+        <Link to="/" className="sidebar-link">
+          <div className="logo-icon">
+            <img src={logo} alt="Appointopia" />
+            <span>Appointopia</span>
+          </div>
         </Link>
-       
       </div>
 
       {/* Menu */}
       <nav className="sidebar-menu">
-
-        <div className="sidebar-item sidebar-item-active">
-          <FaCalendarAlt className="sidebar-icon" />
-          <span>Calendar</span>
-        </div>
-
-        <div className="sidebar-item">
-          <MdEventNote className="sidebar-icon" />
-          <span>Appointment Schedule</span>
-        </div>
-
-        <div className="sidebar-item">
-          <BiGitBranch className="sidebar-icon" />
-          <span>Workflows</span>
-        </div>
-
+        {menuItems.map(({ path, label, icon: Icon }) => {
+          const isActive = location.pathname.startsWith(path);
+          return (
+            <Link to={path} key={path} className="sidebar-link">
+              <div className={isActive ? "sidebar-item-active" : "sidebar-item"}>
+                <Icon className="sidebar-icon" />
+                <span>{label}</span>
+              </div>
+            </Link>
+          );
+        })}
       </nav>
 
       {/* Happy Hour Card */}
@@ -56,7 +57,6 @@ export default function Sidebar() {
           <img src={happyPerson} alt="Happy hour" />
         </div>
       </div>
-
     </aside>
   );
 }
