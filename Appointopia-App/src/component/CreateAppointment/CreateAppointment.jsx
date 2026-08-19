@@ -70,6 +70,8 @@ export default function CreateAppointment({ onClose, onSave }) {
 
   };
 
+
+
   /* =========================================
      STEP 2 — SCHEDULE
   ========================================= */
@@ -188,26 +190,93 @@ export default function CreateAppointment({ onClose, onSave }) {
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
+   // src/component/CreateAppointment/CreateAppointment.jsx
 
-  const handleShare = () => {
+const handleShare = () => {
+  // ✅ Get current time for start time
+  const now = new Date();
+  const startHour = now.getHours() + 1;
+  const startMin = now.getMinutes();
+  const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+  
+  // ✅ Parse duration
+  const durationMatch = scheduleData.duration?.match(/(\d+)/);
+  const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+  
+  // ✅ Calculate end time
+  const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
+  const endHour = Math.floor(endTotalMinutes / 60);
+  const endMin = endTotalMinutes % 60;
+  const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
 
-    // Build the card object in the exact shape AppointmentCard expects
-    const newAppointment = {
+  // Build the appointment object
+  const newAppointment = {
       id: Date.now(),
       title: formData.eventName,
+      location: formData.location,
+      onlineLink: formData.onlineLink,
       duration: scheduleData.duration,
       bookings: "0 bookings",
-      bookingPage: `${
-        formData.onlineLink.replace(/^https?:\/\//, "")
-      }/${slugify(formData.eventName)}`,
+      bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
       color: selectedColor,
-    };
-
-    onSave?.(newAppointment, scheduleData.targetMonth);
-
-    onClose();
-
+      startTime: startTime,
+      endTime: endTime,
+      date: new Date().toISOString().split('T')[0]
   };
+
+  // Call onSave with the new appointment and target month
+  if (onSave) {
+      onSave(newAppointment, scheduleData.targetMonth);
+  }
+
+  // Close the modal
+  onClose();
+};
+// const handleShare = () => {
+//   // ✅ Get current date
+//   const today = new Date();
+//   const dateStr = today.toISOString().split('T')[0];
+  
+//   // ✅ Get current time for start time
+//   const now = new Date();
+//   const startHour = now.getHours() + 1;
+//   const startMin = now.getMinutes();
+//   const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+  
+//   // ✅ Parse duration
+//   const durationMatch = scheduleData.duration?.match(/(\d+)/);
+//   const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+  
+//   // ✅ Calculate end time
+//   const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
+//   const endHour = Math.floor(endTotalMinutes / 60);
+//   const endMin = endTotalMinutes % 60;
+//   const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+
+//   // Build the appointment object
+//   const newAppointment = {
+//       id: Date.now(),
+//       title: formData.eventName,
+//       location: formData.location,
+//       onlineLink: formData.onlineLink,
+//       duration: scheduleData.duration,
+//       bookings: "0 bookings",
+//       bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
+//       color: selectedColor,
+//       startTime: startTime,
+//       endTime: endTime,
+//       date: dateStr, // ✅ ADD DATE
+//   };
+
+//   // Call onSave with the new appointment and target month
+//   if (onSave) {
+//       onSave(newAppointment, scheduleData.targetMonth);
+//   }
+
+//   // Close the modal
+//   onClose();
+// };
+    
 
   const selectedColorHex = colors.find(
     (c) => c.id === selectedColor

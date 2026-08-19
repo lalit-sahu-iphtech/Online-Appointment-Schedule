@@ -1,155 +1,132 @@
 // src/context/AppointmentContext.jsx
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AppointmentContext = createContext();
 
-// Default months
-const DEFAULT_MONTHS = ['JAN', 'FEB', 'MARCH', 'APRIL', 'MAY', 'JUNE', 
-                        'JULY', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-
-// Get initial data from localStorage or create default
-const getInitialData = () => {
-  const saved = localStorage.getItem('appointments');
-  if (saved) {
-    try {
-      return JSON.parse(saved);
-    } catch {
-      return createDefaultAppointments();
-    }
-  }
-  return createDefaultAppointments();
-};
-
-const createDefaultAppointments = () => {
-  const currentMonthIndex = new Date().getMonth();
-  
-  return DEFAULT_MONTHS.map((month, index) => {
-    // Add some default appointments for current month only
-    if (index === currentMonthIndex) {
-      return {
-        month,
-        events: "2 Events",
-        expanded: true,
-        appointments: [
-          {
-            id: Date.now() + 1,
-            title: "One-on-one",
-            duration: "60 mins",
-            bookings: "4 bookings",
-            color: "teal",
-            bookingPage: "link.com/one-on-one"
-          },
-          {
-            id: Date.now() + 2,
-            title: "Monthly Review",
-            duration: "60 mins",
-            bookings: "2 bookings",
-            color: "orange",
-            bookingPage: "link.com/monthly-review"
-          }
-        ]
-      };
-    }
-    return {
-      month,
-      events: "0 Events",
-      expanded: false,
-      appointments: []
-    };
-  });
-};
-
 export function AppointmentProvider({ children }) {
-  const [appointments, setAppointments] = useState(getInitialData);
-  const [loading, setLoading] = useState(false);
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Save to localStorage whenever appointments change
+  // ✅ Load from localStorage on mount
   useEffect(() => {
-    localStorage.setItem('appointments', JSON.stringify(appointments));
-  }, [appointments]);
+    const saved = localStorage.getItem('appointments');
+    console.log("📂 Loading appointments from localStorage:", saved);
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        console.log("✅ Loaded appointments:", parsed);
+        setAppointments(parsed);
+      } catch (e) {
+        console.error('Error loading appointments:', e);
+        setAppointments([]);
+      }
+    } else {
+      // ✅ Default appointments if nothing in localStorage
+      const defaultAppointments = [
+        {
+          month: "AUG",
+          events: "1 Event",
+          appointments: [
+            {
+              id: Date.now(),
+              title: "Sample Meeting",
+              location: "Room 01",
+              onlineLink: "meet.com",
+              duration: "60 mins",
+              bookings: "0 bookings",
+              bookingPage: "meet.com/sample",
+              color: "teal",
+              startTime: "10:00",
+              endTime: "11:00",
+              date: new Date().toISOString().split('T')[0]
+            }
+          ]
+        }
+      ];
+      localStorage.setItem('appointments', JSON.stringify(defaultAppointments));
+      setAppointments(defaultAppointments);
+    }
+    setLoading(false);
+  }, []);
 
-  // Add new appointment
+  // ✅ Save to localStorage whenever appointments change
+  useEffect(() => {
+    if (!loading) {
+      console.log("💾 Saving appointments to localStorage:", appointments);
+      localStorage.setItem('appointments', JSON.stringify(appointments));
+    }
+  }, [appointments, loading]);
+
   const addAppointment = (newAppointment, targetMonth) => {
+    const monthUpper = targetMonth.toUpperCase();
+    console.log("📝 Adding appointment:", newAppointment, "to month:", monthUpper);
+    
     setAppointments(prev => {
-      const monthIndex = prev.findIndex(m => m.month === targetMonth);
+      const existingMonth = prev.find(m => m.month === monthUpper);
       
-      if (monthIndex !== -1) {
-        const updated = [...prev];
-        const currentAppointments = updated[monthIndex].appointments;
-        updated[monthIndex] = {
-          ...updated[monthIndex],
-          appointments: [...currentAppointments, newAppointment],
-          events: `${currentAppointments.length + 1} Event${currentAppointments.length + 1 !== 1 ? 's' : ''}`,
-          expanded: true
-        };
-        return updated;
+      let newAppointments;
+      if (existingMonth) {
+        // Add to existing month
+        newAppointments = prev.map(m => 
+          m.month === monthUpper 
+            ? { 
+                ...m, 
+                appointments: [...m.appointments, newAppointment],
+                events: `${m.appointments.length + 1} Event${m.appointments.length + 1 !== 1 ? 's' : ''}`
+              }
+            : m
+        );
+      } else {
+        // Create new month
+        newAppointments = [
+          ...prev,
+          {
+            month: monthUpper,
+            events: "1 Event",
+            appointments: [newAppointment]
+          }
+        ];
       }
       
-      // If month doesn't exist, create it
-      return [...prev, {
-        month: targetMonth,
-        events: "1 Event",
-        expanded: true,
-        appointments: [newAppointment]
-      }];
+      console.log("✅ New appointments:", newAppointments);
+      return newAppointments;
     });
   };
 
-  // Delete appointment
   const deleteAppointment = (id) => {
-    setAppointments(prev =>
-      prev.map(month => ({
-        ...month,
-        appointments: month.appointments.filter(apt => apt.id !== id),
-        events: `${month.appointments.filter(apt => apt.id !== id).length} Event${month.appointments.filter(apt => apt.id !== id).length !== 1 ? 's' : ''}`
-      }))
-    );
+    console.log("🗑️ Deleting appointment:", id);
+    setAppointments(prev => {
+      const newAppointments = prev
+        .map(month => ({
+          ...month,
+          appointments: month.appointments.filter(apt => apt.id !== id),
+          events: `${month.appointments.filter(apt => apt.id !== id).length} Event${month.appointments.filter(apt => apt.id !== id).length !== 1 ? 's' : ''}`
+        }))
+        .filter(month => month.appointments.length > 0);
+      
+      console.log("✅ After delete:", newAppointments);
+      return newAppointments;
+    });
   };
 
-  // Update appointment
-  const updateAppointment = (id, updatedData) => {
-    setAppointments(prev =>
-      prev.map(month => ({
-        ...month,
-        appointments: month.appointments.map(apt =>
-          apt.id === id ? { ...apt, ...updatedData } : apt
-        )
-      }))
-    );
-  };
-
-  // Get appointments for a specific month
-  const getAppointmentsByMonth = (month) => {
-    const found = appointments.find(m => m.month === month);
-    return found ? found.appointments : [];
-  };
-
-  // Get total appointments count
-  const getTotalAppointments = () => {
-    return appointments.reduce((total, month) => total + month.appointments.length, 0);
+  const value = {
+    appointments,
+    loading,
+    addAppointment,
+    deleteAppointment
   };
 
   return (
-    <AppointmentContext.Provider value={{
-      appointments,
-      setAppointments,
-      addAppointment,
-      deleteAppointment,
-      updateAppointment,
-      getAppointmentsByMonth,
-      getTotalAppointments,
-      loading
-    }}>
+    <AppointmentContext.Provider value={value}>
       {children}
     </AppointmentContext.Provider>
   );
 }
 
-// Custom hook for using appointments
 export const useAppointments = () => {
   const context = useContext(AppointmentContext);
   if (!context) {
-    throw new Error('useAppointments must be used within an AppointmentProvider');
+    throw new Error('useAppointments must be used within AppointmentProvider');
   }
   return context;
 };
