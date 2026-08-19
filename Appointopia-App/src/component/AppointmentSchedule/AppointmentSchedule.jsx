@@ -1,4 +1,5 @@
-import { useState } from "react";
+// src/component/AppointmentSchedule/AppointmentSchedule.jsx
+import { useState, useEffect } from "react";
 import {
   FaPlus,
   FaSearch,
@@ -20,7 +21,7 @@ const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE",
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export default function AppointmentSchedule() {
-  const { appointments, addAppointment, deleteAppointment } = useAppointments();
+  const { appointments, addAppointment, deleteAppointment, loading } = useAppointments();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
   const [showFilter, setShowFilter] = useState(false);
@@ -29,6 +30,28 @@ export default function AppointmentSchedule() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState("all");
   const [filterDuration, setFilterDuration] = useState("all");
+  
+  // ✅ State for topbar dropdowns
+  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile'
+
+  // ✅ Toggle panels
+  const togglePanel = (panel) => {
+    setActivePanel((prev) => (prev === panel ? null : panel));
+  };
+
+  // ✅ Close panel on outside click
+  useEffect(() => {
+    if (!activePanel) return;
+    const handleClickOutside = (e) => {
+      if (!e.target.closest(".appointment-icon-wrap")) {
+        setActivePanel(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [activePanel]);
+
+  // ✅ Initialize expanded months from appointments
   const [expandedMonths, setExpandedMonths] = useState(() => {
     const state = {};
     appointments.forEach(month => {
@@ -36,6 +59,15 @@ export default function AppointmentSchedule() {
     });
     return state;
   });
+
+  // ✅ Update expanded months when appointments change
+  useEffect(() => {
+    const state = {};
+    appointments.forEach(month => {
+      state[month.month] = month.appointments.length > 0;
+    });
+    setExpandedMonths(state);
+  }, [appointments]);
 
   const toggleMonth = (monthName) => {
     setExpandedMonths(prev => ({
@@ -48,14 +80,13 @@ export default function AppointmentSchedule() {
   const nextYear = () => setCurrentYear(y => y + 1);
   const goToThisMonth = () => setCurrentYear(new Date().getFullYear());
 
-  // Ensure all months exist in appointments
+  // ✅ Ensure all months exist in appointments
   const allMonths = MONTHS.map(month => {
     const existing = appointments.find(a => a.month === month);
     if (existing) return existing;
     return {
       month,
       events: "0 Events",
-      expanded: false,
       appointments: []
     };
   });
@@ -92,18 +123,83 @@ export default function AppointmentSchedule() {
     month.appointments.length > 0 || month.month === MONTHS[new Date().getMonth()]
   );
 
+  // ✅ Get upcoming notifications (same as Calendar)
+  const getUpcomingNotifications = () => {
+    const now = new Date();
+    const notifications = [];
+    
+    appointments.forEach(monthData => {
+      monthData.appointments.forEach(apt => {
+        if (apt.startTime) {
+          const [hours, minutes] = apt.startTime.split(":").map(Number);
+          const eventDate = new Date();
+          eventDate.setHours(hours, minutes, 0, 0);
+          
+          const diffMinutes = (eventDate - now) / 60000;
+          if (diffMinutes >= -10 && diffMinutes <= 60) {
+            notifications.push({
+              item: apt,
+              diffMinutes
+            });
+          }
+        }
+      });
+    });
+    
+    return notifications.sort((a, b) => a.diffMinutes - b.diffMinutes);
+  };
+
+  const upcomingNotifications = getUpcomingNotifications();
+
+  const getNotificationLabel = (diffMinutes) => {
+    if (diffMinutes > 1) return `Starts in ${Math.round(diffMinutes)} min`;
+    if (diffMinutes >= -1) return "Starting now";
+    return `Started ${Math.round(-diffMinutes)} min ago`;
+  };
+
+  // ✅ Comments count
+  const getCommentsCount = () => {
+    let count = 0;
+    appointments.forEach(monthData => {
+      monthData.appointments.forEach(apt => {
+        if (apt.comments) count += apt.comments.length;
+      });
+    });
+    return count;
+  };
+
+  // ✅ Search results
+  const getSearchResults = () => {
+    if (!search.trim()) return [];
+    const results = [];
+    appointments.forEach(monthData => {
+      monthData.appointments.forEach(apt => {
+        if (apt.title.toLowerCase().includes(search.trim().toLowerCase())) {
+          results.push(apt);
+        }
+      });
+    });
+    return results;
+  };
+
+  const searchResults = getSearchResults();
+
+  // ✅ Show loading state
+  if (loading) {
+    return <div className="appointment-layout">Loading...</div>;
+  }
+
   return (
     <div className="appointment-layout">
       <section className="appointment-main">
         
         {/* ============================================
-            HEADER - Calendar style (Same as Calendar.jsx)
+            TOPBAR - Calendar Style
             ============================================ */}
         <div className="appointment-topbar">
           <h1>Appointment Schedule</h1>
           
           <div className="appointment-topbar-right">
-            {/* Create Button - Same as Calendar */}
             <button 
               className="appointment-create-btn" 
               onClick={() => setShowCreate(true)}
@@ -111,41 +207,158 @@ export default function AppointmentSchedule() {
               <span>+</span> Create
             </button>
 
-            {/* Icons - Same as Calendar */}
             <div className="appointment-topbar-icons">
-              <button 
-                className="appointment-icon-btn" 
-                onClick={() => setSearchOpen(!searchOpen)}
-              >
-                <FaSearch />
-              </button>
-              <button className="appointment-icon-btn">
-                <FaRegBell />
-                <span className="appointment-notification-dot"></span>
-              </button>
-              <button className="appointment-icon-btn">
-                <FaRegCommentDots />
-              </button>
-              <div className="appointment-avatar-wrap">
+              
+              {/* 🔍 SEARCH */}
+              <div className="appointment-icon-wrap">
+                <button
+                  className="appointment-icon-btn"
+                  onClick={() => togglePanel("search")}
+                  aria-label="Search appointments"
+                >
+                  <FaSearch />
+                </button>
+
+                {activePanel === "search" && (
+                  <div className="appointment-icon-dropdown">
+                    <h4>Search appointments</h4>
+                    <div className="appointment-search-input-wrap">
+                      <input
+                        type="text"
+                        autoFocus
+                        placeholder="Search by appointment name"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    </div>
+
+                    {search.trim() === "" && (
+                      <div className="appointment-dropdown-empty">Type to search your appointments</div>
+                    )}
+
+                    {search.trim() !== "" && searchResults.length === 0 && (
+                      <div className="appointment-dropdown-empty">No appointments found</div>
+                    )}
+
+                    {searchResults.length > 0 && (
+                      <div className="appointment-search-result-list">
+                        {searchResults.map((item) => (
+                          <div
+                            key={item.id}
+                            className="appointment-search-result-item"
+                            onClick={() => {
+                              setActivePanel(null);
+                              setSearch("");
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            <span className="appointment-search-result-date">
+                              {item.date || "Today"}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 🔔 NOTIFICATIONS */}
+              <div className="appointment-icon-wrap">
+                <button
+                  className="appointment-icon-btn"
+                  onClick={() => togglePanel("notifications")}
+                  aria-label="Notifications"
+                >
+                  <FaRegBell />
+                  {upcomingNotifications.length > 0 && (
+                    <span className="appointment-icon-badge"></span>
+                  )}
+                </button>
+
+                {activePanel === "notifications" && (
+                  <div className="appointment-icon-dropdown">
+                    <h4>Upcoming meetings</h4>
+                    {upcomingNotifications.length === 0 ? (
+                      <div className="appointment-dropdown-empty">No meeting starting soon</div>
+                    ) : (
+                      <div className="appointment-search-result-list">
+                        {upcomingNotifications.map(({ item, diffMinutes }) => (
+                          <div
+                            key={item.id}
+                            className="appointment-search-result-item"
+                            onClick={() => {
+                              setActivePanel(null);
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            <span className="appointment-search-result-date">
+                              {getNotificationLabel(diffMinutes)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* 💬 COMMENTS */}
+              <div className="appointment-icon-wrap">
+                <button
+                  className="appointment-icon-btn"
+                  onClick={() => togglePanel("comments")}
+                  aria-label="Comments"
+                >
+                  <FaRegCommentDots />
+                  {getCommentsCount() > 0 && (
+                    <span className="appointment-icon-badge"></span>
+                  )}
+                </button>
+
+                {activePanel === "comments" && (
+                  <div className="appointment-icon-dropdown">
+                    <h4>Comments</h4>
+                    <div className="appointment-dropdown-empty">
+                      {getCommentsCount() === 0 ? "No comments yet" : "Comments coming soon"}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* 👤 PROFILE */}
+              <div className="appointment-icon-wrap appointment-avatar-wrap" onClick={() => togglePanel("profile")}>
                 <FaUserCircle className="appointment-avatar-icon" />
                 <FaChevronDown className="appointment-avatar-chevron" />
+
+                {activePanel === "profile" && (
+                  <div className="appointment-icon-dropdown appointment-profile-dropdown">
+                    <div className="appointment-profile-dropdown-header">
+                      <FaUserCircle className="appointment-profile-avatar" />
+                      <div>
+                        <h4>My Account</h4>
+                        <span>Manage your profile</span>
+                      </div>
+                    </div>
+
+                    <div className="appointment-profile-menu">
+                      <button type="button" className="appointment-profile-menu-item">
+                        <FaUserCircle /> Profile
+                      </button>
+                      <button type="button" className="appointment-profile-menu-item">
+                        <FaSearch /> Settings
+                      </button>
+                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout">
+                        <FaUserCircle /> Logout
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
+
             </div>
           </div>
         </div>
-
-        {/* Search Input - Shows when search icon clicked */}
-        {searchOpen && (
-          <div className="appointment-search-bar">
-            <input
-              type="text"
-              placeholder="Search appointments..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              autoFocus
-            />
-          </div>
-        )}
 
         {/* ============================================
             SCHEDULE CONTAINER
@@ -209,7 +422,7 @@ export default function AppointmentSchedule() {
                   setFilterDuration("all");
                   setShowFilter(false);
                 }}
-                style={{ background: "#e5e7eb", color: "#374151" }}
+                className="clear-filter"
               >
                 Clear
               </button>

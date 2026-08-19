@@ -44,6 +44,7 @@ import {
         <div className="appointment-card-content">
           <div className="appointment-title-row">
             <h3>{appointment.title}</h3>
+
             <div style={{ display: "flex", gap: "8px" }}>
               <button 
                 className="card-setting" 
@@ -57,6 +58,11 @@ import {
               </button>
             </div>
           </div>
+          {appointment.location && (
+                    <div style={{ fontSize: '12px', color: '#4e5662', marginTop: '6px' }}>
+                        📍 {appointment.location}
+                    </div>
+                )}
   
           <div className="appointment-info">
             <span>
