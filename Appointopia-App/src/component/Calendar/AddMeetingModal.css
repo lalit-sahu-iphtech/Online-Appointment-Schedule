@@ -99,6 +99,9 @@
 
 .meeting-form-body {
     padding: 16px;
+    max-height: 75vh;
+    overflow-y: auto;
+    box-sizing: border-box;
 }
 
 
@@ -405,6 +408,87 @@
     background: #7544c8;
 }
 /* =====================================================
+   COMMENTS / NOTES SECTION
+===================================================== */
+
+.comments-section {
+    margin-top: 16px;
+}
+
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 140px;
+    overflow-y: auto;
+    margin: 8px 0 10px;
+}
+
+.comment-item {
+    background: #f8f6ff;
+    border-radius: 8px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.comment-text {
+    font-size: 11px;
+    color: #374151;
+    word-break: break-word;
+}
+
+.comment-time {
+    font-size: 9px;
+    color: #9aa1ad;
+}
+
+.comment-empty {
+    font-size: 11px;
+    color: #9aa1ad;
+    text-align: center;
+    padding: 10px 0;
+}
+
+.comment-input-row {
+    display: flex;
+    gap: 8px;
+}
+
+.comment-input-row input {
+    flex: 1;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    outline: none;
+    font-family: "Poppins", sans-serif;
+    font-size: 11px;
+    color: #374151;
+}
+
+.comment-input-row input:focus {
+    box-shadow: 0 0 0 1px #8555d5;
+}
+
+.comment-input-row button {
+    height: 34px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #8555d5;
+    color: #ffffff;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.comment-input-row button:hover {
+    background: #7544c8;
+}
+
+/* =====================================================
    ERROR STYLES
 ===================================================== */
 
@@ -458,6 +542,42 @@
 
 .meeting-modal {
     animation: modalFadeIn 0.25s ease;
+}
+/* =====================================================
+   SHARE LINK SECTION - ADDITIONAL STYLES
+===================================================== */
+
+.share-link-section input::selection {
+    background: #d4c4f0;
+}
+
+/* Copy success animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-4px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive for share section */
+@media (max-width: 600px) {
+    .share-link-section > div {
+        flex-wrap: wrap;
+    }
+    
+    .share-link-section input {
+        width: 100%;
+        font-size: 11px !important;
+    }
+    
+    .share-link-section button {
+        padding: 6px 12px !important;
+        font-size: 11px !important;
+    }
 }
 
 /* =====================================================

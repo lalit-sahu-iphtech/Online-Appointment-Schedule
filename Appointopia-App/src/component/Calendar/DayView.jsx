@@ -21,17 +21,26 @@ export default function DayView({
     timeSlots.push(`${hour}:00 ${ampm}`);
   }
 
+  // Calculate total height for grid
+  const totalHeight = timeSlots.length * 58;
+
   return (
     <div className="calendar-body">
-      <div className="time-column">
+      <div className="time-column" style={{ height: `${totalHeight}px` }}>
         {timeSlots.map((time, index) => (
           <div key={index}>{time}</div>
         ))}
       </div>
 
-      <div className="calendar-grid">
+      <div className="calendar-grid" style={{ height: `${totalHeight}px` }}>
         {timeSlots.map((_, index) => (
-          <div key={index} className="grid-line"></div>
+          <div 
+            key={index} 
+            className="grid-line"
+            style={{
+              borderBottom: index === timeSlots.length - 1 ? 'none' : '1px solid #e5e7eb'
+            }}
+          ></div>
         ))}
 
         {dayEvents.map((item) => {

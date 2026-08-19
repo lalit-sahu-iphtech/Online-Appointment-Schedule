@@ -1,0 +1,157 @@
+// src/component/Calendar/Reminder.jsx
+import { useState, useEffect } from "react";
+import { FaBell, FaVideo, FaTimes, FaClock } from "react-icons/fa";
+import "./Reminder.css";
+
+export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  // Har 30 second mein time update karo
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // Check upcoming events (next 60 minutes)
+  useEffect(() => {
+    const now = new Date();
+    const upcoming = events
+      .map((event) => {
+        if (!event.date || !event.startTime) return null;
+        
+        // Event ka start time calculate karo
+        const [year, month, day] = event.date.split("-").map(Number);
+        const [hours, minutes] = event.startTime.split(":").map(Number);
+        const eventStart = new Date(year, month - 1, day, hours, minutes, 0);
+        
+        // Difference in minutes
+        const diffMinutes = (eventStart - now) / 60000;
+        
+        return {
+          ...event,
+          eventStart,
+          diffMinutes,
+          // 5 minutes pehle se lekar 10 minutes baad tak show karo
+          isActive: diffMinutes >= -10 && diffMinutes <= 5,
+          isSoon: diffMinutes > 0 && diffMinutes <= 60,
+        };
+      })
+      .filter((event) => event && (event.isActive || event.isSoon))
+      .sort((a, b) => a.diffMinutes - b.diffMinutes);
+
+    setUpcomingEvents(upcoming);
+  }, [events, currentTime]);
+
+  // Reminder dismiss karo
+  const handleDismiss = (eventId) => {
+    setUpcomingEvents((prev) => prev.filter((e) => e.id !== eventId));
+    if (onDismiss) {
+      onDismiss(eventId);
+    }
+  };
+
+  // Meeting join karo
+  const handleJoin = (event) => {
+    if (onJoinMeeting) {
+      onJoinMeeting(event);
+    }
+    // Agar online link hai toh open karo
+    if (event.onlineLink) {
+      window.open(event.onlineLink, "_blank");
+    }
+  };
+
+  // Time difference ko readable format mein convert karo
+  const getTimeLabel = (diffMinutes) => {
+    if (diffMinutes <= 0) {
+      const mins = Math.round(Math.abs(diffMinutes));
+      return mins === 0 ? "Now" : `${mins}m ago`;
+    }
+    const mins = Math.round(diffMinutes);
+    if (mins < 60) {
+      return `In ${mins}m`;
+    }
+    const hours = Math.floor(mins / 60);
+    const remainingMins = mins % 60;
+    return remainingMins === 0 
+      ? `In ${hours}h` 
+      : `In ${hours}h ${remainingMins}m`;
+  };
+
+  // Agar koi upcoming event nahi hai toh kuch mat dikhao
+  if (upcomingEvents.length === 0) {
+    return null;
+  }
+
+  return (
+    <div className="reminder-container">
+      {upcomingEvents.slice(0, 3).map((event) => (
+        <div 
+          key={event.id} 
+          className={`reminder-card ${event.diffMinutes <= 0 ? "active" : ""}`}
+        >
+          <div className="reminder-header">
+            <div className="reminder-title">
+              <FaBell className="reminder-icon" />
+              <span className="reminder-name">{event.meetingName}</span>
+            </div>
+            <button 
+              className="reminder-dismiss" 
+              onClick={() => handleDismiss(event.id)}
+            >
+              <FaTimes />
+            </button>
+          </div>
+
+          <div className="reminder-body">
+            <div className="reminder-time">
+              <FaClock className="time-icon" />
+              <span className="time-label">
+                {getTimeLabel(event.diffMinutes)}
+              </span>
+              <span className="time-detail">
+                {event.startTime} - {event.endTime}
+              </span>
+            </div>
+
+            {event.location && (
+              <div className="reminder-location">
+                📍 {event.location}
+              </div>
+            )}
+
+            {event.diffMinutes <= 0 && event.diffMinutes >= -5 && (
+              <div className="reminder-urgency">
+                🔴 Meeting in progress
+              </div>
+            )}
+          </div>
+
+          <div className="reminder-footer">
+            <button 
+              className="reminder-join-btn" 
+              onClick={() => handleJoin(event)}
+            >
+              <FaVideo /> Join Online
+            </button>
+            <button 
+              className="reminder-snooze-btn"
+              onClick={() => handleDismiss(event.id)}
+            >
+              Snooze
+            </button>
+          </div>
+        </div>
+      ))}
+
+      {upcomingEvents.length > 3 && (
+        <div className="reminder-more">
+          +{upcomingEvents.length - 3} more meetings
+        </div>
+      )}
+    </div>
+  );
+}

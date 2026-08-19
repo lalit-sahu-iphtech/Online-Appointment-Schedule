@@ -7,11 +7,13 @@ import {
   FaLink,
   FaShareAlt,
   FaCheck,
+  FaRegCommentDots,
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 
-export default function EventDetailsModal({ event, onClose }) {
+export default function EventDetailsModal({ event, onClose, onAddComment }) {
   const [copied, setCopied] = useState(false);
+  const [commentText, setCommentText] = useState("");
 
   // Agar koi event click nahi hua toh popup mat dikhao
   if (!event) return null;
@@ -24,6 +26,27 @@ export default function EventDetailsModal({ event, onClose }) {
     navigator.clipboard.writeText(meetingLink);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000); // 2 second baad wapis normal button
+  };
+
+  // Naya comment/note is meeting me add karo
+  const handleAddComment = () => {
+    if (!commentText.trim()) return;
+    if (onAddComment) {
+      onAddComment(commentText.trim());
+    }
+    setCommentText("");
+  };
+
+  const handleCommentKeyPress = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleAddComment();
+    }
+  };
+
+  const formatCommentTime = (iso) => {
+    const d = new Date(iso);
+    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };
 
   return (
@@ -95,6 +118,39 @@ export default function EventDetailsModal({ event, onClose }) {
               >
                 {copied ? <FaCheck /> : <FaShareAlt />}
                 {copied ? "Copied!" : "Share"}
+              </button>
+            </div>
+          </div>
+
+          {/* Comments / Notes Section (har meeting ka apna section) */}
+          <div className="comments-section" style={{ marginTop: "16px" }}>
+            <label>
+              <FaRegCommentDots /> Comments
+            </label>
+
+            <div className="comment-list">
+              {event.comments && event.comments.length > 0 ? (
+                event.comments.map((c) => (
+                  <div className="comment-item" key={c.id}>
+                    <span className="comment-text">{c.text}</span>
+                    <span className="comment-time">{formatCommentTime(c.time)}</span>
+                  </div>
+                ))
+              ) : (
+                <div className="comment-empty">No comments yet</div>
+              )}
+            </div>
+
+            <div className="comment-input-row">
+              <input
+                type="text"
+                placeholder="Add a note or comment..."
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                onKeyPress={handleCommentKeyPress}
+              />
+              <button type="button" onClick={handleAddComment}>
+                Post
               </button>
             </div>
           </div>

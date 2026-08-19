@@ -21,9 +21,14 @@ export default function WeekView({
     timeSlots.push(`${hour}:00 ${ampm}`);
   }
 
+  // Header (62px) + har hour slot (58px) ka total height, isse hi
+  // time column aur day columns dono ki height match hogi
+  const headerHeight = 62;
+  const totalHeight = headerHeight + timeSlots.length * 58;
+
   return (
     <div className="week-calendar-body">
-      <div className="week-time-column">
+      <div className="week-time-column" style={{ height: `${totalHeight}px` }}>
         <div></div>
         {timeSlots.map((time, index) => (
           <div key={index}>{time}</div>
@@ -36,7 +41,7 @@ export default function WeekView({
         const isTodayDate = isToday(day);
 
         return (
-          <div key={dayIndex} className="week-day">
+          <div key={dayIndex} className="week-day" style={{ height: `${totalHeight}px` }}>
             <div className="week-day-header">
               <strong className={isTodayDate ? 'selected-date' : ''}>
                 {day.getDate()}
@@ -44,7 +49,7 @@ export default function WeekView({
               <span>{weekdays[dayIndex]}</span>
             </div>
 
-            <div className="week-grid"></div>
+            <div className="week-grid" style={{ height: `${timeSlots.length * 58}px` }}></div>
 
             {dayEvents.map((item) => {
               const { top, height } = getEventPosition(item.startTime, item.endTime);

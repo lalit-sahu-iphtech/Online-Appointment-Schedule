@@ -4,25 +4,20 @@
 
 .calendar-topbar {
     width: 100%;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     margin-bottom: 18px;
-
     flex-shrink: 0;
+    box-sizing: border-box;
 }
 
 .calendar-topbar h1 {
     margin: 0;
-
     font-size: 32px;
     font-weight: 700;
-
     color: #171A1F;
 }
-
 
 /* =====================================================
    TOP BAR RIGHT
@@ -31,10 +26,8 @@
 .topbar-right {
     display: flex;
     align-items: center;
-
     gap: 16px;
 }
-
 
 /* =====================================================
    CREATE BUTTON
@@ -42,40 +35,29 @@
 
 .create-btn {
     height: 42px;
-
     padding: 0 20px;
-
     display: flex;
     align-items: center;
-
     gap: 8px;
-
     border: none;
     border-radius: 10px;
-
     background-color: #8659D3;
-
     color: white;
-
     font-family: "Poppins", sans-serif;
     font-size: 14px;
-
     cursor: pointer;
-
     transition: 0.2s ease;
 }
 
 .create-btn span {
     font-size: 25px;
     font-weight: 300;
-
     line-height: 1;
 }
 
 .create-btn:hover {
     background-color: #7544c8;
 }
-
 
 /* =====================================================
    TOP RIGHT ICONS
@@ -84,29 +66,21 @@
 .topbar-icons {
     display: flex;
     align-items: center;
-
     gap: 10px;
 }
 
 .icon-btn {
     width: 38px;
     height: 38px;
-
     border: none;
     border-radius: 50%;
-
     background-color: #F3F4F6;
-
     color: #667085;
-
     font-size: 15px;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     cursor: pointer;
-
     transition: 0.2s ease;
 }
 
@@ -114,6 +88,188 @@
     background-color: #e7e8eb;
 }
 
+/* =====================================================
+   ICON DROPDOWN PANELS (search / notifications / comments)
+===================================================== */
+
+.icon-wrap {
+    position: relative;
+}
+
+.icon-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 2px solid #ffffff;
+    pointer-events: none;
+}
+
+.icon-dropdown {
+    position: absolute;
+    top: 46px;
+    right: 0;
+    width: 260px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+    padding: 14px;
+    box-sizing: border-box;
+    animation: iconDropdownFadeIn 0.15s ease;
+}
+
+@keyframes iconDropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.icon-dropdown h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #20242a;
+}
+
+.icon-dropdown-empty {
+    font-size: 12px;
+    color: #7b8494;
+    text-align: center;
+    padding: 16px 0 4px;
+}
+
+.search-input-wrap input {
+    width: 100%;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    color: #374151;
+}
+
+.search-input-wrap input:focus {
+    box-shadow: 0 0 0 1px #8555d5;
+}
+
+.search-result-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.search-result-item {
+    padding: 8px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.search-result-item:hover {
+    background: #f4effd;
+    color: #8555d5;
+}
+
+.search-result-date {
+    font-size: 10px;
+    color: #9aa1ad;
+    flex-shrink: 0;
+}
+
+/* =====================================================
+   PROFILE DROPDOWN
+===================================================== */
+
+.profile-dropdown {
+    width: 220px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.profile-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.profile-dropdown-avatar {
+    width: 34px;
+    height: 34px;
+    color: #8659D3;
+    flex-shrink: 0;
+}
+
+.profile-dropdown-header h4 {
+    margin: 0 0 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #20242a;
+}
+
+.profile-dropdown-header span {
+    font-size: 10px;
+    color: #9aa1ad;
+}
+
+.profile-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+}
+
+.profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: #374151;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.profile-menu-item:hover {
+    background: #f4effd;
+    color: #8555d5;
+}
+
+.profile-menu-logout {
+    color: #ef4444;
+}
+
+.profile-menu-logout:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
 
 /* =====================================================
    AVATAR
@@ -122,27 +278,21 @@
 .avatar-wrap {
     display: flex;
     align-items: center;
-
     gap: 4px;
-
     cursor: pointer;
-
     margin-left: 4px;
 }
 
 .avatar-icon {
     width: 36px;
     height: 36px;
-
     color: #8659D3;
 }
 
 .avatar-chevron {
     font-size: 11px;
-
     color: #667085;
 }
-
 
 /* =====================================================
    CALENDAR CONTAINER
@@ -150,28 +300,17 @@
 
 .calendar-container {
     width: 100%;
-
-    /*
-       Topbar approx 42px
-       Margin 18px
-       Remaining area calendar ke liye
-    */
     flex: 1;
-
     min-height: 0;
-
     display: flex;
     flex-direction: column;
-
     background-color: #fff;
-
     overflow: hidden;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 12px;
+    height: calc(100vh - 190px);
+    max-height: calc(100vh - 100px);
 }
-
 
 /* =====================================================
    CALENDAR HEADER
@@ -179,22 +318,15 @@
 
 .calendar-header {
     height: 62px;
-
     flex-shrink: 0;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     padding: 0 18px 0 24px;
-
     border-bottom: 1px solid #e5e7eb;
-
     box-sizing: border-box;
-
     background: #ffffff;
 }
-
 
 /* =====================================================
    DATE
@@ -203,19 +335,15 @@
 .calendar-date {
     display: flex;
     align-items: center;
-
     gap: 10px;
 }
 
 .calendar-date h2 {
     margin: 0 5px;
-
     font-size: 15px;
     font-weight: 600;
-
     color: #20242a;
 }
-
 
 /* =====================================================
    ARROW BUTTON
@@ -224,18 +352,12 @@
 .arrow-btn {
     width: 28px;
     height: 28px;
-
     border: none;
     border-radius: 50%;
-
     background-color: #F3F4F6;
-
     color: #667085;
-
     font-size: 20px;
-
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
@@ -245,35 +367,25 @@
     background-color: #e7e8eb;
 }
 
-
 /* =====================================================
    TODAY BUTTON
 ===================================================== */
 
 .today-btn {
     height: 30px;
-
     padding: 0 10px;
-
     border: none;
-
     background-color: #F6F3FC;
-
     border-radius: 8px;
-
     color: #8555d5;
-
     font-size: 12px;
-
     cursor: pointer;
 }
 
 .today-btn:hover {
     color: #8659D3;
-
     background: #E8E0F7;
 }
-
 
 /* =====================================================
    DAY WEEK MONTH
@@ -282,35 +394,25 @@
 .calendar-view {
     display: flex;
     align-items: center;
-
     gap: 4px;
 }
 
 .calendar-view button {
     min-width: 68px;
     height: 34px;
-
     border: none;
-
     background-color: transparent;
-
     color: #8555d5;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 12px;
-
     cursor: pointer;
-
     border-radius: 10px;
 }
 
 .calendar-view .view-active {
     background-color: #8555d5;
-
     color: #fff;
 }
-
 
 /* =====================================================
    CALENDAR BODY
@@ -318,29 +420,16 @@
 
 .calendar-body {
     flex: 1;
-
     min-height: 0;
-
     display: flex;
-
     position: relative;
-
-    /*
-       IMPORTANT:
-       Sirf calendar body scroll hogi.
-       Pura page scroll nahi hoga.
-    */
-
     overflow-y: auto;
     overflow-x: hidden;
-
     scrollbar-width: thin;
-
     scrollbar-color: #d1d5db transparent;
+    height: calc(100% - 62px);
+    max-height: calc(100% - 62px);
 }
-
-
-/* Chrome / Edge Scrollbar */
 
 .calendar-body::-webkit-scrollbar {
     width: 7px;
@@ -352,7 +441,6 @@
 
 .calendar-body::-webkit-scrollbar-thumb {
     background: #d1d5db;
-
     border-radius: 10px;
 }
 
@@ -360,42 +448,29 @@
     background: #b8bbc1;
 }
 
-
-
 /* =====================================================
    TIME COLUMN
 ===================================================== */
 
 .time-column {
     width: 140px;
-
     flex-shrink: 0;
-
     background-color: #fff;
-
     border-right: 1px solid #e2e5e9;
 }
 
 .time-column div {
     height: 58px;
-
     display: flex;
     align-items: flex-start;
     justify-content: center;
-
     padding-top: 10px;
-
     box-sizing: border-box;
-
     color: #7b8494;
-
     font-size: 11px;
-
-    /* border-bottom: 1px solid #e9ebee; */
-
     white-space: nowrap;
+    border-bottom: 1px solid #e5e7eb;
 }
-
 
 /* =====================================================
    CALENDAR GRID
@@ -403,23 +478,11 @@
 
 .calendar-grid {
     flex: 1;
-
     position: relative;
-
-    /*
-       17 hours
-       17 × 58 = 986px
-
-       07 AM → 11 PM
-    */
-
     height: 986px;
-
     background-color: #fff;
-
     min-width: 0;
 }
-
 
 /* =====================================================
    GRID LINE
@@ -427,12 +490,9 @@
 
 .grid-line {
     height: 58px;
-
     border-bottom: 1px solid #e5e7eb;
-
     box-sizing: border-box;
 }
-
 
 /* =====================================================
    EVENTS
@@ -440,33 +500,25 @@
 
 .calendar-event {
     position: absolute;
-
-    left: 1px;
-    right: 1px;
-
+    left: 4px;
+    right: 4px;
     border-radius: 5px;
-
     padding: 10px 18px;
-
     display: flex;
     flex-direction: column;
-
     gap: 2px;
-
     box-sizing: border-box;
-
     z-index: 2;
-
     overflow: hidden;
+    cursor: pointer;
 }
-.new-meeting-event {
-    background: #8659D3;
-    color: #ffffff;
+
+.calendar-event:hover {
+    opacity: 0.9;
 }
 
 .calendar-event strong {
     font-size: 11px;
-
     font-weight: 700;
 }
 
@@ -474,36 +526,26 @@
     font-size: 10px;
 }
 
-
 /* =====================================================
    DELETE MEETING BUTTON
 ===================================================== */
 
 .delete-meeting-btn {
     position: absolute;
-
     top: 4px;
     right: 4px;
-
     width: 16px;
     height: 16px;
-
     padding: 0;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     border: none;
     border-radius: 50%;
-
     background: rgba(255, 255, 255, 0.25);
     color: #ffffff;
-
     font-size: 9px;
-
     cursor: pointer;
-
     z-index: 3;
 }
 
@@ -519,120 +561,22 @@
     font-size: 8px;
 }
 
-
-/* =====================================================
-   PROJECT KICKOFF
-   08:00 AM - 09:00 AM
-===================================================== */
-
-.project-event {
-    /*
-       07 AM = 0px
-       08 AM = 58px
-
-       1 hour = 58px
-    */
-
-    top: 25px;
-
-    height: 90px;
-
-    background-color: #f0f1f3;
-
-    color: #667085;
-}
-
-
-/* =====================================================
-   CREATIVE WORKSHOP
-   09:00 AM - 11:00 AM
-===================================================== */
-
-.workshop-event {
-    /*
-       07 AM = 0
-       08 AM = 58
-       09 AM = 116
-
-       2 hours = 116px
-    */
-
-    top: 145px;
-
-    height: 143px;
-
-    background: #10a5ad;
-
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   HAPPY HOUR
-   01:00 PM - 02:00 PM
-===================================================== */
-
-.happy-event {
-    /*
-       07 AM → 01 PM = 6 hours
-
-       6 × 58 = 348px
-    */
-
-    top: 348px;
-
-    height: 58px;
-
-    background: #ff8300;
-
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   ONE ON ONE
-   03:00 PM - 04:00 PM
-===================================================== */
-
-.one-event {
-    /*
-       07 AM → 03 PM = 8 hours
-
-       8 × 58 = 464px
-    */
-
-    top: 464px;
-
-    height: 58px;
-
-    background: #e5f8fa;
-
-    color: #078e97;
-}
 /* =====================================================
    WEEK VIEW
 ===================================================== */
 
-/* Main week body */
 .week-calendar-body {
     flex: 1;
-
     min-height: 0;
-
     display: flex;
-
     position: relative;
-
     overflow-y: auto;
     overflow-x: auto;
-
     scrollbar-width: thin;
-
     scrollbar-color: #d1d5db transparent;
+    height: calc(100% - 62px);
+    max-height: calc(100% - 62px);
 }
-
-
-/* Chrome / Edge Scrollbar */
 
 .week-calendar-body::-webkit-scrollbar {
     width: 7px;
@@ -645,7 +589,6 @@
 
 .week-calendar-body::-webkit-scrollbar-thumb {
     background: #d1d5db;
-
     border-radius: 10px;
 }
 
@@ -653,59 +596,37 @@
     background: #b8bbc1;
 }
 
-
 /* =====================================================
    WEEK TIME COLUMN
 ===================================================== */
 
 .week-time-column {
     width: 95px;
-
     flex-shrink: 0;
-
     background-color: #ffffff;
-
     border-right: 1px solid #e2e5e9;
-
     position: sticky;
-
     left: 0;
-
     z-index: 5;
+}
+
+.week-time-column div:first-child {
+    height: 62px;
+    border-bottom: 1px solid #e5e7eb;
 }
 
 .week-time-column div {
     height: 58px;
-
     display: flex;
-
     align-items: flex-start;
-
     justify-content: center;
-
     padding-top: 10px;
-
     box-sizing: border-box;
-
     color: #7b8494;
-
     font-size: 11px;
-
     white-space: nowrap;
-}
-
-
-/*
-   First empty div
-   This is used for Week header space
-*/
-
-.week-time-column div:first-child {
-    height: 62px;
-
     border-bottom: 1px solid #e5e7eb;
 }
-
 
 /* =====================================================
    WEEK DAY COLUMN
@@ -713,20 +634,14 @@
 
 .week-day {
     flex: 1;
-
     min-width: 120px;
-
-    height: 986px;
-
     position: relative;
-
     background-color: #ffffff;
-
     border-right: 1px solid #e1e5e9;
-
     box-sizing: border-box;
+    height: 100%;
+    min-height: 500px;
 }
-
 
 /* =====================================================
    WEEK DAY HEADER
@@ -734,44 +649,29 @@
 
 .week-day-header {
     height: 62px;
-
     display: flex;
-
     flex-direction: column;
-
     align-items: center;
-
     justify-content: center;
-
     gap: 7px;
-
     background-color: #ffffff;
-
     border-bottom: 1px solid #e1e5e9;
-
     position: sticky;
-
     top: 0;
-
     z-index: 4;
 }
 
 .week-day-header strong {
     font-size: 14px;
-
     font-weight: 600;
-
     color: #20242a;
 }
 
 .week-day-header span {
     font-size: 11px;
-
     font-weight: 400;
-
     color: #20242a;
 }
-
 
 /* =====================================================
    SELECTED DATE
@@ -779,24 +679,15 @@
 
 .week-day-header .selected-date {
     width: 36px;
-
     height: 36px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     border: 1px solid #8555d5;
-
     border-radius: 50%;
-
     color: #8555d5;
-
     box-sizing: border-box;
 }
-
 
 /* =====================================================
    WEEK GRID
@@ -804,41 +695,19 @@
 
 .week-grid {
     position: absolute;
-
     top: 62px;
-
     left: 0;
-
     right: 0;
-
-    height: 924px;
-
+    bottom: 0;
     background-color: #ffffff;
-
-    /*
-       1 hour = 58px
-
-       Horizontal lines:
-       07
-       08
-       09
-       10
-       ...
-    */
-
     background-image: repeating-linear-gradient(
         to bottom,
-
         transparent 0px,
-
         transparent 57px,
-
         #e5e7eb 57px,
-
         #e5e7eb 58px
     );
 }
-
 
 /* =====================================================
    WEEK EVENTS
@@ -846,31 +715,25 @@
 
 .week-event {
     position: absolute;
-
     left: 3px;
-
     right: 3px;
-
     z-index: 3;
-
     border-radius: 5px;
-
     padding: 9px 8px;
-
     display: flex;
-
     flex-direction: column;
-
     gap: 2px;
-
     box-sizing: border-box;
-
     overflow: hidden;
+    cursor: pointer;
+}
+
+.week-event:hover {
+    opacity: 0.9;
 }
 
 .week-event strong {
     font-size: 10px;
-
     font-weight: 700;
 }
 
@@ -878,187 +741,19 @@
     font-size: 9px;
 }
 
-
-/* =====================================================
-   MONDAY
-   PROJECT KICKOFF
-   08 - 09
-===================================================== */
-
-.project-week-event {
-    /*
-       Header = 62px
-
-       07 AM = 0
-       08 AM = 58px
-
-       Total:
-       62 + 58 = 120px
-    */
-
-    top: 120px;
-
-    height: 58px;
-
-    background-color: #f0f1f3;
-
-    color: #667085;
-}
-
-
-/* =====================================================
-   MONDAY
-   ONE ON ONE
-   01 - 02
-===================================================== */
-
-.one-week-event {
-    /*
-       07 AM → 01 PM
-       6 × 58 = 348
-
-       Header = 62
-
-       62 + 348 = 410
-    */
-
-    top: 410px;
-
-    height: 58px;
-
-    background-color: #e5f8fa;
-
-    color: #078e97;
-}
-
-
-/* =====================================================
-   TUESDAY
-   HAPPY HOUR
-   11 - 12
-===================================================== */
-
-.happy-week-event {
-    /*
-       07 AM → 11 AM
-       4 × 58 = 232
-
-       Header = 62
-
-       62 + 232 = 294
-    */
-
-    top: 294px;
-
-    height: 58px;
-
-    background-color: #ff8300;
-
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   TUESDAY
-   ONE ON ONE
-   02 - 03
-===================================================== */
-
-.second-one {
-    /*
-       07 AM → 02 PM
-       7 × 58 = 406
-
-       Header = 62
-
-       62 + 406 = 468
-    */
-
-    top: 468px;
-
-    height: 58px;
-}
-
-
-/* =====================================================
-   THURSDAY
-   ONE ON ONE
-   01 - 02
-===================================================== */
-
-.week-day:nth-child(5) .one-week-event {
-    top: 410px;
-}
-
-
-/* =====================================================
-   FRIDAY
-   CREATIVE WORKSHOP
-   09 - 12
-===================================================== */
-
-.workshop-week-event {
-
-    /*
-       07 AM → 09 AM
-       2 × 58 = 116
-
-       Header = 62
-
-       62 + 116 = 178
-    */
-
-    top: 178px;
-
-    /*
-       09 AM → 12 PM
-       3 × 58 = 174px
-    */
-
-    height: 174px;
-
-    background-color: #10a5ad;
-
-    color: #ffffff;
-}
-
-
-/* =====================================================
-   FRIDAY
-   WEEKLY MEETING
-   01 - 02
-===================================================== */
-
-.weekly-week-event {
-
-    top: 410px;
-
-    height: 58px;
-
-    background-color: #8555d5;
-
-    color: #ffffff;
-}
-
-
 /* =====================================================
    MONTH VIEW
 ===================================================== */
 
 .month-calendar {
     flex: 1;
-
     min-height: 0;
-
     display: flex;
-
     flex-direction: column;
-
     background-color: #ffffff;
-
     overflow: hidden;
+    height: 100%;
 }
-
 
 /* =====================================================
    MONTH WEEK DAYS
@@ -1066,38 +761,26 @@
 
 .month-weekdays {
     height: 42px;
-
     flex-shrink: 0;
-
     display: grid;
-
     grid-template-columns: repeat(7, 1fr);
-
     border-bottom: 1px solid #e1e5e9;
-
     background-color: #ffffff;
 }
 
 .month-weekdays div {
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     font-size: 12px;
-
     font-weight: 400;
-
     color: #20242a;
 }
 
 .month-weekdays .active-weekday {
     color: #8555d5;
-
     font-weight: 600;
 }
-
 
 /* =====================================================
    MONTH ROW
@@ -1105,14 +788,12 @@
 
 .month-row {
     flex: 1;
-
     min-height: 0;
-
     display: grid;
-
     grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    height: calc((100% - 42px) / 6);
 }
-
 
 /* =====================================================
    MONTH DAY CELL
@@ -1120,26 +801,26 @@
 
 .month-day {
     min-width: 0;
-
     position: relative;
-
-    padding: 7px 4px;
-
+    padding: 6px 6px 4px;
     border-right: 1px solid #e1e5e9;
-
     border-bottom: 1px solid #e1e5e9;
-
     background-color: #ffffff;
-
     color: #20242a;
-
-    font-size: 11px;
-
+    font-size: 12px;
     overflow: hidden;
-
     box-sizing: border-box;
+    height: 100%;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
 }
 
+.month-day > span {
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+}
 
 /* =====================================================
    PREVIOUS / NEXT MONTH DATE
@@ -1147,10 +828,8 @@
 
 .month-day.previous {
     color: #9aa1ad;
-
     background-color: #ffffff;
 }
-
 
 /* =====================================================
    SELECTED MONTH DATE
@@ -1158,12 +837,9 @@
 
 .month-selected-date {
     color: #8555d5;
-
     text-decoration: underline;
-
     font-weight: 700;
 }
-
 
 /* =====================================================
    MONTH EVENT
@@ -1171,217 +847,75 @@
 
 .month-event {
     width: 100%;
-
-    min-height: 29px;
-
-    margin-top: 7px;
-
-    padding: 6px 6px;
-
+    min-height: 22px;
+    margin-top: 3px;
+    padding: 3px 7px;
     box-sizing: border-box;
-
     border-radius: 5px;
-
-    font-size: 9px;
-
+    font-size: 10px;
     font-weight: 600;
-
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
-
     position: relative;
+    flex-shrink: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.month-event:hover {
+    opacity: 0.85;
 }
 
 .month-event small {
-    font-size: 8px;
-
+    font-size: 9px;
     font-weight: 400;
-
-    margin-right: 5px;
+    margin-right: 6px;
 }
-
 
 /* =====================================================
    MONTH EVENT COLORS
 ===================================================== */
 
-
-/* Gray Event */
-
 .gray-event {
     background-color: #f0f1f3;
-
     color: #667085;
 }
 
-
-/* Cyan Event */
-
 .cyan-event {
     background-color: #e5f8fa;
-
     color: #078e97;
 }
 
-
-/* Teal Event */
-
 .teal-event {
     background-color: #10a5ad;
-
     color: #ffffff;
 }
-
-
-/* Purple Event */
 
 .purple-event {
     background-color: #8555d5;
-
     color: #ffffff;
 }
-
-
-/* Orange Event */
 
 .orange-event {
     background-color: #ff8300;
-
     color: #ffffff;
 }
 
-
-/* Birthday */
-
 .birthday-event {
     background-color: #ffe1bd;
-
     color: #e77800;
 }
-
-
-/* =====================================================
-   MONTH VIEW SCROLLBAR
-===================================================== */
-
-.month-calendar::-webkit-scrollbar {
-    width: 7px;
-}
-
-.month-calendar::-webkit-scrollbar-track {
-    background: transparent;
-}
-
-.month-calendar::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-
-    border-radius: 10px;
-}
-
-
-/* =====================================================
-   WEEK / MONTH RESPONSIVE
-===================================================== */
-
-@media (max-width: 768px) {
-
-    /* WEEK */
-
-    .week-time-column {
-        width: 65px;
-    }
-
-    .week-time-column div {
-        font-size: 9px;
-    }
-
-    .week-day {
-        min-width: 110px;
-    }
-
-    .week-day-header strong {
-        font-size: 12px;
-    }
-
-    .week-day-header span {
-        font-size: 9px;
-    }
-
-
-    /* MONTH */
-
-    .month-weekdays div {
-        font-size: 10px;
-    }
-
-    .month-day {
-        font-size: 10px;
-
-        padding: 6px 3px;
-    }
-
-    .month-event {
-        font-size: 8px;
-
-        padding: 5px 3px;
-    }
-
-    .month-event small {
-        font-size: 7px;
-    }
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media (max-width: 500px) {
-
-    /* WEEK */
-
-    .week-calendar-body {
-        overflow-x: auto;
-    }
-
-    .week-time-column {
-        width: 60px;
-    }
-
-    .week-day {
-        min-width: 120px;
-    }
-
-
-    /* MONTH */
-
-    .month-calendar {
-        overflow-x: auto;
-    }
-
-    .month-weekdays,
-    .month-row {
-        min-width: 700px;
-    }
-
-    .month-day {
-        min-width: 100px;
-    }
-
-    .month-event {
-        font-size: 8px;
-    }
-}
-
 
 /* =====================================================
    RESPONSIVE
 ===================================================== */
 
 @media (max-width: 768px) {
+    .calendar-container {
+        height: calc(100vh - 170px);
+        max-height: calc(100vh - 170px);
+    }
 
     .calendar-topbar h1 {
         font-size: 26px;
@@ -1407,21 +941,67 @@
         font-size: 9px;
     }
 
-    .topbar-icons .icon-btn:nth-child(3) {
+    .topbar-icons .icon-wrap:nth-child(3) {
         display: none;
+    }
+
+    .icon-dropdown {
+        width: 220px;
+    }
+
+    .week-time-column {
+        width: 65px;
+    }
+
+    .week-time-column div {
+        font-size: 9px;
+    }
+
+    .week-day {
+        min-width: 110px;
+    }
+
+    .week-day-header strong {
+        font-size: 12px;
+    }
+
+    .week-day-header span {
+        font-size: 9px;
+    }
+
+    .month-weekdays div {
+        font-size: 10px;
+    }
+
+    .month-day {
+        padding: 4px 3px;
+        min-height: 50px;
+        font-size: 10px;
+    }
+
+    .month-day > span {
+        font-size: 11px;
+    }
+
+    .month-event {
+        font-size: 8px;
+        padding: 4px 4px;
+        min-height: 24px;
+    }
+
+    .month-event small {
+        font-size: 7px;
     }
 }
 
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
 @media (max-width: 500px) {
+    .calendar-container {
+        height: calc(100vh - 150px);
+        max-height: calc(100vh - 150px);
+    }
 
     .calendar-topbar {
         align-items: flex-start;
-
         gap: 10px;
     }
 
@@ -1431,23 +1011,16 @@
 
     .create-btn {
         height: 38px;
-
         padding: 0 12px;
     }
 
     .calendar-header {
         height: auto;
-
         min-height: 100px;
-
         flex-direction: column;
-
         align-items: flex-start;
-
         justify-content: center;
-
         gap: 10px;
-
         padding: 12px;
     }
 
@@ -1457,5 +1030,49 @@
 
     .calendar-grid {
         min-width: 500px;
+    }
+
+    .week-calendar-body {
+        overflow-x: auto;
+    }
+
+    .week-time-column {
+        width: 60px;
+    }
+
+    .week-day {
+        min-width: 120px;
+    }
+
+    .month-calendar {
+        overflow-x: auto;
+    }
+
+    .month-weekdays,
+    .month-row {
+        min-width: 700px;
+    }
+
+    .month-day {
+        min-width: 100px;
+        padding: 3px 2px;
+        min-height: 40px;
+        font-size: 9px;
+    }
+
+    .month-day > span {
+        font-size: 10px;
+    }
+
+    .month-event {
+        font-size: 7px;
+        padding: 3px 3px;
+        min-height: 20px;
+        margin-top: 3px;
+    }
+
+    .month-event small {
+        font-size: 6px;
+        margin-right: 3px;
     }
 }

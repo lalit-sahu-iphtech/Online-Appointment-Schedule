@@ -18,6 +18,16 @@ export default function MonthView({
     weeks.push(monthDays.slice(i, i + 7));
   }
 
+  // Group events by date for better performance
+  const eventsByDate = {};
+  meeting.forEach(item => {
+    const dateStr = formatDate(new Date(item.date));
+    if (!eventsByDate[dateStr]) {
+      eventsByDate[dateStr] = [];
+    }
+    eventsByDate[dateStr].push(item);
+  });
+
   return (
     <div className="month-calendar">
       <div className="month-weekdays">
@@ -32,7 +42,7 @@ export default function MonthView({
         <div key={weekIndex} className="month-row">
           {week.map((day, dayIndex) => {
             const dateStr = formatDate(day.date);
-            const dayEvents = meeting.filter(item => item.date === dateStr);
+            const dayEvents = eventsByDate[dateStr] || [];
             const isTodayDate = isToday(day.date);
             const isCurrentMonth = day.isCurrentMonth;
 
@@ -69,19 +79,30 @@ export default function MonthView({
                         <FaTimes />
                       </button>
                       <small>{item.startTime}</small>
-                      {item.meetingName}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {item.meetingName}
+                      </span>
                     </div>
                   );
                 })}
                 
                 {dayEvents.length > 3 && (
-                  <div className="month-event" style={{ 
-                    background: 'transparent', 
-                    color: '#8555d5',
-                    fontSize: '8px',
-                    padding: '2px 6px',
-                    marginTop: '2px'
-                  }}>
+                  <div 
+                    className="month-event" 
+                    style={{ 
+                      background: 'transparent', 
+                      color: '#8555d5',
+                      fontSize: '9px',
+                      padding: '2px 6px',
+                      marginTop: '2px',
+                      minHeight: 'auto',
+                      fontWeight: '500',
+                      cursor: 'pointer'
+                    }}
+                    onClick={() => {
+                      // Optional: Show all events or switch to day view
+                    }}
+                  >
                     +{dayEvents.length - 3} more
                   </div>
                 )}

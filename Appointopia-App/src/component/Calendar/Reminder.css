@@ -1,0 +1,274 @@
+/* =====================================================
+   REMINDER CONTAINER
+===================================================== */
+
+.reminder-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 999;
+    max-width: 380px;
+    width: 100%;
+    pointer-events: none;
+}
+
+/* =====================================================
+   REMINDER CARD
+===================================================== */
+
+.reminder-card {
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    padding: 16px 18px;
+    pointer-events: auto;
+    border-left: 4px solid #8555d5;
+    animation: slideIn 0.3s ease;
+    transition: all 0.3s ease;
+}
+
+.reminder-card.active {
+    border-left-color: #ef4444;
+    background: #fef2f2;
+}
+
+.reminder-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.18);
+}
+
+/* =====================================================
+   REMINDER HEADER
+===================================================== */
+
+.reminder-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.reminder-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.reminder-icon {
+    color: #8555d5;
+    font-size: 14px;
+}
+
+.reminder-card.active .reminder-icon {
+    color: #ef4444;
+    animation: bellRing 0.5s ease;
+}
+
+.reminder-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #20242a;
+}
+
+.reminder-dismiss {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: #9aa1ad;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.2s;
+}
+
+.reminder-dismiss:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+/* =====================================================
+   REMINDER BODY
+===================================================== */
+
+.reminder-body {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+
+.reminder-time {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #667085;
+}
+
+.time-icon {
+    font-size: 11px;
+    color: #9aa1ad;
+}
+
+.time-label {
+    font-weight: 600;
+    color: #8555d5;
+}
+
+.reminder-card.active .time-label {
+    color: #ef4444;
+}
+
+.time-detail {
+    color: #9aa1ad;
+    font-size: 12px;
+}
+
+.reminder-location {
+    font-size: 12px;
+    color: #667085;
+    margin-top: 2px;
+}
+
+.reminder-urgency {
+    font-size: 12px;
+    font-weight: 600;
+    color: #ef4444;
+    margin-top: 2px;
+    animation: pulse 1.5s ease infinite;
+}
+
+/* =====================================================
+   REMINDER FOOTER
+===================================================== */
+
+.reminder-footer {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.reminder-join-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: #8555d5;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Poppins", sans-serif;
+}
+
+.reminder-join-btn:hover {
+    background: #7544c8;
+    transform: scale(1.02);
+}
+
+.reminder-snooze-btn {
+    padding: 8px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: transparent;
+    color: #667085;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.2s;
+    font-family: "Poppins", sans-serif;
+}
+
+.reminder-snooze-btn:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+}
+
+/* =====================================================
+   REMINDER MORE
+===================================================== */
+
+.reminder-more {
+    text-align: center;
+    font-size: 12px;
+    color: #667085;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 6px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(8px);
+    pointer-events: auto;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.reminder-more:hover {
+    background: #ffffff;
+    color: #8555d5;
+}
+
+/* =====================================================
+   ANIMATIONS
+===================================================== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bellRing {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-15deg); }
+    75% { transform: rotate(15deg); }
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 600px) {
+    .reminder-container {
+        bottom: 16px;
+        right: 16px;
+        left: 16px;
+        max-width: 100%;
+    }
+    
+    .reminder-card {
+        padding: 14px 16px;
+    }
+    
+    .reminder-name {
+        font-size: 13px;
+    }
+    
+    .reminder-footer {
+        flex-direction: column;
+    }
+    
+    .reminder-join-btn,
+    .reminder-snooze-btn {
+        padding: 10px 14px;
+    }
+}
