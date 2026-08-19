@@ -52,16 +52,23 @@ export default function CreateWorkflowModal({ onClose, onSave }) {
       alert("Please enter workflow name");
       return;
     }
-    onSave({
+    
+    const newWorkflow = {
       title: formData.title,
       category: formData.category,
       trigger: formData.trigger,
       actions: formData.actions,
       description: `${formData.trigger} — ${formData.actions.join(", ")}`,
-    });
+    };
+    
+    // ✅ Call onSave with the new workflow
+    if (onSave) {
+      onSave(newWorkflow);
+    }
+    
     onClose();
   };
-
+  
   return (
     <div className="workflows-overlay" onClick={onClose}>
       <div className="workflows-drawer" onClick={(e) => e.stopPropagation()}>
