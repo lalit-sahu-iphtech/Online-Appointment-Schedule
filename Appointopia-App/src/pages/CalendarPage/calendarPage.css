@@ -1,91 +1,55 @@
 .calendar-page {
   width: 100%;
   height: 100vh;
-
   display: flex;
-
   background: #ffffff;
-
   font-family: "Poppins", sans-serif;
-
   overflow: hidden;
 }
 
-
-/* Sidebar */
-.calendar-page > .sidebar {
-  width: 208px;
-  height: 100vh;
-
-  flex-shrink: 0;
-}
-
+/* Sidebar - remove the old .sidebar styles since we have them in Sidebar.css */
+/* Keep only the page layout */
 
 /* Main */
 .calendar-main {
   flex: 1;
-
   min-width: 0;
-
   height: 100vh;
-
   box-sizing: border-box;
-
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
-
 
 /* Calendar Content */
 .calendar-content {
   width: 100%;
   height: 100%;
-
   padding: 20px 24px;
-
   box-sizing: border-box;
-
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
+
 /* =====================================================
  RESPONSIVE
 ===================================================== */
 
 @media (max-width: 1000px) {
-
-  .calendar-page > .sidebar {
-      width: 200px;
-
-      flex-basis: 200px;
-  }
-
   .calendar-content {
       padding: 20px;
   }
 }
 
-
 @media (max-width: 768px) {
-
-  .calendar-page > .sidebar {
-      width: 75px;
-
-      flex-basis: 75px;
-  }
-
   .calendar-content {
       padding: 15px;
   }
 }
 
-
 @media (max-width: 500px) {
-
-  .calendar-page > .sidebar {
-      width: 60px;
-
-      flex-basis: 60px;
-  }
-
   .calendar-content {
       padding: 10px;
   }
