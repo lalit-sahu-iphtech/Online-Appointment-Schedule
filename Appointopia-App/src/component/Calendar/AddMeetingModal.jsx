@@ -11,7 +11,6 @@ import {
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 
-// ✅ Default avatar colors for different users
 const AVATAR_COLORS = [
     '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
     '#E84C8A', '#27AE60', '#F2C94C', '#4A56E2'
@@ -20,17 +19,12 @@ const AVATAR_COLORS = [
 export default function AddMeetingModal({ onClose, onSave, defaultDate, initialData, isEditMode }) {
 
     const getDefaultDate = () => {
-        if (initialData?.date) {
-            return initialData.date;
-        }
-        if (defaultDate && typeof defaultDate === 'string') {
-            return defaultDate;
-        }
+        if (initialData?.date) return initialData.date;
+        if (defaultDate && typeof defaultDate === 'string') return defaultDate;
         const today = new Date();
         return today.toISOString().split('T')[0];
     };
 
-    // NEW: initialData ho to usi se form banao, warna defaults se (create mode)
     const buildFormData = () => ({
         meetingName: initialData?.meetingName || "",
         date: getDefaultDate(),
@@ -38,26 +32,19 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         endTime: initialData?.endTime || "10:00",
         location: initialData?.location || "",
         onlineLink: initialData?.onlineLink || "",
-        invitees: initialData?.invitees ? [...initialData.invitees] : []  // ✅ ab edit pe invitees preserve honge
+        invitees: initialData?.invitees ? [...initialData.invitees] : []
     });
 
     const [formData, setFormData] = useState(buildFormData);
-
     const [inviteeName, setInviteeName] = useState("");
     const [errors, setErrors] = useState({});
 
-    // Jab modal create-mode me sirf defaultDate se khule
     useEffect(() => {
         if (!initialData && defaultDate && typeof defaultDate === 'string') {
-            setFormData(prev => ({
-                ...prev,
-                date: defaultDate
-            }));
+            setFormData(prev => ({ ...prev, date: defaultDate }));
         }
     }, [defaultDate, initialData]);
 
-    // NEW: jab initialData badle (Edit button se modal khule, ya doosri meeting edit karo),
-    // form ko us meeting ke data se re-populate karo — isse invitees/location/link kabhi wipe nahi honge
     useEffect(() => {
         setFormData(buildFormData());
         setErrors({});
@@ -67,32 +54,22 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value
-        });
+        setFormData({ ...formData, [name]: value });
         if (errors[name]) {
-            setErrors({
-                ...errors,
-                [name]: null
-            });
+            setErrors({ ...errors, [name]: null });
         }
     };
 
-    // ✅ Add invitee with avatar color
     const addInvitee = () => {
         if (!inviteeName.trim()) {
             alert("Please enter a name");
             return;
         }
-
-        // Check duplicate
         if (formData.invitees.some(item => item.name === inviteeName.trim())) {
             alert("This person is already invited");
             return;
         }
 
-        // ✅ Create invitee object with random avatar color
         const newInvitee = {
             id: Date.now(),
             name: inviteeName.trim(),
@@ -101,33 +78,21 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             initials: inviteeName.trim().split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
         };
 
-        setFormData({
-            ...formData,
-            invitees: [...formData.invitees, newInvitee]
-        });
+        setFormData({ ...formData, invitees: [...formData.invitees, newInvitee] });
         setInviteeName("");
     };
 
     const removeInvitee = (id) => {
-        setFormData({
-            ...formData,
-            invitees: formData.invitees.filter(item => item.id !== id)
-        });
+        setFormData({ ...formData, invitees: formData.invitees.filter(item => item.id !== id) });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
         const newErrors = {};
-        if (!formData.meetingName.trim()) {
-            newErrors.meetingName = "Meeting name is required";
-        }
-        if (!formData.date) {
-            newErrors.date = "Date is required";
-        }
-        if (!formData.startTime || !formData.endTime) {
-            newErrors.time = "Start and end time are required";
-        }
+        if (!formData.meetingName.trim()) newErrors.meetingName = "Meeting name is required";
+        if (!formData.date) newErrors.date = "Date is required";
+        if (!formData.startTime || !formData.endTime) newErrors.time = "Start and end time are required";
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
@@ -150,12 +115,10 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    // ✅ Get initials from name
     const getInitials = (name) => {
         return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
     };
 
-    // ✅ Get random color based on name
     const getColorFromName = (name) => {
         let hash = 0;
         for (let i = 0; i < name.length; i++) {
@@ -164,10 +127,16 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
     };
 
+    // ✅ Format time for display - only used for AM/PM label
+    const getTimeAmPm = (time) => {
+        if (!time) return "AM";
+        const [h] = time.split(':').map(Number);
+        return h >= 12 ? 'PM' : 'AM';
+    };
+
     return (
         <div className="meeting-overlay" onClick={onClose}>
             <div className="meeting-modal" onClick={(e) => e.stopPropagation()}>
-
                 <div className="meeting-modal-header">
                     <h2>{isEditMode ? "Edit Meeting" : "Add New Meeting"}</h2>
                     <button className="meeting-close-btn" onClick={onClose}>
@@ -177,10 +146,9 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
                 <form onSubmit={handleSubmit}>
                     <div className="meeting-form-body">
-
                         {/* Meeting Name */}
                         <div className="form-group full-width">
-                            <label>Meeting Name <span style={{ color: 'red' }}>*</span></label>
+                            <label>Meeting Name <span className="required-star">*</span></label>
                             <input
                                 type="text"
                                 name="meetingName"
@@ -189,15 +157,13 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                 placeholder="Enter meeting name"
                                 className={errors.meetingName ? 'input-error' : ''}
                             />
-                            {errors.meetingName && (
-                                <span className="error-text">{errors.meetingName}</span>
-                            )}
+                            {errors.meetingName && <span className="error-text">{errors.meetingName}</span>}
                         </div>
 
-                        {/* DATE + TIME */}
+                        {/* DATE + TIME - FIXED */}
                         <div className="form-row">
                             <div className="form-group">
-                                <label>Date <span style={{ color: 'red' }}>*</span></label>
+                                <label>Date <span className="required-star">*</span></label>
                                 <div className="input-icon">
                                     <input
                                         type="date"
@@ -205,29 +171,34 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                         value={formData.date}
                                         onChange={handleChange}
                                     />
+                                    <FaCalendarAlt className="calendar-icon" />
                                 </div>
                             </div>
 
                             <div className="form-group">
-                                <label>Time <span style={{ color: 'red' }}>*</span></label>
-                                <div className="time-inputs">
-                                    <input
-                                        type="time"
-                                        name="startTime"
-                                        value={formData.startTime}
-                                        onChange={handleChange}
-                                    />
-                                    <span>-</span>
-                                    <input
-                                        type="time"
-                                        name="endTime"
-                                        value={formData.endTime}
-                                        onChange={handleChange}
-                                    />
+                                <label>Time <span className="required-star">*</span></label>
+                                <div className="time-inputs-wrapper">
+                                    <div className="time-input-group">
+                                        <input
+                                            type="time"
+                                            name="startTime"
+                                            value={formData.startTime}
+                                            onChange={handleChange}
+                                        />
+                                        {/* <span className="time-ampm">{getTimeAmPm(formData.startTime)}</span> */}
+                                    </div>
+                                    <span className="time-separator">-</span>
+                                    <div className="time-input-group">
+                                        <input
+                                            type="time"
+                                            name="endTime"
+                                            value={formData.endTime}
+                                            onChange={handleChange}
+                                        />
+                                        {/* <span className="time-ampm">{getTimeAmPm(formData.endTime)}</span> */}
+                                    </div>
                                 </div>
-                                {errors.time && (
-                                    <span className="error-text">{errors.time}</span>
-                                )}
+                                {errors.time && <span className="error-text">{errors.time}</span>}
                             </div>
                         </div>
 
@@ -262,7 +233,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
-                        {/* ✅ INVITEES WITH AVATAR */}
+                        {/* INVITEES WITH AVATAR */}
                         <div className="invitees-section">
                             <label>Invitees</label>
                             <div className="invitee-list">
@@ -301,10 +272,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                         </div>
 
                         {/* Quick time suggestions */}
-                        <div className="quick-times" style={{ marginTop: '12px' }}>
-                            <span style={{ fontSize: '11px', color: '#667085', marginRight: '8px' }}>
-                                Quick:
-                            </span>
+                        <div className="quick-times">
+                            <span className="quick-times-label">Quick:</span>
                             {['30 min', '1 hour', '2 hours'].map((duration) => (
                                 <button
                                     key={duration}
@@ -313,8 +282,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                     onClick={() => {
                                         const start = formData.startTime;
                                         const [h, m] = start.split(':').map(Number);
-                                        let endH = h;
-                                        let endM = m;
+                                        let endH = h, endM = m;
                                         if (duration === '30 min') endM += 30;
                                         else if (duration === '1 hour') endH += 1;
                                         else if (duration === '2 hours') endH += 2;
@@ -331,7 +299,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                 </button>
                             ))}
                         </div>
-
                     </div>
 
                     <div className="meeting-modal-footer">
@@ -343,7 +310,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     );
