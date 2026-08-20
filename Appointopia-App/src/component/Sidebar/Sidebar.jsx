@@ -6,8 +6,14 @@ import {
   FaClock, 
   FaMapMarkerAlt, 
   FaLink,
+  FaSmile,
+  FaUserFriends,
+  FaChevronDown,
+  FaChevronUp,
+  FaEnvelope,
   FaCalendarCheck,
-  FaSmile
+  FaMapPin,
+  FaTimes
 } from "react-icons/fa";
 import { MdEventNote } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
@@ -23,32 +29,111 @@ const menuItems = [
   { path: "/workflows", label: "Workflows", icon: BiGitBranch },
 ];
 
+// ✅ Avatar colors
+const AVATAR_COLORS = [
+    '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
+    '#E84C8A', '#27AE60', '#F2C94C', '#4A56E2',
+    '#E74C3C', '#1ABC9C', '#9B59B6', '#3498DB'
+];
+
+const getInitials = (name) => {
+    if (!name) return "?";
+    return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+};
+
+const getColorFromName = (name) => {
+    if (!name) return AVATAR_COLORS[0];
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+};
+
+// ✅ Generate email from name
+const generateEmail = (name) => {
+    if (!name) return "unknown@example.com";
+    return name.toLowerCase().replace(/\s/g, '.') + '@example.com';
+};
+
 export default function Sidebar({ events = [], selectedDate = new Date() }) {
   const location = useLocation();
   const [nextEvent, setNextEvent] = useState(null);
+  const [showAllInvitees, setShowAllInvitees] = useState(false);
+  
+  // ✅ State for selected invitee popup
+  const [selectedInvitee, setSelectedInvitee] = useState(null);
 
-  // ✅ Memoize events to prevent unnecessary re-renders
   const memoizedEvents = useMemo(() => events, [events]);
   const memoizedDate = useMemo(() => selectedDate, [selectedDate]);
 
-  console.log("📌 Sidebar received props:");
-  console.log("  events length:", memoizedEvents.length);
-  console.log("  selectedDate:", memoizedDate);
-
-  // Calculate next event whenever events or selectedDate change
+  // Calculate next event
   useEffect(() => {
-    console.log("🔄 Sidebar useEffect triggered");
-    console.log("  events length:", memoizedEvents.length);
-    
     if (memoizedEvents && memoizedEvents.length > 0 && memoizedDate) {
       const next = getNextEvent(memoizedEvents, memoizedDate);
-      console.log("📌 Setting nextEvent:", next);
       setNextEvent(next);
     } else {
-      console.log("❌ No events or selectedDate, setting nextEvent to null");
       setNextEvent(null);
     }
   }, [memoizedEvents, memoizedDate]);
+
+  // Reset expand when event changes
+  useEffect(() => {
+    setShowAllInvitees(false);
+    setSelectedInvitee(null);
+  }, [nextEvent]);
+
+  const getInvitees = (event) => {
+    if (event.invitees && event.invitees.length > 0) {
+      return event.invitees;
+    }
+    if (event.meetingName) {
+      return [
+        { name: event.meetingName, initials: getInitials(event.meetingName) }
+      ];
+    }
+    return [];
+  };
+
+  const toggleExpandInvitees = () => {
+    setShowAllInvitees(!showAllInvitees);
+  };
+
+  // ✅ Handle invitee click - Show profile card
+  const handleInviteeClick = (person, e) => {
+    e.stopPropagation();
+    setSelectedInvitee({
+      ...person,
+      name: person.name || person,
+      email: person.email || generateEmail(person.name || person),
+      avatarColor: person.avatarColor || getColorFromName(person.name || person),
+      initials: person.initials || getInitials(person.name || person),
+    });
+  };
+
+  // ✅ Close profile card
+  const closeProfileCard = () => {
+    setSelectedInvitee(null);
+  };
+
+  // ✅ Render invitee avatar with click handler
+  const renderInviteeAvatar = (person, index) => {
+    const name = person.name || person;
+    const color = person.avatarColor || getColorFromName(name);
+    const initials = person.initials || getInitials(name);
+    
+    return (
+      <div 
+        key={index} 
+        className="invitee-avatar-circle clickable"
+        style={{ backgroundColor: color }}
+        title={`Click to view ${name}'s profile`}
+        onClick={(e) => handleInviteeClick(person, e)}
+      >
+        {initials}
+      </div>
+    );
+  };
 
   return (
     <aside className="sidebar">
@@ -77,11 +162,10 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
         })}
       </nav>
 
-      {/* Next Event Card - Dynamic */}
+      {/* Next Event Card */}
       {nextEvent ? (
         <div className="next-event-card">
           <div className="next-event-header">
-            {/* <FaCalendarCheck className="next-event-icon" /> */}
             <span className="next-event-label">Next Event</span>
           </div>
           
@@ -108,6 +192,65 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
                 <span>{nextEvent.onlineLink}</span>
               </a>
             )}
+
+            {/* INVITEES SECTION */}
+            {(() => {
+              const invitees = getInvitees(nextEvent);
+              if (invitees.length === 0) return null;
+              
+              const displayInvitees = showAllInvitees 
+                  ? invitees 
+                  : invitees.slice(0, 4);
+              
+              const hasMore = invitees.length > 4;
+              
+              return (
+                <div className="event-invitees">
+                  <div className="invitees-header">
+                    <FaUserFriends className="invitees-icon" />
+                    <span className="invitees-label">
+                      {invitees.length} Invitee{invitees.length > 1 ? 's' : ''}
+                    </span>
+                    {hasMore && (
+                      <button 
+                        className="invitees-toggle-btn"
+                        onClick={toggleExpandInvitees}
+                      >
+                        {showAllInvitees ? (
+                          <><FaChevronUp /> Show less</>
+                        ) : (
+                          <><FaChevronDown /> Show all</>
+                        )}
+                      </button>
+                    )}
+                  </div>
+                  
+                  {/* Row 1 - First 4 invitees */}
+                  <div className="invitees-avatars-row">
+                    {displayInvitees.slice(0, 4).map((person, index) => 
+                      renderInviteeAvatar(person, index)
+                    )}
+                    {!showAllInvitees && hasMore && (
+                      <div 
+                        className="invitee-more-clickable"
+                        onClick={toggleExpandInvitees}
+                      >
+                        +{invitees.length - 4}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Row 2 - Remaining invitees */}
+                  {showAllInvitees && invitees.length > 4 && (
+                    <div className="invitees-avatars-row expanded-row">
+                      {invitees.slice(4).map((person, index) => 
+                        renderInviteeAvatar(person, index + 4)
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
           </div>
         </div>
       ) : (
@@ -116,6 +259,54 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
             <FaSmile className="celebration-icon" />
             <h3>No more events today</h3>
             <p>Enjoy your free time!</p>
+          </div>
+        </div>
+      )}
+
+      {/* ✅ INVITEE PROFILE CARD - POPUP */}
+      {selectedInvitee && (
+        <div className="invitee-profile-overlay" onClick={closeProfileCard}>
+          <div className="invitee-profile-card" onClick={(e) => e.stopPropagation()}>
+            <button className="profile-close-btn" onClick={closeProfileCard}>
+              <FaTimes />
+            </button>
+            
+            <div className="profile-header">
+              <div 
+                className="profile-avatar-large"
+                style={{ backgroundColor: selectedInvitee.avatarColor }}
+              >
+                {selectedInvitee.initials}
+              </div>
+              <div className="profile-name-section">
+                <h3>{selectedInvitee.name}</h3>
+                <span className="profile-email">
+                  <FaEnvelope className="profile-icon" />
+                  {selectedInvitee.email}
+                </span>
+              </div>
+            </div>
+
+            <div className="profile-divider"></div>
+
+            <div className="profile-details">
+              <div className="profile-detail-item">
+                <FaCalendarCheck className="profile-detail-icon" />
+                <span>2 meetings with {selectedInvitee.name}</span>
+              </div>
+              <div className="profile-detail-item">
+                <FaMapPin className="profile-detail-icon" />
+                <span>New York, USA</span>
+              </div>
+              <div className="profile-detail-item">
+                <FaUserFriends className="profile-detail-icon" />
+                <span>Joined Appointopia in 2024</span>
+              </div>
+            </div>
+
+            <button className="profile-view-btn">
+              View Full Profile
+            </button>
           </div>
         </div>
       )}
