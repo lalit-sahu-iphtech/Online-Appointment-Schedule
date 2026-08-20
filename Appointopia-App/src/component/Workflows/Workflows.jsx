@@ -1,5 +1,4 @@
 // src/component/Workflows/Workflows.jsx
-
 import { useState, useEffect } from "react";
 import {
   FaSearch,
@@ -9,12 +8,16 @@ import {
   FaChevronDown,
   FaChevronUp,
   FaFilter,
+  FaUser,
+  FaCog,
+  FaSignOutAlt
 } from "react-icons/fa";
 import WorkflowCard from "./WorkflowCard";
 import CreateWorkflowModal from "./CreateWorkflowModal";
 import "./workflows.css";
+import { useNavigate } from "react-router-dom";
 
-// Default Workflow Data
+// ✅ DEFAULT WORKFLOWS (Templates)
 const DEFAULT_WORKFLOWS = [
   {
     id: 1,
@@ -22,6 +25,9 @@ const DEFAULT_WORKFLOWS = [
     title: "Reminder Event Email",
     description:
       "Reminder emails prevent overlooking important events/tasks in both professional and personal settings.",
+    trigger: "1 day before event happens",
+    actions: ["Send email to guests"],
+    isTemplate: true,
   },
   {
     id: 2,
@@ -29,6 +35,9 @@ const DEFAULT_WORKFLOWS = [
     title: "Cancellation Email",
     description:
       "A cancellation email is a communication sent to inform recipients that a previously scheduled event has been canceled.",
+    trigger: "2 hours before event happens",
+    actions: ["Send cancellation notification"],
+    isTemplate: true,
   },
   {
     id: 3,
@@ -36,6 +45,9 @@ const DEFAULT_WORKFLOWS = [
     title: "Thank You Email",
     description:
       "Thank-you emails are a thoughtful way to acknowledge someone's actions and show that their efforts are valued and recognized.",
+    trigger: "Immediately after event happens",
+    actions: ["Send thank you email"],
+    isTemplate: true,
   },
   {
     id: 4,
@@ -43,6 +55,9 @@ const DEFAULT_WORKFLOWS = [
     title: "Download eBook",
     description:
       "The presentations cover a wide range of topics discussed by our esteemed speakers, offering valuable insights.",
+    trigger: "Immediately after event happens",
+    actions: ["Send eBook download link"],
+    isTemplate: true,
   },
   {
     id: 5,
@@ -50,29 +65,35 @@ const DEFAULT_WORKFLOWS = [
     title: "Wrap-Up Report",
     description:
       "Wrap-Up Report that highlights the key takeaways, accomplishments, and insights from the event.",
+    trigger: "1 day after event happens",
+    actions: ["Send wrap-up report"],
+    isTemplate: true,
   },
 ];
 
 export default function Workflows({ onWorkflowsChange }) {
+  const navigate = useNavigate();
+
+  const [currentUser, setCurrentUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editingWorkflow, setEditingWorkflow] = useState(null);
   const [search, setSearch] = useState("");
   const [showAll, setShowAll] = useState(false);
   const [activeTab, setActiveTab] = useState("templates");
   const [collapsed, setCollapsed] = useState({ before: false, after: false });
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
-  
-  // ✅ Dropdown states
-  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile'
+  const [activePanel, setActivePanel] = useState(null);
 
   // ✅ Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
 
-  // ✅ Close panel on outside click
   useEffect(() => {
     if (!activePanel) return;
     const handleClickOutside = (e) => {
@@ -84,13 +105,19 @@ export default function Workflows({ onWorkflowsChange }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // ✅ Load workflows from localStorage on mount
+  // ✅ Load workflows from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('workflows');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        setWorkflows(parsed);
+        // ✅ Merge templates with saved data
+        const merged = DEFAULT_WORKFLOWS.map(template => {
+          const existing = parsed.find(w => w.id === template.id && w.isTemplate);
+          return existing || template;
+        });
+        const userWorkflows = parsed.filter(w => !w.isTemplate);
+        setWorkflows([...merged, ...userWorkflows]);
       } catch (error) {
         console.error('Error loading workflows:', error);
         setWorkflows(DEFAULT_WORKFLOWS);
@@ -102,7 +129,7 @@ export default function Workflows({ onWorkflowsChange }) {
     setLoading(false);
   }, []);
 
-  // ✅ Save to localStorage whenever workflows change
+  // ✅ Save to localStorage
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('workflows', JSON.stringify(workflows));
@@ -112,6 +139,45 @@ export default function Workflows({ onWorkflowsChange }) {
     }
   }, [workflows, loading, onWorkflowsChange]);
 
+  // ✅ Auth check
+  useEffect(() => {
+    const stored = localStorage.getItem("currentUser");
+    if (!stored) {
+      navigate("/signin");
+      return;
+    }
+    try {
+      setCurrentUser(JSON.parse(stored));
+    } catch (error) {
+      console.error("Invalid currentUser in storage:", error);
+      localStorage.removeItem("currentUser");
+      navigate("/signin");
+      return;
+    }
+    setCheckingAuth(false);
+  }, [navigate]);
+
+  // ✅ Profile actions
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setActivePanel(null);
+    navigate("/signin");
+  };
+
+  const handleProfileClick = () => {
+    setActivePanel(null);
+    navigate("/profile");
+  };
+
+  const handleSettingsClick = () => {
+    setActivePanel(null);
+    navigate("/settings");
+  };
+
+  if (checkingAuth) {
+    return null;
+  }
+
   const toggleCollapse = (key) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -120,15 +186,26 @@ export default function Workflows({ onWorkflowsChange }) {
     setFilterOpen(false);
   };
 
-  // Filter by category
-  const beforeEvents = workflows.filter(
+  // ✅ Get workflows based on active tab
+  const getWorkflowsByTab = () => {
+    if (activeTab === "my") {
+      return workflows.filter(w => !w.isTemplate);
+    } else {
+      return workflows.filter(w => w.isTemplate);
+    }
+  };
+
+  const filteredWorkflows = getWorkflowsByTab();
+
+  // ✅ Filter by category
+  const beforeEvents = filteredWorkflows.filter(
     (w) => w.category === "Before Event/Meeting"
   );
-  const afterEvents = workflows.filter(
+  const afterEvents = filteredWorkflows.filter(
     (w) => w.category === "After Event/Meeting"
   );
 
-  // Search filter
+  // ✅ Search filter
   const filterBySearch = (items) => {
     if (!search) return items;
     return items.filter(
@@ -141,36 +218,74 @@ export default function Workflows({ onWorkflowsChange }) {
   const searchedBefore = filterBySearch(beforeEvents);
   const searchedAfter = filterBySearch(afterEvents);
 
-  // Category filter
+  // ✅ Category filter
   const filteredBefore = activeFilter === "after" ? [] : searchedBefore;
   const filteredAfter = activeFilter === "before" ? [] : searchedAfter;
 
-  // Show more logic
+  // ✅ Show more logic
   const displayBefore = showAll ? filteredBefore : filteredBefore.slice(0, 2);
   const displayAfter = showAll ? filteredAfter : filteredAfter.slice(0, 3);
 
   const totalCount = filteredBefore.length + filteredAfter.length;
   const visibleCount = displayBefore.length + displayAfter.length;
 
+  // ✅ Use workflow
   const handleUseWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     alert(`"${workflow?.title}" workflow activated!`);
   };
 
-  // ✅ Add new workflow
+  // ✅ ✅ FIX: Edit workflow - Sabke liye allow
+  const handleEditWorkflow = (id) => {
+    const workflow = workflows.find((w) => w.id === id);
+    if (workflow) {
+      setEditingWorkflow(workflow);
+      setShowCreateModal(true);
+    }
+  };
+
+  // ✅ ✅ FIX: Delete workflow - Sabke liye allow
+  const handleDeleteWorkflow = (id) => {
+    const workflow = workflows.find((w) => w.id === id);
+    if (workflow) {
+      if (window.confirm(`Delete "${workflow.title}"?`)) {
+        setWorkflows(prev => prev.filter(w => w.id !== id));
+      }
+    }
+  };
+
+  // ✅ Add/Edit workflow
   const addWorkflow = (newWorkflow) => {
-    const updatedWorkflows = [
-      ...workflows,
-      {
-        ...newWorkflow,
-        id: Date.now(),
-      },
-    ];
-    setWorkflows(updatedWorkflows);
+    if (editingWorkflow) {
+      // ✅ Edit mode
+      setWorkflows(prev =>
+        prev.map(w =>
+          w.id === editingWorkflow.id
+            ? { 
+                ...newWorkflow, 
+                id: editingWorkflow.id, 
+                isTemplate: editingWorkflow.isTemplate || false 
+              }
+            : w
+        )
+      );
+      setEditingWorkflow(null);
+    } else {
+      // ✅ Create mode
+      setWorkflows([
+        ...workflows,
+        {
+          ...newWorkflow,
+          id: Date.now(),
+          isTemplate: false,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    }
     setShowCreateModal(false);
   };
 
-  // ✅ Search results for dropdown
+  // ✅ Search results
   const getSearchResults = () => {
     if (!search.trim()) return [];
     return workflows.filter(
@@ -182,7 +297,7 @@ export default function Workflows({ onWorkflowsChange }) {
 
   const searchResults = getSearchResults();
 
-  // ✅ Upcoming notifications (workflow based)
+  // ✅ Notifications
   const getNotifications = () => {
     return workflows.slice(0, 3).map((w) => ({
       id: w.id,
@@ -192,11 +307,8 @@ export default function Workflows({ onWorkflowsChange }) {
   };
 
   const notifications = getNotifications();
-
-  // ✅ Comments count
   const commentsCount = workflows.length > 0 ? workflows.length : 0;
 
-  // Show loading state
   if (loading) {
     return <div className="workflows-container">Loading workflows...</div>;
   }
@@ -210,19 +322,20 @@ export default function Workflows({ onWorkflowsChange }) {
         <div className="workflows-topbar-right">
           <button
             className="workflows-create-btn"
-            onClick={() => setShowCreateModal(true)}
+            onClick={() => {
+              setEditingWorkflow(null);
+              setShowCreateModal(true);
+            }}
           >
             <span>+</span> Create
           </button>
 
           <div className="workflows-topbar-icons">
-            
-            {/* 🔍 SEARCH */}
+            {/* SEARCH */}
             <div className="workflows-icon-wrap">
               <button
                 className="workflows-icon-btn"
                 onClick={() => togglePanel("search")}
-                aria-label="Search workflows"
               >
                 <FaSearch />
               </button>
@@ -261,7 +374,7 @@ export default function Workflows({ onWorkflowsChange }) {
                         >
                           <span>{item.title}</span>
                           <span className="workflows-search-result-date">
-                            {item.category === "Before Event/Meeting" ? "Before" : "After"}
+                            {item.isTemplate ? "Template" : "My Workflow"}
                           </span>
                         </div>
                       ))}
@@ -271,12 +384,11 @@ export default function Workflows({ onWorkflowsChange }) {
               )}
             </div>
 
-            {/* 🔔 NOTIFICATIONS */}
+            {/* NOTIFICATIONS */}
             <div className="workflows-icon-wrap">
               <button
                 className="workflows-icon-btn"
                 onClick={() => togglePanel("notifications")}
-                aria-label="Notifications"
               >
                 <FaRegBell />
                 {notifications.length > 0 && (
@@ -295,9 +407,7 @@ export default function Workflows({ onWorkflowsChange }) {
                         <div
                           key={item.id}
                           className="workflows-search-result-item"
-                          onClick={() => {
-                            setActivePanel(null);
-                          }}
+                          onClick={() => setActivePanel(null)}
                         >
                           <span>{item.title}</span>
                           <span className="workflows-search-result-date">
@@ -311,12 +421,11 @@ export default function Workflows({ onWorkflowsChange }) {
               )}
             </div>
 
-            {/* 💬 COMMENTS */}
+            {/* COMMENTS */}
             <div className="workflows-icon-wrap">
               <button
                 className="workflows-icon-btn"
                 onClick={() => togglePanel("comments")}
-                aria-label="Comments"
               >
                 <FaRegCommentDots />
                 {commentsCount > 0 && (
@@ -334,7 +443,7 @@ export default function Workflows({ onWorkflowsChange }) {
               )}
             </div>
 
-            {/* 👤 PROFILE */}
+            {/* PROFILE */}
             <div className="workflows-icon-wrap workflows-avatar-wrap" onClick={() => togglePanel("profile")}>
               <FaUserCircle className="workflows-avatar-icon" />
               <FaChevronDown className="workflows-avatar-chevron" />
@@ -344,20 +453,20 @@ export default function Workflows({ onWorkflowsChange }) {
                   <div className="workflows-profile-dropdown-header">
                     <FaUserCircle className="workflows-profile-avatar" />
                     <div>
-                      <h4>My Account</h4>
-                      <span>Manage your profile</span>
+                      <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
+                      <span>{currentUser?.email || "Manage your profile"}</span>
                     </div>
                   </div>
 
                   <div className="workflows-profile-menu">
-                    <button type="button" className="workflows-profile-menu-item">
-                      <FaUserCircle /> Profile
+                    <button type="button" className="workflows-profile-menu-item" onClick={handleProfileClick}>
+                      <FaUser /> Profile
                     </button>
-                    <button type="button" className="workflows-profile-menu-item">
-                      <FaSearch /> Settings
+                    <button type="button" className="workflows-profile-menu-item" onClick={handleSettingsClick}>
+                      <FaCog /> Settings
                     </button>
-                    <button type="button" className="workflows-profile-menu-item workflows-profile-menu-logout">
-                      <FaUserCircle /> Logout
+                    <button type="button" className="workflows-profile-menu-item workflows-profile-menu-logout" onClick={handleLogout}>
+                      <FaSignOutAlt /> Logout
                     </button>
                   </div>
                 </div>
@@ -375,17 +484,27 @@ export default function Workflows({ onWorkflowsChange }) {
           <div className="workflows-tabs">
             <button
               className={`workflows-tab ${activeTab === "my" ? "active" : ""}`}
-              onClick={() => setActiveTab("my")}
+              onClick={() => {
+                setActiveTab("my");
+                setShowAll(false);
+              }}
             >
               My workflow
+              <span className="workflows-tab-count">
+                {workflows.filter(w => !w.isTemplate).length}
+              </span>
             </button>
             <button
-              className={`workflows-tab ${
-                activeTab === "templates" ? "active" : ""
-              }`}
-              onClick={() => setActiveTab("templates")}
+              className={`workflows-tab ${activeTab === "templates" ? "active" : ""}`}
+              onClick={() => {
+                setActiveTab("templates");
+                setShowAll(false);
+              }}
             >
               Templates
+              <span className="workflows-tab-count">
+                {workflows.filter(w => w.isTemplate).length}
+              </span>
             </button>
           </div>
 
@@ -398,10 +517,7 @@ export default function Workflows({ onWorkflowsChange }) {
             </button>
 
             {filterOpen && (
-              <div
-                className="workflows-filter-backdrop"
-                onClick={() => setFilterOpen(false)}
-              />
+              <div className="workflows-filter-backdrop" onClick={() => setFilterOpen(false)} />
             )}
 
             {filterOpen && (
@@ -429,17 +545,32 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         </div>
 
+        {/* ✅ Empty State for My Workflow */}
+        {activeTab === "my" && filteredWorkflows.length === 0 && (
+          <div className="workflows-empty">
+            <div className="workflows-empty-icon">📋</div>
+            <h3>No workflows created yet</h3>
+            <p>Create your first workflow to automate your event processes.</p>
+            <button
+              className="workflows-create-btn"
+              onClick={() => {
+                setEditingWorkflow(null);
+                setShowCreateModal(true);
+              }}
+            >
+              <span>+</span> Create Workflow
+            </button>
+          </div>
+        )}
+
         {/* Before Event/Meeting Section */}
         {displayBefore.length > 0 && (
           <div className="workflows-section">
             <div className="workflows-section-header">
               <h2 className="workflows-section-title">Before Event/Meeting</h2>
               <button
-                className={`workflows-section-collapse ${
-                  collapsed.before ? "collapsed" : ""
-                }`}
+                className={`workflows-section-collapse ${collapsed.before ? "collapsed" : ""}`}
                 onClick={() => toggleCollapse("before")}
-                aria-label="Toggle section"
               >
                 <FaChevronUp />
               </button>
@@ -451,6 +582,9 @@ export default function Workflows({ onWorkflowsChange }) {
                     key={workflow.id}
                     workflow={workflow}
                     onUse={handleUseWorkflow}
+                    onEdit={handleEditWorkflow}      // ✅ Sabko edit dena
+                    onDelete={handleDeleteWorkflow}  // ✅ Sabko delete dena
+                    isTemplate={workflow.isTemplate}
                   />
                 ))}
               </div>
@@ -464,11 +598,8 @@ export default function Workflows({ onWorkflowsChange }) {
             <div className="workflows-section-header">
               <h2 className="workflows-section-title">After Event/Meeting</h2>
               <button
-                className={`workflows-section-collapse ${
-                  collapsed.after ? "collapsed" : ""
-                }`}
+                className={`workflows-section-collapse ${collapsed.after ? "collapsed" : ""}`}
                 onClick={() => toggleCollapse("after")}
-                aria-label="Toggle section"
               >
                 <FaChevronUp />
               </button>
@@ -480,6 +611,9 @@ export default function Workflows({ onWorkflowsChange }) {
                     key={workflow.id}
                     workflow={workflow}
                     onUse={handleUseWorkflow}
+                    onEdit={handleEditWorkflow}      
+                    onDelete={handleDeleteWorkflow}  
+                    isTemplate={workflow.isTemplate}
                   />
                 ))}
               </div>
@@ -500,25 +634,24 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         )}
 
-        {/* Empty State */}
-        {filteredBefore.length === 0 && filteredAfter.length === 0 && (
+        {/* Empty State for Templates */}
+        {activeTab === "templates" && filteredWorkflows.length === 0 && (
           <div className="workflows-empty">
-            <p>No workflows found</p>
-            <button
-              className="workflows-create-btn"
-              onClick={() => setShowCreateModal(true)}
-            >
-              <span>+</span> Create Workflow
-            </button>
+            <p>No templates available</p>
           </div>
         )}
       </div>
 
-      {/* Create Workflow Modal */}
+      {/* Create/Edit Workflow Modal */}
       {showCreateModal && (
         <CreateWorkflowModal
-          onClose={() => setShowCreateModal(false)}
+          onClose={() => {
+            setShowCreateModal(false);
+            setEditingWorkflow(null);
+          }}
           onSave={addWorkflow}
+          initialData={editingWorkflow}
+          isEditMode={!!editingWorkflow}
         />
       )}
     </>
