@@ -1,3 +1,6 @@
+
+import { getEventColor } from "../../utils/colorUtils";
+
 // src/component/AppointmentSchedule/AppointmentSchedule.jsx
 import { useState, useEffect } from "react";
 import {
@@ -14,18 +17,20 @@ import {
   FaUser,
   FaCog,
   FaSignOutAlt,
+  FaTrash,
+  FaClock,
 } from "react-icons/fa";
 import AppointmentCard from "./AppointmentCard";
 import CreateAppointment from "../CreateAppointment/CreateAppointment";
 import { useAppointments } from "../../context/AppointmentContext";
 import "./appointmentSchedule.css";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export default function AppointmentSchedule() {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const { appointments, addAppointment, deleteAppointment, loading } = useAppointments();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
@@ -35,12 +40,12 @@ export default function AppointmentSchedule() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState("all");
   const [filterDuration, setFilterDuration] = useState("all");
-
-  const[currentUser, setCurrentUser] = useState(null);
-  const[checkingAuth, setCheckingAuth] = useState(true);
+  const [currentUser, setCurrentUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [activePanel, setActivePanel] = useState(null);
   
-  // ✅ State for topbar dropdowns
-  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile'
+  // ✅ Week view state
+  const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
   // ✅ Toggle panels
   const togglePanel = (panel) => {
@@ -59,7 +64,7 @@ export default function AppointmentSchedule() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // ✅ Initialize expanded months from appointments
+  // ✅ Initialize expanded months
   const [expandedMonths, setExpandedMonths] = useState(() => {
     const state = {};
     appointments.forEach(month => {
@@ -68,7 +73,6 @@ export default function AppointmentSchedule() {
     return state;
   });
 
-  // ✅ Update expanded months when appointments change
   useEffect(() => {
     const state = {};
     appointments.forEach(month => {
@@ -77,42 +81,42 @@ export default function AppointmentSchedule() {
     setExpandedMonths(state);
   }, [appointments]);
 
-  useEffect(()=>{
+  // ✅ Auth check
+  useEffect(() => {
     const stored = localStorage.getItem("currentUser");
-    if(!stored){
+    if (!stored) {
       navigate("/signin");
       return;
     }
-    try{
+    try {
       setCurrentUser(JSON.parse(stored));
-    }catch(error){
-      console.log("Invalid currentUser in strorage:", error);
+    } catch (error) {
+      console.log("Invalid currentUser in storage:", error);
       localStorage.removeItem("currentUser");
       navigate("/signin");
       return;
     }
     setCheckingAuth(false);
-  },[navigate]);
+  }, [navigate]);
 
-const handleLogout = () =>{
-  localStorage.removeItem("currentUser");
-  setActivePanel(null);
-  navigate("/signin");
-}
-const handleProfileClick = () =>{
-  setActivePanel(null);
-  navigate("/profile");
-}
+  // ✅ Profile actions
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setActivePanel(null);
+    navigate("/signin");
+  };
+  const handleProfileClick = () => {
+    setActivePanel(null);
+    navigate("/profile");
+  };
+  const handleSettingsClick = () => {
+    setActivePanel(null);
+    navigate("/settings");
+  };
 
-const handleSettingsClick = () =>{
-  setActivePanel(null);
-  navigate("/settings");
-}
-
-if(checkingAuth){
-  return null;
-}
-
+  if (checkingAuth) {
+    return null;
+  }
 
   const toggleMonth = (monthName) => {
     setExpandedMonths(prev => ({
@@ -121,11 +125,124 @@ if(checkingAuth){
     }));
   };
 
+  // ✅ Month view navigation
   const previousYear = () => setCurrentYear(y => y - 1);
   const nextYear = () => setCurrentYear(y => y + 1);
   const goToThisMonth = () => setCurrentYear(new Date().getFullYear());
 
-  // ✅ Ensure all months exist in appointments
+  // ✅ Week view navigation
+  const goToPreviousWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() - 7);
+    setCurrentWeekStart(newDate);
+  };
+
+  const goToNextWeek = () => {
+    const newDate = new Date(currentWeekStart);
+    newDate.setDate(newDate.getDate() + 7);
+    setCurrentWeekStart(newDate);
+  };
+
+  const goToThisWeek = () => {
+    setCurrentWeekStart(new Date());
+  };
+
+  // ✅ Get week range text
+  const getWeekRangeText = () => {
+    const weekDays = getWeekDates(currentWeekStart);
+    const start = weekDays[0];
+    const end = weekDays[6];
+    const startMonth = start.toLocaleString('default', { month: 'short' });
+    const endMonth = end.toLocaleString('default', { month: 'short' });
+    const year = start.getFullYear();
+    
+    if (startMonth === endMonth) {
+      return `${startMonth} ${start.getDate()} - ${end.getDate()}, ${year}`;
+    }
+    return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
+  };
+
+  // ✅ Get week dates
+  const getWeekDates = (startDate) => {
+    const today = new Date(startDate);
+    const currentDay = today.getDay();
+    const diff = today.getDate() - currentDay + (currentDay === 0 ? -6 : 1);
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(diff);
+    startOfWeek.setHours(0, 0, 0, 0);
+    
+    const week = [];
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + i);
+      week.push(day);
+    }
+    return week;
+  };
+
+  // ✅ Get all appointments (flatten months)
+  const getAllAppointments = () => {
+    const all = [];
+    appointments.forEach(monthData => {
+      monthData.appointments.forEach(apt => {
+        all.push({
+          ...apt,
+          month: monthData.month
+        });
+      });
+    });
+    return all;
+  };
+
+  // ✅ Get appointments for a specific date
+  const getAppointmentsForDate = (date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    const allAppointments = getAllAppointments();
+    return allAppointments.filter(apt => apt.date === dateStr);
+  };
+
+  // ✅ Get event color
+  const getEventColor = (color) => {
+    const colors = {
+      purple: { bg: '#8755D5', text: '#ffffff' },
+      teal: { bg: '#16A6AD', text: '#ffffff' },
+      orange: { bg: '#FF7800', text: '#ffffff' },
+      blue: { bg: '#2F80D7', text: '#ffffff' },
+      pink: { bg: '#E84C8A', text: '#ffffff' },
+      green: { bg: '#27AE60', text: '#ffffff' },
+      red: { bg: '#E74C3C', text: '#ffffff' },
+      yellow: { bg: '#F2C94C', text: '#1a1a1a' },
+      indigo: { bg: '#4A56E2', text: '#ffffff' },
+      brown: { bg: '#8B5E3C', text: '#ffffff' },
+    };
+    return colors[color] || colors.purple;
+  };
+
+  // ✅ Get event position
+  const getEventPosition = (startTime, endTime) => {
+    const [startHour, startMinute] = startTime ? startTime.split(":").map(Number) : [9, 0];
+    const [endHour, endMinute] = endTime ? endTime.split(":").map(Number) : [10, 0];
+    const calendarStartHour = 7;
+    const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
+    const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
+    const top = (startMinutes / 60) * 58;
+    const height = ((endMinutes - startMinutes) / 60) * 58;
+    return { top, height: Math.max(height, 30) };
+  };
+
+  // ✅ Week days and time slots
+  const weekDays = getWeekDates(currentWeekStart);
+  const weekDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+  const today = new Date();
+
+  const timeSlots = [];
+  for (let i = 7; i <= 23; i++) {
+    const hour = i > 12 ? i - 12 : i;
+    const ampm = i >= 12 ? 'PM' : 'AM';
+    timeSlots.push(`${hour}:00 ${ampm}`);
+  }
+
+  // ✅ Month view - Ensure all months exist
   const allMonths = MONTHS.map(month => {
     const existing = appointments.find(a => a.month === month);
     if (existing) return existing;
@@ -163,34 +280,31 @@ if(checkingAuth){
     };
   });
 
-  // Only show months that have appointments or current month
   const visibleMonths = filteredMonths.filter(month => 
     month.appointments.length > 0 || month.month === MONTHS[new Date().getMonth()]
   );
 
-  // ✅ Get upcoming notifications (same as Calendar)
+  // ✅ Notifications
   const getUpcomingNotifications = () => {
     const now = new Date();
     const notifications = [];
+    const allAppointments = getAllAppointments();
     
-    appointments.forEach(monthData => {
-      monthData.appointments.forEach(apt => {
-        if (apt.startTime) {
-          const [hours, minutes] = apt.startTime.split(":").map(Number);
-          const eventDate = new Date();
-          eventDate.setHours(hours, minutes, 0, 0);
-          
-          const diffMinutes = (eventDate - now) / 60000;
-          if (diffMinutes >= -10 && diffMinutes <= 60) {
-            notifications.push({
-              item: apt,
-              diffMinutes
-            });
-          }
+    allAppointments.forEach(apt => {
+      if (apt.startTime) {
+        const [hours, minutes] = apt.startTime.split(":").map(Number);
+        const eventDate = new Date();
+        eventDate.setHours(hours, minutes, 0, 0);
+        
+        const diffMinutes = (eventDate - now) / 60000;
+        if (diffMinutes >= -10 && diffMinutes <= 60) {
+          notifications.push({
+            item: apt,
+            diffMinutes
+          });
         }
-      });
+      }
     });
-    
     return notifications.sort((a, b) => a.diffMinutes - b.diffMinutes);
   };
 
@@ -202,7 +316,6 @@ if(checkingAuth){
     return `Started ${Math.round(-diffMinutes)} min ago`;
   };
 
-  // ✅ Comments count
   const getCommentsCount = () => {
     let count = 0;
     appointments.forEach(monthData => {
@@ -213,23 +326,20 @@ if(checkingAuth){
     return count;
   };
 
-  // ✅ Search results
   const getSearchResults = () => {
     if (!search.trim()) return [];
     const results = [];
-    appointments.forEach(monthData => {
-      monthData.appointments.forEach(apt => {
-        if (apt.title.toLowerCase().includes(search.trim().toLowerCase())) {
-          results.push(apt);
-        }
-      });
+    const allAppointments = getAllAppointments();
+    allAppointments.forEach(apt => {
+      if (apt.title.toLowerCase().includes(search.trim().toLowerCase())) {
+        results.push(apt);
+      }
     });
     return results;
   };
 
   const searchResults = getSearchResults();
 
-  // ✅ Show loading state
   if (loading) {
     return <div className="appointment-layout">Loading...</div>;
   }
@@ -238,9 +348,7 @@ if(checkingAuth){
     <div className="appointment-layout">
       <section className="appointment-main">
         
-        {/* ============================================
-            TOPBAR - Calendar Style
-            ============================================ */}
+        {/* TOPBAR */}
         <div className="appointment-topbar">
           <h1>Appointment Schedule</h1>
           
@@ -254,16 +362,14 @@ if(checkingAuth){
 
             <div className="appointment-topbar-icons">
               
-              {/* 🔍 SEARCH */}
+              {/* SEARCH */}
               <div className="appointment-icon-wrap">
                 <button
                   className="appointment-icon-btn"
                   onClick={() => togglePanel("search")}
-                  aria-label="Search appointments"
                 >
                   <FaSearch />
                 </button>
-
                 {activePanel === "search" && (
                   <div className="appointment-icon-dropdown">
                     <h4>Search appointments</h4>
@@ -276,15 +382,12 @@ if(checkingAuth){
                         onChange={(e) => setSearch(e.target.value)}
                       />
                     </div>
-
                     {search.trim() === "" && (
                       <div className="appointment-dropdown-empty">Type to search your appointments</div>
                     )}
-
                     {search.trim() !== "" && searchResults.length === 0 && (
                       <div className="appointment-dropdown-empty">No appointments found</div>
                     )}
-
                     {searchResults.length > 0 && (
                       <div className="appointment-search-result-list">
                         {searchResults.map((item) => (
@@ -308,19 +411,17 @@ if(checkingAuth){
                 )}
               </div>
 
-              {/* 🔔 NOTIFICATIONS */}
+              {/* NOTIFICATIONS */}
               <div className="appointment-icon-wrap">
                 <button
                   className="appointment-icon-btn"
                   onClick={() => togglePanel("notifications")}
-                  aria-label="Notifications"
                 >
                   <FaRegBell />
                   {upcomingNotifications.length > 0 && (
                     <span className="appointment-icon-badge"></span>
                   )}
                 </button>
-
                 {activePanel === "notifications" && (
                   <div className="appointment-icon-dropdown">
                     <h4>Upcoming meetings</h4>
@@ -332,9 +433,7 @@ if(checkingAuth){
                           <div
                             key={item.id}
                             className="appointment-search-result-item"
-                            onClick={() => {
-                              setActivePanel(null);
-                            }}
+                            onClick={() => setActivePanel(null)}
                           >
                             <span>{item.title}</span>
                             <span className="appointment-search-result-date">
@@ -348,19 +447,17 @@ if(checkingAuth){
                 )}
               </div>
 
-              {/* 💬 COMMENTS */}
+              {/* COMMENTS */}
               <div className="appointment-icon-wrap">
                 <button
                   className="appointment-icon-btn"
                   onClick={() => togglePanel("comments")}
-                  aria-label="Comments"
                 >
                   <FaRegCommentDots />
                   {getCommentsCount() > 0 && (
                     <span className="appointment-icon-badge"></span>
                   )}
                 </button>
-
                 {activePanel === "comments" && (
                   <div className="appointment-icon-dropdown">
                     <h4>Comments</h4>
@@ -371,30 +468,27 @@ if(checkingAuth){
                 )}
               </div>
 
-              {/* 👤 PROFILE */}
+              {/* PROFILE */}
               <div className="appointment-icon-wrap appointment-avatar-wrap" onClick={() => togglePanel("profile")}>
                 <FaUserCircle className="appointment-avatar-icon" />
                 <FaChevronDown className="appointment-avatar-chevron" />
-
                 {activePanel === "profile" && (
                   <div className="appointment-icon-dropdown appointment-profile-dropdown">
                     <div className="appointment-profile-dropdown-header">
                       <FaUserCircle className="appointment-profile-avatar" />
                       <div>
-                        <h4>My Account</h4>
-                        <span>Manage your profile</span>
+                        <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
+                        <span>{currentUser?.email || "Manage your profile"}</span>
                       </div>
                     </div>
-
                     <div className="appointment-profile-menu">
-                      <button type="button" className="appointment-profile-menu-item"onClick={handleProfileClick}>
+                      <button type="button" className="appointment-profile-menu-item" onClick={handleProfileClick}>
                         <FaUser /> Profile
                       </button>
-                      <button type="button" className="appointment-profile-menu-item"onClick={handleSettingsClick}>
+                      <button type="button" className="appointment-profile-menu-item" onClick={handleSettingsClick}>
                         <FaCog /> Settings
                       </button>
-                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout"
-                      onClick={handleLogout}>
+                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout" onClick={handleLogout}>
                         <FaSignOutAlt /> Logout
                       </button>
                     </div>
@@ -406,23 +500,41 @@ if(checkingAuth){
           </div>
         </div>
 
-        {/* ============================================
-            SCHEDULE CONTAINER
-            ============================================ */}
+        {/* SCHEDULE CONTAINER */}
         <div className="schedule-container">
+          
           {/* Toolbar */}
           <div className="schedule-toolbar">
             <div className="toolbar-left">
-              <strong>{currentYear}</strong>
-              <button className="year-btn" onClick={previousYear}>
-                <FaChevronLeft />
-              </button>
-              <button className="year-btn" onClick={nextYear}>
-                <FaChevronRight />
-              </button>
-              <button className="this-month" onClick={goToThisMonth}>
-                This Month
-              </button>
+              <strong>
+                {view === "week" ? getWeekRangeText() : currentYear}
+              </strong>
+              
+              {view === "week" ? (
+                <>
+                  <button className="year-btn" onClick={goToPreviousWeek}>
+                    <FaChevronLeft />
+                  </button>
+                  <button className="year-btn" onClick={goToNextWeek}>
+                    <FaChevronRight />
+                  </button>
+                  <button className="this-month" onClick={goToThisWeek}>
+                    This Week
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button className="year-btn" onClick={previousYear}>
+                    <FaChevronLeft />
+                  </button>
+                  <button className="year-btn" onClick={nextYear}>
+                    <FaChevronRight />
+                  </button>
+                  <button className="this-month" onClick={goToThisMonth}>
+                    This Month
+                  </button>
+                </>
+              )}
             </div>
 
             <div className="toolbar-right">
@@ -475,19 +587,111 @@ if(checkingAuth){
             </div>
           )}
 
-          {/* Week View */}
+          {/* ============================================
+              WEEK VIEW - Complete Working
+          ============================================ */}
           {view === "week" ? (
-            <div className="week-view">
-              <div className="week-empty">
-                <h2>Weekly Schedule</h2>
-                <p>Your weekly appointment schedule will appear here.</p>
-                <button onClick={() => setShowCreate(true)}>
+            <div className="week-view-container">
+              {/* Week Header */}
+              <div className="week-header">
+                <div className="week-header-time"></div>
+                {weekDays.map((day, index) => {
+                  const isToday = today.toDateString() === day.toDateString();
+                  const dayAppointments = getAppointmentsForDate(day);
+                  return (
+                    <div key={index} className="week-header-day">
+                      <span className="week-day-name">{weekDayNames[index]}</span>
+                      <span className={`week-day-number ${isToday ? 'today' : ''}`}>
+                        {day.getDate()}
+                      </span>
+                      <span className="week-day-count">{dayAppointments.length} events</span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Week Body */}
+              <div className="week-body">
+                {/* Time Column */}
+                <div className="week-time-column">
+                  <div className="week-time-header">Time</div>
+                  {timeSlots.map((time, index) => (
+                    <div key={index} className="week-time-slot">{time}</div>
+                  ))}
+                </div>
+
+                {/* Day Columns */}
+                {weekDays.map((day, dayIndex) => {
+                  const dayAppointments = getAppointmentsForDate(day);
+                  const isToday = today.toDateString() === day.toDateString();
+                  
+                  return (
+                    <div key={dayIndex} className={`week-day-column ${isToday ? 'today-column' : ''}`}>
+                      {/* Grid lines */}
+                      <div className="week-grid-lines">
+                        {timeSlots.map((_, index) => (
+                          <div key={index} className="week-grid-line"></div>
+                        ))}
+                      </div>
+
+                      {/* Events */}
+                      {dayAppointments.map((appointment) => {
+                        const startTime = appointment.startTime || "09:00";
+                        const endTime = appointment.endTime || "10:00";
+                        const { top, height } = getEventPosition(startTime, endTime);
+                        const color = getEventColor(appointment.color || "purple");
+                        
+                        return (
+                          <div
+                            key={appointment.id}
+                            className="week-event-item"
+                            style={{
+                              top: `${top + 40}px`,
+                              height: `${height}px`,
+                              background: color.bg,
+                              color: color.text,
+                            }}
+                          >
+                            <button
+                              className="week-event-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                deleteAppointment(appointment.id);
+                              }}
+                            >
+                              <FaTrash />
+                            </button>
+                            <strong>{appointment.title}</strong>
+                            <span>{startTime} - {endTime}</span>
+                          </div>
+                        );
+                      })}
+
+                      {/* Empty state */}
+                      {dayAppointments.length === 0 && (
+                        <div className="week-day-empty">
+                          <span>No events</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Create button in week view */}
+              <div className="week-create-btn-wrap">
+                <button 
+                  className="week-create-btn"
+                  onClick={() => setShowCreate(true)}
+                >
                   <FaPlus /> Create Appointment
                 </button>
               </div>
             </div>
           ) : (
-            /* Month View */
+            /* ============================================
+                MONTH VIEW
+            ============================================ */
             <div className="months-container">
               {visibleMonths.map((month) => (
                 <div className="month-section" key={month.month}>
@@ -536,7 +740,25 @@ if(checkingAuth){
       {showCreate && (
         <CreateAppointment
           onClose={() => setShowCreate(false)}
-          onSave={addAppointment}
+          onSave={(newAppointment, targetMonth) => {
+            const today = new Date();
+            const dateStr = today.toISOString().split('T')[0];
+            
+            const appointmentWithDate = {
+              ...newAppointment,
+              date: newAppointment.date || dateStr,
+              startTime: newAppointment.startTime || `${String(today.getHours() + 1).padStart(2, '0')}:00`,
+              endTime: newAppointment.endTime || `${String(today.getHours() + 2).padStart(2, '0')}:00`,
+            };
+            
+            addAppointment(appointmentWithDate, targetMonth);
+            setShowCreate(false);
+            
+            // Refresh week view
+            if (view === "week") {
+              setCurrentWeekStart(new Date(currentWeekStart));
+            }
+          }}
         />
       )}
     </div>
