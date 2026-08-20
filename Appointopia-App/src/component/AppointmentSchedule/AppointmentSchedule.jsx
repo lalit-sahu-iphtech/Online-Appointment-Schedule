@@ -11,16 +11,21 @@ import {
   FaChevronRight,
   FaChevronUp,
   FaFilter,
+  FaUser,
+  FaCog,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import AppointmentCard from "./AppointmentCard";
 import CreateAppointment from "../CreateAppointment/CreateAppointment";
 import { useAppointments } from "../../context/AppointmentContext";
 import "./appointmentSchedule.css";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export default function AppointmentSchedule() {
+  const navigate = useNavigate(); 
   const { appointments, addAppointment, deleteAppointment, loading } = useAppointments();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
@@ -30,6 +35,9 @@ export default function AppointmentSchedule() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [filterType, setFilterType] = useState("all");
   const [filterDuration, setFilterDuration] = useState("all");
+
+  const[currentUser, setCurrentUser] = useState(null);
+  const[checkingAuth, setCheckingAuth] = useState(true);
   
   // ✅ State for topbar dropdowns
   const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile'
@@ -68,6 +76,43 @@ export default function AppointmentSchedule() {
     });
     setExpandedMonths(state);
   }, [appointments]);
+
+  useEffect(()=>{
+    const stored = localStorage.getItem("currentUser");
+    if(!stored){
+      navigate("/signin");
+      return;
+    }
+    try{
+      setCurrentUser(JSON.parse(stored));
+    }catch(error){
+      console.log("Invalid currentUser in strorage:", error);
+      localStorage.removeItem("currentUser");
+      navigate("/signin");
+      return;
+    }
+    setCheckingAuth(false);
+  },[navigate]);
+
+const handleLogout = () =>{
+  localStorage.removeItem("currentUser");
+  setActivePanel(null);
+  navigate("/signin");
+}
+const handleProfileClick = () =>{
+  setActivePanel(null);
+  navigate("/profile");
+}
+
+const handleSettingsClick = () =>{
+  setActivePanel(null);
+  navigate("/settings");
+}
+
+if(checkingAuth){
+  return null;
+}
+
 
   const toggleMonth = (monthName) => {
     setExpandedMonths(prev => ({
@@ -342,14 +387,15 @@ export default function AppointmentSchedule() {
                     </div>
 
                     <div className="appointment-profile-menu">
-                      <button type="button" className="appointment-profile-menu-item">
-                        <FaUserCircle /> Profile
+                      <button type="button" className="appointment-profile-menu-item"onClick={handleProfileClick}>
+                        <FaUser /> Profile
                       </button>
-                      <button type="button" className="appointment-profile-menu-item">
-                        <FaSearch /> Settings
+                      <button type="button" className="appointment-profile-menu-item"onClick={handleSettingsClick}>
+                        <FaCog /> Settings
                       </button>
-                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout">
-                        <FaUserCircle /> Logout
+                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout"
+                      onClick={handleLogout}>
+                        <FaSignOutAlt /> Logout
                       </button>
                     </div>
                   </div>
