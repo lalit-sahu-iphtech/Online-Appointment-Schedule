@@ -6,14 +6,23 @@ import {
     FaMapMarkerAlt,
     FaPlus,
     FaLink,
-    FaClock
+    FaClock,
+    FaUserCircle,
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 
-export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
+// ✅ Default avatar colors for different users
+const AVATAR_COLORS = [
+    '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
+    '#E84C8A', '#27AE60', '#F2C94C', '#4A56E2'
+];
 
-    // Agar defaultDate string hai toh use karo, nahi toh today's date
+export default function AddMeetingModal({ onClose, onSave, defaultDate, initialData, isEditMode }) {
+
     const getDefaultDate = () => {
+        if (initialData?.date) {
+            return initialData.date;
+        }
         if (defaultDate && typeof defaultDate === 'string') {
             return defaultDate;
         }
@@ -21,28 +30,40 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
         return today.toISOString().split('T')[0];
     };
 
-    const [formData, setFormData] = useState({
-        meetingName: "",
+    // NEW: initialData ho to usi se form banao, warna defaults se (create mode)
+    const buildFormData = () => ({
+        meetingName: initialData?.meetingName || "",
         date: getDefaultDate(),
-        startTime: "09:00",
-        endTime: "10:00",
-        location: "",
-        onlineLink: "",
-        invitees: []
+        startTime: initialData?.startTime || "09:00",
+        endTime: initialData?.endTime || "10:00",
+        location: initialData?.location || "",
+        onlineLink: initialData?.onlineLink || "",
+        invitees: initialData?.invitees ? [...initialData.invitees] : []  // ✅ ab edit pe invitees preserve honge
     });
 
-    const [invitee, setInvitee] = useState("");
+    const [formData, setFormData] = useState(buildFormData);
+
+    const [inviteeName, setInviteeName] = useState("");
     const [errors, setErrors] = useState({});
 
-    // Jab defaultDate change ho toh form update ho
+    // Jab modal create-mode me sirf defaultDate se khule
     useEffect(() => {
-        if (defaultDate && typeof defaultDate === 'string') {
+        if (!initialData && defaultDate && typeof defaultDate === 'string') {
             setFormData(prev => ({
                 ...prev,
                 date: defaultDate
             }));
         }
-    }, [defaultDate]);
+    }, [defaultDate, initialData]);
+
+    // NEW: jab initialData badle (Edit button se modal khule, ya doosri meeting edit karo),
+    // form ko us meeting ke data se re-populate karo — isse invitees/location/link kabhi wipe nahi honge
+    useEffect(() => {
+        setFormData(buildFormData());
+        setErrors({});
+        setInviteeName("");
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialData]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -50,7 +71,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
             ...formData,
             [name]: value
         });
-        // Clear error for this field
         if (errors[name]) {
             setErrors({
                 ...errors,
@@ -59,36 +79,45 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
         }
     };
 
+    // ✅ Add invitee with avatar color
     const addInvitee = () => {
-        if (!invitee.trim()) {
+        if (!inviteeName.trim()) {
             alert("Please enter a name");
             return;
         }
 
         // Check duplicate
-        if (formData.invitees.includes(invitee.trim())) {
+        if (formData.invitees.some(item => item.name === inviteeName.trim())) {
             alert("This person is already invited");
             return;
         }
 
+        // ✅ Create invitee object with random avatar color
+        const newInvitee = {
+            id: Date.now(),
+            name: inviteeName.trim(),
+            email: `${inviteeName.trim().toLowerCase().replace(/\s/g, '.')}@example.com`,
+            avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+            initials: inviteeName.trim().split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+        };
+
         setFormData({
             ...formData,
-            invitees: [...formData.invitees, invitee.trim()]
+            invitees: [...formData.invitees, newInvitee]
         });
-        setInvitee("");
+        setInviteeName("");
     };
 
-    const removeInvitee = (index) => {
+    const removeInvitee = (id) => {
         setFormData({
             ...formData,
-            invitees: formData.invitees.filter((_, i) => i !== index)
+            invitees: formData.invitees.filter(item => item.id !== id)
         });
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validation
         const newErrors = {};
         if (!formData.meetingName.trim()) {
             newErrors.meetingName = "Meeting name is required";
@@ -105,7 +134,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
             return;
         }
 
-        // Check if end time is after start time
         if (formData.startTime >= formData.endTime) {
             alert("End time must be after start time");
             return;
@@ -115,7 +143,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
         onClose();
     };
 
-    // Handle Enter key in invitee input
     const handleInviteeKeyPress = (e) => {
         if (e.key === 'Enter') {
             e.preventDefault();
@@ -123,19 +150,31 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
         }
     };
 
+    // ✅ Get initials from name
+    const getInitials = (name) => {
+        return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
+    };
+
+    // ✅ Get random color based on name
+    const getColorFromName = (name) => {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) {
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+    };
+
     return (
         <div className="meeting-overlay" onClick={onClose}>
             <div className="meeting-modal" onClick={(e) => e.stopPropagation()}>
 
-                {/* HEADER */}
                 <div className="meeting-modal-header">
-                    <h2>Add New Meeting</h2>
+                    <h2>{isEditMode ? "Edit Meeting" : "Add New Meeting"}</h2>
                     <button className="meeting-close-btn" onClick={onClose}>
                         <FaTimes />
                     </button>
                 </div>
 
-                {/* FORM */}
                 <form onSubmit={handleSubmit}>
                     <div className="meeting-form-body">
 
@@ -166,7 +205,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
                                         value={formData.date}
                                         onChange={handleChange}
                                     />
-                                    <FaCalendarAlt />
                                 </div>
                             </div>
 
@@ -224,16 +262,23 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
                             </div>
                         </div>
 
-                        {/* INVITEES */}
+                        {/* ✅ INVITEES WITH AVATAR */}
                         <div className="invitees-section">
                             <label>Invitees</label>
                             <div className="invitee-list">
-                                {formData.invitees.map((person, index) => (
-                                    <div className="invitee-chip" key={index}>
-                                        <span>{person}</span>
+                                {formData.invitees.map((person) => (
+                                    <div className="invitee-chip-with-avatar" key={person.id}>
+                                        <div 
+                                            className="invitee-avatar"
+                                            style={{ backgroundColor: person.avatarColor || getColorFromName(person.name) }}
+                                        >
+                                            {person.initials || getInitials(person.name)}
+                                        </div>
+                                        <span className="invitee-name">{person.name}</span>
                                         <button
                                             type="button"
-                                            onClick={() => removeInvitee(index)}
+                                            className="invitee-remove"
+                                            onClick={() => removeInvitee(person.id)}
                                         >
                                             ×
                                         </button>
@@ -243,8 +288,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
                                 <div className="add-invitee">
                                     <input
                                         type="text"
-                                        value={invitee}
-                                        onChange={(e) => setInvitee(e.target.value)}
+                                        value={inviteeName}
+                                        onChange={(e) => setInviteeName(e.target.value)}
                                         onKeyPress={handleInviteeKeyPress}
                                         placeholder="Add invitee"
                                     />
@@ -289,13 +334,12 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate }) {
 
                     </div>
 
-                    {/* FOOTER */}
                     <div className="meeting-modal-footer">
                         <button type="button" className="advanced-btn">
                             ⚙️ Advanced settings
                         </button>
                         <button type="submit" className="save-meeting-btn">
-                            ✅ Save Meeting
+                            {isEditMode ? "✅ Update Meeting" : "✅ Save Meeting"}
                         </button>
                     </div>
                 </form>

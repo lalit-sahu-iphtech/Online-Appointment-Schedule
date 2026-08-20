@@ -1,170 +1,205 @@
-import { useState } from "react";
+
 import {
   FaTimes,
+  FaExpandAlt,
   FaCalendarAlt,
   FaClock,
   FaMapMarkerAlt,
   FaLink,
   FaShareAlt,
-  FaCheck,
-  FaRegCommentDots,
+  FaUserFriends,
+  FaRegUserCircle,
+  FaPen,
 } from "react-icons/fa";
-import "./AddMeetingModal.css";
+import "./eventDetailsModal.css";
 
-export default function EventDetailsModal({ event, onClose, onAddComment }) {
-  const [copied, setCopied] = useState(false);
-  const [commentText, setCommentText] = useState("");
-
-  // Agar koi event click nahi hua toh popup mat dikhao
+export default function EventDetailsModal({ event, onClose, onExpand, onEdit, onShare }) {
   if (!event) return null;
 
-  // Meeting link ya current URL
   const meetingLink = event.onlineLink || window.location.href;
 
-  // Link copy karne ka function
-  const handleShareLink = () => {
+  const handleShare = () => {
+    if (onShare) {
+      onShare(event);
+      return;
+    }
     navigator.clipboard.writeText(meetingLink);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000); // 2 second baad wapis normal button
   };
 
-  // Naya comment/note is meeting me add karo
-  const handleAddComment = () => {
-    if (!commentText.trim()) return;
-    if (onAddComment) {
-      onAddComment(commentText.trim());
-    }
-    setCommentText("");
+  const handleEdit = () => {
+    if (onEdit) onEdit(event);
   };
 
-  const handleCommentKeyPress = (e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      handleAddComment();
-    }
+  const formatTimeDisplay = (time) => {
+    if (!time) return "";
+    const [h, m] = time.split(":").map(Number);
+    const ampm = h >= 12 ? "PM" : "AM";
+    const hour12 = h % 12 || 12;
+    return `${hour12}:${String(m).padStart(2, "0")} ${ampm}`;
   };
 
-  const formatCommentTime = (iso) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  const getDurationLabel = () => {
+    if (event.durationLabel) return event.durationLabel;
+    if (!event.startTime || !event.endTime) return null;
+    const [sh, sm] = event.startTime.split(":").map(Number);
+    const [eh, em] = event.endTime.split(":").map(Number);
+    const mins = (eh * 60 + em) - (sh * 60 + sm);
+    if (mins <= 0) return null;
+    if (mins < 60) return `${mins} mins`;
+    const hrs = Math.floor(mins / 60);
+    const rem = mins % 60;
+    return rem === 0 ? `${hrs} hr${hrs > 1 ? "s" : ""}` : `${hrs}h ${rem}m`;
   };
+
+  const formatDateDisplay = (dateStr) => {
+    if (!dateStr) return "TUE, JUL 18";
+    const d = new Date(dateStr);
+    if (Number.isNaN(d.getTime())) return dateStr;
+    return d
+      .toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })
+      .toUpperCase()
+      .replace(",", ",");
+  };
+
+  const timeRange = event.startTime
+    ? `${formatTimeDisplay(event.startTime)} - ${formatTimeDisplay(event.endTime)}`
+    : "09:00 - 09:30 AM";
+
+  const duration = getDurationLabel();
 
   return (
-    <div className="meeting-overlay">
-      <div className="meeting-modal">
+    <div className="event-details-overlay" onClick={onClose}>
+      <div className="event-details-modal" onClick={(e) => e.stopPropagation()}>
+
         {/* Header */}
-        <div className="meeting-modal-header">
-          <h2>Meeting Details</h2>
-          <button className="meeting-close-btn" onClick={onClose}>
-            <FaTimes />
-          </button>
+        <div className="event-details-header">
+          <h2>{event.meetingName || "Meeting Details"}</h2>
+          <div className="event-details-header-actions">
+            {onExpand && (
+              <button className="event-details-icon-btn" onClick={onExpand}>
+                <FaExpandAlt />
+              </button>
+            )}
+            <button className="event-details-icon-btn" onClick={onClose}>
+              <FaTimes />
+            </button>
+          </div>
         </div>
 
-        {/* Event Info */}
-        <div className="meeting-form-body">
-          <h3 style={{ margin: "0 0 14px 0", color: "#20242a" }}>
-            {event.meetingName || "Meeting Details"}
-          </h3>
+        {/* Body */}
+        <div className="event-details-body">
+          <div className="event-detail-columns">
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>
-                <FaCalendarAlt /> Date
-              </label>
+            {/* Left column */}
+            <div className="event-detail-col event-detail-col-left">
+              <div className="event-detail-item">
+                <div className="event-detail-label-row">
+                  <FaCalendarAlt className="event-detail-icon" />
+                  <span className="event-detail-label">Date</span>
+                </div>
+                <span className="event-detail-value">
+                  {formatDateDisplay(event.date)}
+                </span>
+              </div>
 
-              <span style={{ fontSize: "12px", color: "#374151" }}>
-                {event.date || "2023-07-10"}
-              </span>
-            </div>
-            <div className="form-group">
-              <label>
-                <FaClock /> Time
-              </label>
-
-              <span style={{ fontSize: "12px", color: "#374151" }}>
-                {event.startTime
-                  ? `${event.startTime} - ${event.endTime}`
-                  : "08:00 AM - 09:00 AM"}
-              </span>
-            </div>
-          </div>
-
-          {event.location && (
-            <div
-              className="form-group full-width"
-              style={{ marginTop: "12px" }}
-            >
-              <label>
-                <FaMapMarkerAlt /> Location
-              </label>
-              <span style={{ fontSize: "12px", color: "#374151" }}>
-                {event.location}
-              </span>
-            </div>
-          )}
-
-          {/* Share Link Input */}
-          <div className="form-group full-width" style={{ marginTop: "14px" }}>
-            <label>
-              <FaLink /> Share Meeting Link
-            </label>
-            <div style={{ display: "flex", gap: "8px" }}>
-              <input type="text" readOnly value={meetingLink} />
-              <button
-                type="button"
-                className="save-meeting-btn"
-                onClick={handleShareLink}
-                style={{ display: "flex", alignItems: "center", gap: "6px" }}
-              >
-                {copied ? <FaCheck /> : <FaShareAlt />}
-                {copied ? "Copied!" : "Share"}
-              </button>
-            </div>
-          </div>
-
-          {/* Comments / Notes Section (har meeting ka apna section) */}
-          <div className="comments-section" style={{ marginTop: "16px" }}>
-            <label>
-              <FaRegCommentDots /> Comments
-            </label>
-
-            <div className="comment-list">
-              {event.comments && event.comments.length > 0 ? (
-                event.comments.map((c) => (
-                  <div className="comment-item" key={c.id}>
-                    <span className="comment-text">{c.text}</span>
-                    <span className="comment-time">{formatCommentTime(c.time)}</span>
+              {event.location && (
+                <div className="event-detail-item">
+                  <div className="event-detail-label-row">
+                    <FaMapMarkerAlt className="event-detail-icon" />
+                    <span className="event-detail-label">Location</span>
                   </div>
-                ))
-              ) : (
-                <div className="comment-empty">No comments yet</div>
+                  <span className="event-detail-value">{event.location}</span>
+                </div>
+              )}
+
+              <div className="event-detail-item">
+                <div className="event-detail-label-row">
+                  <FaClock className="event-detail-icon" />
+                  <span className="event-detail-label">Time</span>
+                  {duration && (
+                    <span className="event-detail-duration-badge">{duration}</span>
+                  )}
+                </div>
+                <span className="event-detail-value">{timeRange}</span>
+              </div>
+
+              {event.onlineLink && (
+                <div className="event-detail-item">
+                  <div className="event-detail-label-row">
+                    <FaLink className="event-detail-icon" />
+                    <span className="event-detail-label">Online Link</span>
+                  </div>
+                  <a
+                    href={event.onlineLink}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="event-detail-link"
+                  >
+                    {event.onlineLink.replace(/^https?:\/\//, "")}
+                  </a>
+                </div>
               )}
             </div>
 
-            <div className="comment-input-row">
-              <input
-                type="text"
-                placeholder="Add a note or comment..."
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                onKeyPress={handleCommentKeyPress}
-              />
-              <button type="button" onClick={handleAddComment}>
-                Post
-              </button>
+            {/* Right column */}
+            <div className="event-detail-col">
+              {event.organizer && (
+                <div className="event-detail-item">
+                  <div className="event-detail-label-row">
+                    <FaRegUserCircle className="event-detail-icon" />
+                    <span className="event-detail-label">Organizer</span>
+                  </div>
+                  <span className="event-detail-value">
+                    {event.organizer.name || event.organizer}
+                  </span>
+                </div>
+              )}
+
+              {event.invitees && event.invitees.length > 0 && (
+                <div className="event-detail-item">
+                  <div className="event-detail-label-row">
+                    <FaUserFriends className="event-detail-icon" />
+                    <span className="event-detail-label">Invitees</span>
+                  </div>
+                  <div className="invitees-list-detail">
+                    {event.invitees.map((person, index) => {
+                      const name = person.name || person;
+                      const color = person.avatarColor || "#8555D5";
+                      const avatarUrl = person.avatarUrl;
+                      const initials =
+                        person.initials ||
+                        name.split(" ").map((w) => w[0]).join("").toUpperCase().slice(0, 2);
+
+                      return (
+                        <div key={index} className="invitee-chip-detail">
+                          <div
+                            className="invitee-avatar-detail"
+                            style={{ backgroundColor: color }}
+                          >
+                            {avatarUrl ? <img src={avatarUrl} alt={name} /> : initials}
+                          </div>
+                          <span className="invitee-name-detail">{name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
+
           </div>
         </div>
 
         {/* Footer */}
-        <div
-          className="meeting-modal-footer"
-          style={{ justifyContent: "flex-end" }}
-        >
-          <button type="button" className="save-meeting-btn" onClick={onClose}>
-            Close
+        <div className="event-details-footer">
+          <button type="button" className="event-details-edit-btn" onClick={handleEdit}>
+            <FaPen /> Edit
+          </button>
+          <button type="button" className="event-details-share-btn" onClick={handleShare}>
+            Share <FaShareAlt />
           </button>
         </div>
+
       </div>
     </div>
   );

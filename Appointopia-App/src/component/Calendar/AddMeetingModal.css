@@ -1,23 +1,18 @@
+/* src/component/Calendar/AddMeetingModal.css */
+
 /* =====================================================
    OVERLAY
 ===================================================== */
 
 .meeting-overlay {
     position: fixed;
-
     inset: 0;
-
     background: rgba(20, 20, 30, 0.12);
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     z-index: 1000;
 }
-
 
 /* =====================================================
    MODAL
@@ -25,18 +20,24 @@
 
 .meeting-modal {
     width: 430px;
-
     max-width: calc(100vw - 30px);
-
     background: #ffffff;
-
     border-radius: 14px;
-
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
-
     overflow: hidden;
+    animation: modalFadeIn 0.25s ease;
 }
 
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
 
 /* =====================================================
    HEADER
@@ -44,54 +45,36 @@
 
 .meeting-modal-header {
     height: 54px;
-
     display: flex;
-
     align-items: center;
-
     justify-content: space-between;
-
     padding: 0 16px;
-
     border-bottom: 1px solid #e5e7eb;
 }
 
 .meeting-modal-header h2 {
     margin: 0;
-
     font-size: 16px;
-
     font-weight: 700;
-
     color: #20242a;
 }
 
 .meeting-close-btn {
     width: 30px;
-
     height: 30px;
-
     border: none;
-
     border-radius: 50%;
-
     background: #f3f4f6;
-
     color: #667085;
-
     display: flex;
-
     align-items: center;
-
     justify-content: center;
-
     cursor: pointer;
 }
 
 .meeting-close-btn:hover {
     background: #e5e7eb;
 }
-
 
 /* =====================================================
    FORM BODY
@@ -104,6 +87,14 @@
     box-sizing: border-box;
 }
 
+.meeting-form-body::-webkit-scrollbar {
+    width: 4px;
+}
+
+.meeting-form-body::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
 
 /* =====================================================
    FORM GROUP
@@ -111,20 +102,15 @@
 
 .form-group {
     flex: 1;
-
     min-width: 0;
 }
 
 .form-group label,
 .invitees-section > label {
     display: block;
-
     margin-bottom: 6px;
-
     font-size: 12px;
-
     color: #374151;
-
     font-weight: 500;
 }
 
@@ -132,32 +118,21 @@
     width: 100%;
 }
 
-
 /* =====================================================
    INPUT
 ===================================================== */
 
 .form-group input {
     width: 100%;
-
     height: 36px;
-
     padding: 0 10px;
-
     box-sizing: border-box;
-
     border: none;
-
     outline: none;
-
     border-radius: 9px;
-
     background: #f1f2f4;
-
     color: #374151;
-
     font-family: "Poppins", sans-serif;
-
     font-size: 11px;
 }
 
@@ -169,19 +144,15 @@
     box-shadow: 0 0 0 1px #8555d5;
 }
 
-
 /* =====================================================
    FORM ROW
 ===================================================== */
 
 .form-row {
     display: flex;
-
     gap: 20px;
-
     margin-top: 16px;
 }
-
 
 /* =====================================================
    ICON INPUT
@@ -197,20 +168,13 @@
 
 .input-icon svg {
     position: absolute;
-
     right: 10px;
-
     top: 50%;
-
     transform: translateY(-50%);
-
     color: #667085;
-
     font-size: 12px;
-
     pointer-events: none;
 }
-
 
 /* =====================================================
    TIME
@@ -218,9 +182,7 @@
 
 .time-inputs {
     display: flex;
-
     align-items: center;
-
     gap: 5px;
 }
 
@@ -230,10 +192,8 @@
 
 .time-inputs span {
     color: #667085;
-
     font-size: 12px;
 }
-
 
 /* =====================================================
    INVITEES
@@ -245,57 +205,63 @@
 
 .invitee-list {
     display: flex;
-
     align-items: center;
-
     flex-wrap: wrap;
-
     gap: 6px;
 }
 
-
 /* =====================================================
-   INVITEE CHIP
+   INVITEE CHIP WITH AVATAR
 ===================================================== */
 
-.invitee-chip {
-    height: 32px;
-
-    padding: 0 7px 0 10px;
-
+.invitee-chip-with-avatar {
     display: flex;
-
     align-items: center;
-
     gap: 8px;
-
-    border-radius: 16px;
-
+    padding: 4px 8px 4px 4px;
     background: #f1f2f4;
-
-    color: #374151;
-
-    font-size: 10px;
+    border-radius: 20px;
+    height: 32px;
 }
 
-.invitee-chip button {
-    width: 17px;
-
-    height: 17px;
-
-    padding: 0;
-
-    border: none;
-
+.invitee-avatar {
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
-
-    background: #d9dce1;
-
-    color: #667085;
-
-    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 9px;
+    font-weight: 600;
+    color: #ffffff;
+    flex-shrink: 0;
 }
 
+.invitee-name {
+    font-size: 11px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.invitee-remove {
+    width: 18px;
+    height: 18px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #9aa1ad;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: 0.2s;
+}
+
+.invitee-remove:hover {
+    background: #e5e7eb;
+    color: #ef4444;
+}
 
 /* =====================================================
    ADD INVITEE
@@ -303,189 +269,31 @@
 
 .add-invitee {
     display: flex;
-
     align-items: center;
-
     gap: 5px;
 }
 
 .add-invitee input {
     width: 80px;
-
     height: 30px;
-
     padding: 0 7px;
-
     border: 1px solid #e5e7eb;
-
     border-radius: 7px;
-
     outline: none;
-
     font-size: 10px;
 }
 
 .add-invitee button {
     height: 30px;
-
     padding: 0 8px;
-
     display: flex;
-
     align-items: center;
-
     gap: 4px;
-
     border: none;
-
     background: transparent;
-
     color: #8555d5;
-
     font-size: 10px;
-
     cursor: pointer;
-}
-
-
-/* =====================================================
-   FOOTER
-===================================================== */
-
-.meeting-modal-footer {
-    height: 60px;
-
-    padding: 0 16px;
-
-    display: flex;
-
-    align-items: center;
-
-    justify-content: space-between;
-
-    border-top: 1px solid #e5e7eb;
-}
-
-.advanced-btn {
-    height: 32px;
-
-    padding: 0 12px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: #f7f3ff;
-
-    color: #8555d5;
-
-    font-size: 11px;
-
-    cursor: pointer;
-}
-
-.save-meeting-btn {
-    height: 34px;
-
-    min-width: 75px;
-
-    padding: 0 18px;
-
-    border: none;
-
-    border-radius: 8px;
-
-    background: #8555d5;
-
-    color: #ffffff;
-
-    font-size: 11px;
-
-    cursor: pointer;
-}
-
-.save-meeting-btn:hover {
-    background: #7544c8;
-}
-/* =====================================================
-   COMMENTS / NOTES SECTION
-===================================================== */
-
-.comments-section {
-    margin-top: 16px;
-}
-
-.comment-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    max-height: 140px;
-    overflow-y: auto;
-    margin: 8px 0 10px;
-}
-
-.comment-item {
-    background: #f8f6ff;
-    border-radius: 8px;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-}
-
-.comment-text {
-    font-size: 11px;
-    color: #374151;
-    word-break: break-word;
-}
-
-.comment-time {
-    font-size: 9px;
-    color: #9aa1ad;
-}
-
-.comment-empty {
-    font-size: 11px;
-    color: #9aa1ad;
-    text-align: center;
-    padding: 10px 0;
-}
-
-.comment-input-row {
-    display: flex;
-    gap: 8px;
-}
-
-.comment-input-row input {
-    flex: 1;
-    height: 34px;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 0 10px;
-    box-sizing: border-box;
-    outline: none;
-    font-family: "Poppins", sans-serif;
-    font-size: 11px;
-    color: #374151;
-}
-
-.comment-input-row input:focus {
-    box-shadow: 0 0 0 1px #8555d5;
-}
-
-.comment-input-row button {
-    height: 34px;
-    padding: 0 16px;
-    border: none;
-    border-radius: 8px;
-    background: #8555d5;
-    color: #ffffff;
-    font-size: 11px;
-    cursor: pointer;
-}
-
-.comment-input-row button:hover {
-    background: #7544c8;
 }
 
 /* =====================================================
@@ -508,6 +316,16 @@
    QUICK TIME BUTTONS
 ===================================================== */
 
+.quick-times {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #e5e7eb;
+}
+
 .quick-time-btn {
     padding: 2px 8px;
     border: 1px solid #e5e7eb;
@@ -526,58 +344,43 @@
 }
 
 /* =====================================================
-   MODAL ANIMATION
+   FOOTER
 ===================================================== */
 
-@keyframes modalFadeIn {
-    from {
-        opacity: 0;
-        transform: scale(0.95) translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-    }
+.meeting-modal-footer {
+    height: 60px;
+    padding: 0 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid #e5e7eb;
 }
 
-.meeting-modal {
-    animation: modalFadeIn 0.25s ease;
-}
-/* =====================================================
-   SHARE LINK SECTION - ADDITIONAL STYLES
-===================================================== */
-
-.share-link-section input::selection {
-    background: #d4c4f0;
-}
-
-/* Copy success animation */
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.advanced-btn {
+    height: 32px;
+    padding: 0 12px;
+    border: none;
+    border-radius: 8px;
+    background: #f7f3ff;
+    color: #8555d5;
+    font-size: 11px;
+    cursor: pointer;
 }
 
-/* Responsive for share section */
-@media (max-width: 600px) {
-    .share-link-section > div {
-        flex-wrap: wrap;
-    }
-    
-    .share-link-section input {
-        width: 100%;
-        font-size: 11px !important;
-    }
-    
-    .share-link-section button {
-        padding: 6px 12px !important;
-        font-size: 11px !important;
-    }
+.save-meeting-btn {
+    height: 34px;
+    min-width: 75px;
+    padding: 0 18px;
+    border: none;
+    border-radius: 8px;
+    background: #8555d5;
+    color: #ffffff;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.save-meeting-btn:hover {
+    background: #7544c8;
 }
 
 /* =====================================================
@@ -585,28 +388,22 @@
 ===================================================== */
 
 @media (max-width: 600px) {
-
     .meeting-modal {
         width: calc(100vw - 20px);
     }
 
     .form-row {
         flex-direction: column;
-
         gap: 12px;
     }
 
     .meeting-form-body {
         max-height: 70vh;
-
-        overflow-y: auto;
     }
 
     .meeting-modal-footer {
         height: auto;
-
         min-height: 60px;
-
         gap: 10px;
     }
 }

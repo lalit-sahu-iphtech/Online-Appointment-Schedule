@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaRegBell,
@@ -29,15 +30,42 @@ import {
 } from "../../utils/dateUtils";
 
 export default function Calendar({ onEventsChange, onDateChange }) {
+  const navigate = useNavigate();
+
+  const [currentUser, setCurrentUser] = useState(null); // NEW: logged-in user
+  const [checkingAuth, setCheckingAuth] = useState(true); // NEW: avoid flashing calendar before redirect
+
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showMeetingModal, setShowMeetingModal] = useState(false);
+  const [editingEvent, setEditingEvent] = useState(null); // meeting being edited (null = create mode)
+  const [shareToast, setShareToast] = useState(false); // "Link copied" feedback
   const [meeting, setMeeting] = useState([]);
-  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | null
+  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile' | null
   const [searchTerm, setSearchTerm] = useState("");
   const [now, setNow] = useState(new Date());
+
+  // ===== NEW: AUTH GUARD =====
+  // Calendar page (aur isliye "+ Create") sirf logged-in user access kar sake.
+  // Agar localStorage me currentUser nahi hai to seedha /signin pe bhej do.
+  useEffect(() => {
+    const stored = localStorage.getItem("currentUser");
+    if (!stored) {
+      navigate("/signin");
+      return;
+    }
+    try {
+      setCurrentUser(JSON.parse(stored));
+    } catch (error) {
+      console.error("Invalid currentUser in storage:", error);
+      localStorage.removeItem("currentUser");
+      navigate("/signin");
+      return;
+    }
+    setCheckingAuth(false);
+  }, [navigate]);
 
   // Har 30 second me "now" refresh karo taaki "starts in X min" sahi rahe
   useEffect(() => {
@@ -85,7 +113,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   }, [currentDate, onDateChange]);
 
-  // Search / Notifications / Comments dropdown ko toggle karo
+  // Search / Notifications / Comments / Profile dropdown ko toggle karo
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
@@ -109,7 +137,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     : [];
 
   // ===== UPCOMING MEETING REMINDER =====
-  // Agla 60 min me start hone waali (ya abhi 10 min pehle start hui) meetings
   const getEventStartDateTime = (item) => {
     if (!item.date || !item.startTime) return null;
     const [y, mo, d] = item.date.split("-").map(Number);
@@ -138,7 +165,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     (item) => item.comments && item.comments.length > 0
   );
 
-  // Kisi meeting me naya comment/note add karo (per-meeting comment section)
   const addComment = (eventId, text) => {
     const newComment = { id: Date.now(), text, time: new Date().toISOString() };
     setMeeting((prev) =>
@@ -257,6 +283,55 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   const handleDismissReminder = (eventId) =>{
     console.log("Reminder dismissed:",eventId);
+  }
+
+  // ===== EDIT MEETING =====
+  const handleEditMeeting = (event) => {
+    setSelectedEvent(null);
+    setEditingEvent(event);
+    setShowMeetingModal(true);
+  };
+
+  // ===== SHARE MEETING =====
+  const handleShareMeeting = (event) => {
+    const link = event.onlineLink || window.location.href;
+
+    if (navigator.share) {
+      navigator
+        .share({
+          title: event.meetingName || "Meeting",
+          text: `Join "${event.meetingName || "this meeting"}"`,
+          url: link,
+        })
+        .catch(() => {});
+      return;
+    }
+
+    navigator.clipboard.writeText(link);
+    setShareToast(true);
+    setTimeout(() => setShareToast(false), 2000);
+  };
+
+  // ===== NEW: PROFILE DROPDOWN ACTIONS =====
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    setActivePanel(null);
+    navigate("/signin");
+  };
+
+  const handleProfileClick = () => {
+    setActivePanel(null);
+    navigate("/profile");
+  };
+
+  const handleSettingsClick = () => {
+    setActivePanel(null);
+    navigate("/settings");
+  };
+
+  // Auth check hone tak (ya redirect hote waqt) kuch mat dikhao
+  if (checkingAuth) {
+    return null;
   }
 
   return (
@@ -400,6 +475,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
               )}
             </div>
 
+            {/* PROFILE */}
             <div className="icon-wrap avatar-wrap" onClick={() => togglePanel("profile")}>
               <FaUserCircle className="avatar-icon" />
               <FaChevronDown className="avatar-chevron" />
@@ -409,19 +485,19 @@ export default function Calendar({ onEventsChange, onDateChange }) {
                   <div className="profile-dropdown-header">
                     <FaUserCircle className="profile-dropdown-avatar" />
                     <div>
-                      <h4>My Account</h4>
-                      <span>Manage your profile</span>
+                      <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
+                      <span>{currentUser?.email || "Manage your profile"}</span>
                     </div>
                   </div>
 
                   <div className="profile-menu">
-                    <button type="button" className="profile-menu-item">
+                    <button type="button" className="profile-menu-item" onClick={handleProfileClick}>
                       <FaUser /> Profile
                     </button>
-                    <button type="button" className="profile-menu-item">
+                    <button type="button" className="profile-menu-item" onClick={handleSettingsClick}>
                       <FaCog /> Settings
                     </button>
-                    <button type="button" className="profile-menu-item profile-menu-logout">
+                    <button type="button" className="profile-menu-item profile-menu-logout" onClick={handleLogout}>
                       <FaSignOutAlt /> Logout
                     </button>
                   </div>
@@ -482,15 +558,26 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
       {showMeetingModal && (
         <AddMeetingModal
-          onClose={() => setShowMeetingModal(false)}
-          defaultDate={formatDate(currentDate)}
-          onSave={(data) => {
-            const newEvent = {
-              ...data,
-              id: Date.now(),
-            };
-            setMeeting([...meeting, newEvent]);
+          onClose={() => {
             setShowMeetingModal(false);
+            setEditingEvent(null);
+          }}
+          defaultDate={formatDate(currentDate)}
+          initialData={editingEvent}
+          isEditMode={!!editingEvent}
+          onSave={(data) => {
+            if (editingEvent) {
+              setMeeting((prev) =>
+                prev.map((m) =>
+                  m.id === editingEvent.id ? { ...m, ...data, id: editingEvent.id } : m
+                )
+              );
+            } else {
+              const newEvent = { ...data, id: Date.now() };
+              setMeeting((prev) => [...prev, newEvent]);
+            }
+            setShowMeetingModal(false);
+            setEditingEvent(null);
           }}
         />
       )}
@@ -500,7 +587,31 @@ export default function Calendar({ onEventsChange, onDateChange }) {
           event={selectedEvent}
           onClose={() => setSelectedEvent(null)}
           onAddComment={(text) => addComment(selectedEvent.id, text)}
+          onEdit={handleEditMeeting}
+          onShare={handleShareMeeting}
         />
+      )}
+
+      {/* "link copied" toast for Share fallback */}
+      {shareToast && (
+        <div
+          style={{
+            position: "fixed",
+            bottom: 24,
+            left: "50%",
+            transform: "translateX(-50%)",
+            background: "#20242a",
+            color: "#fff",
+            padding: "10px 18px",
+            borderRadius: 8,
+            fontSize: 13,
+            fontFamily: '"Poppins", sans-serif',
+            zIndex: 2000,
+            boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
+          }}
+        >
+          Link copied to clipboard!
+        </div>
       )}
 
       <Reminder 
