@@ -1,0 +1,289 @@
+/* src/component/Profile/profile.css */
+
+.profile-page {
+    width: 100%;
+    min-height: 100vh;
+    background: #f7f6fb;
+    font-family: "Poppins", sans-serif;
+    box-sizing: border-box;
+}
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.profile-topbar {
+    height: 68px;
+    background: #ffffff;
+    border-bottom: 1px solid #eef0f3;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 0 28px;
+}
+
+.profile-topbar h1 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 700;
+    color: #20242a;
+}
+
+.profile-back-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 36px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f0ff;
+    color: #8555d5;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    transition: 0.2s;
+}
+
+.profile-back-btn:hover {
+    background: #ece3fb;
+}
+
+/* =====================================================
+   CONTENT
+===================================================== */
+
+.profile-content {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px 60px;
+}
+
+.profile-card {
+    width: 100%;
+    max-width: 520px;
+    background: #ffffff;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(20, 20, 30, 0.06);
+    padding: 32px;
+    box-sizing: border-box;
+}
+
+/* =====================================================
+   AVATAR SECTION
+===================================================== */
+
+.profile-avatar-section {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #eef0f3;
+    margin-bottom: 24px;
+}
+
+.profile-avatar-big {
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    font-weight: 700;
+    color: #ffffff;
+    flex-shrink: 0;
+    position: relative;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+}
+
+.profile-avatar-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #20242a;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    border: 2px solid #ffffff;
+}
+
+.profile-avatar-section h2 {
+    margin: 0 0 4px 0;
+    font-size: 19px;
+    font-weight: 700;
+    color: #20242a;
+}
+
+.profile-subtext {
+    font-size: 13px;
+    color: #9aa1ad;
+}
+
+/* =====================================================
+   STATS
+===================================================== */
+
+.profile-stats-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 26px;
+}
+
+.profile-stat {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8f6ff;
+    border-radius: 12px;
+    padding: 14px 16px;
+}
+
+.profile-stat-icon {
+    color: #8555d5;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.profile-stat strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 700;
+    color: #20242a;
+}
+
+.profile-stat span {
+    font-size: 11px;
+    color: #9aa1ad;
+}
+
+/* =====================================================
+   FORM
+===================================================== */
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.profile-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.profile-input-icon {
+    position: relative;
+}
+
+.profile-input-icon input {
+    width: 100%;
+    height: 42px;
+    padding: 0 36px 0 12px;
+    box-sizing: border-box;
+    border: none;
+    outline: none;
+    border-radius: 9px;
+    background: #f1f2f4;
+    color: #374151;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+}
+
+.profile-input-icon input::placeholder {
+    color: #a8adb7;
+}
+
+.profile-input-icon input:focus {
+    box-shadow: 0 0 0 1px #8555d5;
+}
+
+.profile-input-icon input.input-error {
+    box-shadow: 0 0 0 1px #e53935;
+    background: #fff5f5;
+}
+
+.profile-input-icon svg {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9aa1ad;
+    font-size: 13px;
+    pointer-events: none;
+}
+
+.profile-error-text {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #e53935;
+}
+
+.profile-success-text {
+    margin: 0;
+    font-size: 12px;
+    font-weight: 500;
+    color: #22a06b;
+    text-align: center;
+}
+
+.profile-save-btn {
+    height: 42px;
+    border: none;
+    border-radius: 9px;
+    background: #8555d5;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    transition: 0.2s;
+    margin-top: 4px;
+}
+
+.profile-save-btn:hover {
+    background: #7446c3;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 600px) {
+    .profile-topbar {
+        padding: 0 16px;
+        gap: 12px;
+    }
+
+    .profile-topbar h1 {
+        font-size: 15px;
+    }
+
+    .profile-back-btn span {
+        display: none;
+    }
+
+    .profile-content {
+        padding: 24px 14px 40px;
+    }
+
+    .profile-card {
+        padding: 22px;
+        border-radius: 14px;
+    }
+
+    .profile-stats-row {
+        flex-direction: column;
+    }
+}
