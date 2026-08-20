@@ -14,6 +14,8 @@ import Calendar from "./component/Calendar/Calendar";
 import CalendarPage from "./pages/CalendarPage/CalendarPage";
 import AppointmentSchedulePage from "./pages/AppointmentSchedulePage/AppointmentSchedulePage";
 import WorkflowsPage from "./pages/WorkflowsPage/WorkflowsPage";
+import Profile from "./pages/Profile/Profile";
+import Setting from "./pages/Setting/Setting";
 
 function App() {
   return (
@@ -45,6 +47,10 @@ function App() {
       <Route path="/calendar"element={ <CalendarPage/>}/>
       <Route path="/appointment-schedule"element={ <AppointmentSchedulePage/>}/>
       <Route path="/workflows"element={ <WorkflowsPage/>}/>
+
+      <Route path="/profile"element={<Profile/>}/>
+      <Route path="/settings"element={<Setting/>}/>
+
 
 
       {/* Sign Up */}
