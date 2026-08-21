@@ -22,7 +22,6 @@ export default function SignUp() {
 
     const trimmedEmail = email.trim().toLowerCase();
 
-    // Email validation
     if (!trimmedEmail) {
       setError("Email is required");
       return;
@@ -33,43 +32,28 @@ export default function SignUp() {
       return;
     }
 
-    // Get existing users
-    const users =
-      JSON.parse(localStorage.getItem("users")) || [];
-
-    // Check if email already exists
-    const userExists = users.some(
-      (user) => user.email === trimmedEmail
-    );
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const userExists = users.some((user) => user.email === trimmedEmail);
 
     if (userExists) {
       setError("Account already exists with this email");
       return;
     }
 
-    // Create new user
     const newUser = {
       id: Date.now().toString(),
       email: trimmedEmail,
     };
 
-    // Save user
-    localStorage.setItem(
-      "users",
-      JSON.stringify([...users, newUser])
-    );
+    localStorage.setItem("users", JSON.stringify([...users, newUser]));
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
 
-    // Save current user
-    localStorage.setItem(
-      "currentUser",
-      JSON.stringify(newUser)
-    );
+    // ✅ Dispatch event so GetStarted updates
+    window.dispatchEvent(new Event("userLoggedIn"));
 
     setSuccessMessage("Account created successfully!");
-
     setEmail("");
 
-    // Go to home
     setTimeout(() => {
       navigate("/");
     }, 800);
@@ -77,47 +61,28 @@ export default function SignUp() {
 
   return (
     <div className="auth-page">
-
       {/* Logo */}
       <div className="auth-logo">
         <Link to="/" className="logo-link">
-        <div className="auth-logo-icon">
-          <img src={logo} alt="Appointopia" />
-        </div>
-        
-       
+          <div className="auth-logo-icon">
+            <img src={logo} alt="Appointopia" />
+          </div>
           <h2>Appointopia</h2>
         </Link>
-        
-       
-        
       </div>
 
-      {/* Shapes */}
       <div className="auth-top-right-shape"></div>
       <div className="auth-bottom-left-shape"></div>
 
-      {/* Left Section */}
       <div className="auth-left">
-
         <div className="auth-card">
-
           <h1>Welcome</h1>
-
           <p className="auth-description">
             Create an account on Appointopia for free
           </p>
 
-          <form
-            className="auth-form"
-            onSubmit={handleSubmit}
-          >
-
-            {/* Email */}
-            <label>
-              Enter your email to get started
-            </label>
-
+          <form className="auth-form" onSubmit={handleSubmit}>
+            <label>Enter your email to get started</label>
             <input
               type="email"
               placeholder="Enter email"
@@ -130,93 +95,49 @@ export default function SignUp() {
               className={error ? "input-error" : ""}
             />
 
-            {error && (
-              <span className="error-message">
-                {error}
-              </span>
-            )}
+            {error && <span className="error-message">{error}</span>}
+            {successMessage && <p className="success-message">{successMessage}</p>}
 
-            {successMessage && (
-              <p className="success-message">
-                {successMessage}
-              </p>
-            )}
-
-            {/* Sign Up */}
-            <button
-              type="submit"
-              className="auth-main-btn"
-            >
+            <button type="submit" className="auth-main-btn">
               Sign Up
             </button>
 
-            {/* OR */}
             <div className="auth-or-divider">
               <span>OR</span>
             </div>
 
-            {/* Google */}
-            <button
-              type="button"
-              className="auth-social-btn auth-google-btn"
-            >
+            <button type="button" className="auth-social-btn auth-google-btn">
               <img src={google} alt="Google" />
               <span>Sign up with Google</span>
             </button>
 
-            {/* Facebook */}
-            <button
-              type="button"
-              className="auth-social-btn auth-facebook-btn"
-            >
+            <button type="button" className="auth-social-btn auth-facebook-btn">
               <img src={facebook} alt="Facebook" />
               <span>Sign up with Facebook</span>
             </button>
-
           </form>
 
-          {/* Sign In */}
           <p className="auth-bottom-text">
             Already have an account?{" "}
-
-            <Link
-              to="/signin"
-              className="auth-link"
-            >
+            <Link to="/signin" className="auth-link">
               Sign in
             </Link>
           </p>
-
         </div>
-
       </div>
 
-      {/* Right Section */}
       <div className="auth-right">
-
         <div className="auth-quote">
-
-          <span className="auth-quote-mark">
-            “
-          </span>
-
+          <span className="auth-quote-mark">“</span>
           <p>
             Join us to{" "}
-            <span className="auth-highlight">
-              effortlessly
-            </span>{" "}
+            <span className="auth-highlight">effortlessly</span>{" "}
             organize your schedule, manage events,
             and stay on top of your busy life.
           </p>
-
-          <span className="auth-quote-mark">
-            ”
-          </span>
-
+          <span className="auth-quote-mark">”</span>
         </div>
-
       </div>
-
     </div>
   );
 }
