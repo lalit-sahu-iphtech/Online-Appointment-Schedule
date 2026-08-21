@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import profile1 from "../../assets/hero/A1.jpg";
-import profile2 from "../../assets/hero/j1.jpg";
+import profile2 from "../../assets/hero/J1.jpg";
 import profile3 from "../../assets/hero/B1.jpg";
 import "./getstarted.css";
 
