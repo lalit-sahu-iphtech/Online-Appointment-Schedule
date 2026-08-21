@@ -1,3 +1,5 @@
+/* src/component/Navbar/navbar.css */
+
 .navbar {
   width: 100%;
   height: 42px;
@@ -11,6 +13,8 @@
   background-color: #ffffff;
 
   box-sizing: border-box;
+  position: relative;
+  z-index: 10;
 }
 
 .logo-link{
@@ -74,13 +78,33 @@
   white-space: nowrap;
 }
 
+/* ✅ React Router Links */
 .nav-mid a {
   text-decoration: none;
   color: #292929;
+  transition: color 0.2s ease;
+  padding: 4px 0;
+  position: relative;
 }
 
 .nav-mid a:hover {
   color: #8555d5;
+}
+
+/* ✅ Active Link Underline */
+.nav-mid a.active {
+  color: #8555d5;
+}
+
+.nav-mid a.active::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #8555d5;
+  border-radius: 1px;
 }
 
 /* =========================
@@ -118,6 +142,7 @@
   color: #8555d5;
   font-size: 14px;
   padding: 4px 2px;
+  transition: color 0.2s ease;
 }
 
 .sign-in-btn:hover {
@@ -137,10 +162,12 @@
 
   border-radius: 12px;
   font-size: 14px;
+  transition: all 0.2s ease;
 }
 
 .sign-up-btn:hover {
   background-color: #7346c4 !important;
+  transform: translateY(-1px);
 }
 
 /* =========================

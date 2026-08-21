@@ -1,3 +1,4 @@
+// src/component/Navbar/Navbar.jsx
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaSignOutAlt } from "react-icons/fa";
@@ -24,7 +25,7 @@ export default function Navbar() {
     }
   }, []);
 
-  // ✅ Listen for storage changes (when user logs in/out from other tabs)
+  // ✅ Listen for storage changes
   useEffect(() => {
     const handleStorageChange = () => {
       const stored = localStorage.getItem("currentUser");
@@ -61,13 +62,13 @@ export default function Navbar() {
         </div>
       </Link>
 
-      {/* Navigation */}
+      {/* Navigation - All Links */}
       <div className="nav-mid">
         <ul>
-          <li><a href="#product">Product</a></li>
-          <li><a href="#resource">Resource</a></li>
-          <li><a href="#company">Company</a></li>
-          <li><a href="#pricing">Pricing</a></li>
+          <li><Link to="/product">Product</Link></li>
+          <li><Link to="/resource">Resource</Link></li>
+          <li><Link to="/company">Company</Link></li>
+          <li><Link to="/pricing">Pricing</Link></li>
         </ul>
       </div>
 

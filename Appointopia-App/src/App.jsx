@@ -16,6 +16,10 @@ import AppointmentSchedulePage from "./pages/AppointmentSchedulePage/Appointment
 import WorkflowsPage from "./pages/WorkflowsPage/WorkflowsPage";
 import Profile from "./pages/Profile/Profile";
 import Setting from "./pages/Setting/Setting";
+import ProductPage from "./pages/ProductPage/ProductPage";
+import ResourcePage from "./pages/ResourcePage/ResourcePage";
+import CompanyPage from "./pages/CompanyPage/CompanyPage";
+import PricingPage from "./pages/PricingPage/PricingPage";
 
 function App() {
   return (
@@ -50,6 +54,11 @@ function App() {
 
       <Route path="/profile"element={<Profile/>}/>
       <Route path="/settings"element={<Setting/>}/>
+
+      <Route path="/product" element={<ProductPage />} />
+        <Route path="/resource" element={<ResourcePage />} />
+        <Route path="/company" element={<CompanyPage />} />
+        <Route path="/pricing" element={<PricingPage />} />
 
 
 

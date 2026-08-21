@@ -1,0 +1,157 @@
+/* src/pages/ProductPage.css */
+
+.product-page {
+    min-height: calc(100vh - 60px);
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #fafafa 0%, #f3edfc 100%);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  .product-container {
+    max-width: 1200px;
+    width: 100%;
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 50px 60px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+  .page-content{
+    text-align: center;
+  }
+  
+  .product-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .product-header h1 {
+    font-size: 42px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+    text-align: center;
+  }
+  
+  .product-header h1::after {
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, #8755d5, #a87bdf);
+    margin: 12px auto 0;
+    border-radius: 2px;
+  }
+  
+  .product-header p {
+    font-size: 18px;
+    color: #6b7280;
+    margin: 0;
+    text-align: center;
+  }
+  
+  .product-features {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  
+  .feature-card {
+    background: #f8f9fa;
+    padding: 28px 24px;
+    border-radius: 14px;
+    text-align: center;
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+  }
+  
+  .feature-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 35px rgba(133, 85, 213, 0.12);
+    border-color: #e5d9f5;
+    background: #ffffff;
+  }
+  
+  .feature-icon {
+    font-size: 36px;
+    margin-bottom: 12px;
+  }
+  
+  .feature-card h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: #1a1a2e;
+  }
+  
+  .feature-card p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+    line-height: 1.6;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .product-features {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .product-container {
+      padding: 30px 24px;
+    }
+  
+    .product-header h1 {
+      font-size: 32px;
+    }
+  
+    .product-header p {
+      font-size: 16px;
+    }
+  
+    .product-features {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  
+    .feature-card {
+      padding: 20px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .product-page {
+      padding: 16px;
+    }
+  
+    .product-container {
+      padding: 20px 16px;
+    }
+  
+    .product-header h1 {
+      font-size: 26px;
+    }
+  
+    .product-header p {
+      font-size: 14px;
+    }
+  
+    .feature-card {
+      padding: 16px;
+    }
+  
+    .feature-icon {
+      font-size: 28px;
+    }
+  
+    .feature-card h3 {
+      font-size: 16px;
+    }
+  
+    .feature-card p {
+      font-size: 13px;
+    }
+  }
