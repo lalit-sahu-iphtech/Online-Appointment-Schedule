@@ -6,6 +6,8 @@ import {
     FaShareAlt,
     FaTrash
   } from "react-icons/fa";
+
+  import "./AppointmentCard.css"
   
   export default function AppointmentCard({ appointment, onDelete }) {
     

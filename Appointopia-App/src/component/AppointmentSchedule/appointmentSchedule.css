@@ -411,19 +411,26 @@
  SCHEDULE CONTAINER
 ========================================= */
 .schedule-container {
+  width: 100%;
   background: white;
   border: 1px solid #dedfe4;
   border-radius: 12px;
   padding: 15px 28px 30px;
   min-height: 400px;
-  max-height: calc(100vh - 200px);
-  height: 100%; 
+  max-height: calc(100vh - 100px);
+  height: calc(100vh - 150px); 
   box-sizing: border-box;
   overflow-y: auto; 
   flex: 1; 
+  scrollbar-width : none;
+  -ms-overflow-style : none;
+
+  
+ 
 }
 .schedule-container::-webkit-scrollbar {
   width: 6px;
+  display: none;
 }
 
 .schedule-container::-webkit-scrollbar-track {
@@ -657,166 +664,9 @@
   margin-top: 7px;
 }
 
-.appointment-card {
-  min-width: 0;
-  height: 184px;
-  background: white;
-  border-radius: 11px;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
-}
-
-.appointment-card::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 7px;
-  border-radius: 10px 0 0 10px;
-}
-
-.appointment-card.teal::before {
-  background: #13a6ad;
-}
-
-.appointment-card.orange::before {
-  background: #ff8100;
-}
-
-.appointment-card.purple::before {
-  background: #8755d5;
-}
-
-.appointment-card-content {
-  padding: 15px 15px 12px 22px;
-  height: 100%;
-  box-sizing: border-box;
-}
-
-.appointment-title-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.appointment-title-row h3 {
-  margin: 0;
-  font-size: 19px;
-  font-weight: 700;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.appointment-card.teal h3 {
-  color: #078c92;
-}
-
-.appointment-card.orange h3 {
-  color: #ff7800;
-}
-
-.appointment-card.purple h3 {
-  color: #8755d5;
-}
-
-.card-setting {
-  border: none;
-  background: transparent;
-  color: #9298a3;
-  cursor: pointer;
-  font-size: 13px;
-  transition: color 0.2s;
-}
-
-.card-setting:hover {
-  color: #8755d5;
-}
-
-.card-setting.delete-btn:hover {
-  color: #ef4444;
-}
-
-.appointment-info {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  margin-top: 14px;
-  font-size: 12px;
-  color: #4e5662;
-}
-
-.appointment-info span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-
-.appointment-info svg {
-  color: #596270;
-  font-size: 12px;
-}
-
-.booking-page {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin-top: 23px;
-  color: #89909d;
-  font-size: 12px;
-}
-
-.external-arrow {
-  font-size: 19px;
-  color: #89909d;
-}
-
-.appointment-divider {
-  height: 1px;
-  background: #dddfe4;
-  margin-top: 12px;
-}
-
-.appointment-bottom {
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.appointment-bottom a {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: #2188dc;
-  font-size: 12px;
-  text-decoration: underline;
-}
-
-.appointment-bottom a svg {
-  font-size: 11px;
-}
-
-.share-button {
-  width: 30px;
-  height: 30px;
-  border: none;
-  border-radius: 50%;
-  background: #f1f2f4;
-  color: #6c7380;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.share-button:hover {
-  background: #e8e3f3;
-  color: #8152cd;
-}
+/* =========================================
+ NO EVENTS
+========================================= */
 
 .no-events {
   grid-column: 1 / -1;
@@ -824,6 +674,24 @@
   text-align: center;
   color: #9297a2;
   font-size: 13px;
+}
+
+.no-events button {
+  border: none;
+  background: #8755d5;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "Poppins", sans-serif;
+  font-size: 13px;
+}
+
+.no-events button:hover {
+  background: #7544c8;
 }
 
 /* =========================================
@@ -889,6 +757,7 @@
 .floating-create:hover {
   background: #7646c5;
 }
+
 /* =========================================
    WEEK VIEW STYLES
 ========================================= */
@@ -962,14 +831,17 @@
 /* Time Column */
 .week-time-column {
   position: relative;
+  min-height: 600px;
 }
 
 .week-time-header {
   height: 40px;
+  box-sizing: border-box;
 }
 
 .week-time-slot {
   height: 58px;
+  box-sizing: border-box;
   display: flex;
   align-items: flex-start;
   justify-content: center;
@@ -984,6 +856,7 @@
   position: relative;
   border-right: 1px solid #f3f4f6;
   min-height: 600px;
+  box-sizing: border-box;
 }
 
 .week-day-column:last-child {
@@ -997,7 +870,7 @@
 /* Grid Lines */
 .week-grid-lines {
   position: absolute;
-  top: 0;
+  top: 4px;
   left: 0;
   right: 0;
   bottom: 0;
@@ -1007,6 +880,7 @@
 .week-grid-line {
   height: 58px;
   border-bottom: 1px solid #f3f4f6;
+  box-sizing: border-box;
 }
 
 /* Week Events */
@@ -1078,13 +952,14 @@
   height: 100%;
   color: #d1d5db;
   font-size: 12px;
+  margin-top: -20px;
 }
 
 /* Week Create Button */
 .week-create-btn-wrap {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+ 
   padding-top: 16px;
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
@@ -1337,9 +1212,6 @@
   .month-section {
       padding: 10px 12px 15px;
   }
-  .appointment-card {
-      height: 185px;
-  }
   .filter-panel {
       flex-direction: column;
       align-items: stretch;
@@ -1500,4 +1372,3 @@
 .appointment-main::-webkit-scrollbar-thumb:hover {
   background: #b8bbc1;
 }
-

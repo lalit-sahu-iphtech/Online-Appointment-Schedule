@@ -1,7 +1,6 @@
-
 import { getEventColor } from "../../utils/colorUtils";
 
-// src/component/AppointmentSchedule/AppointmentSchedule.jsx
+
 import { useState, useEffect } from "react";
 import {
   FaPlus,
@@ -24,13 +23,14 @@ import AppointmentCard from "./AppointmentCard";
 import CreateAppointment from "../CreateAppointment/CreateAppointment";
 import { useAppointments } from "../../context/AppointmentContext";
 import "./appointmentSchedule.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export default function AppointmentSchedule() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { appointments, addAppointment, deleteAppointment, loading } = useAppointments();
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
@@ -44,15 +44,15 @@ export default function AppointmentSchedule() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [activePanel, setActivePanel] = useState(null);
   
-  // ✅ Week view state
+  // Week view state
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
-  // ✅ Toggle panels
+  // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
 
-  // ✅ Close panel on outside click
+  // Close panel on outside click
   useEffect(() => {
     if (!activePanel) return;
     const handleClickOutside = (e) => {
@@ -64,7 +64,7 @@ export default function AppointmentSchedule() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // ✅ Initialize expanded months
+  // Initialize expanded months
   const [expandedMonths, setExpandedMonths] = useState(() => {
     const state = {};
     appointments.forEach(month => {
@@ -81,7 +81,7 @@ export default function AppointmentSchedule() {
     setExpandedMonths(state);
   }, [appointments]);
 
-  // ✅ Auth check
+  // Auth check
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
     if (!stored) {
@@ -89,7 +89,8 @@ export default function AppointmentSchedule() {
       return;
     }
     try {
-      setCurrentUser(JSON.parse(stored));
+      const user = JSON.parse(stored);
+      setCurrentUser(user);
     } catch (error) {
       console.log("Invalid currentUser in storage:", error);
       localStorage.removeItem("currentUser");
@@ -97,9 +98,9 @@ export default function AppointmentSchedule() {
       return;
     }
     setCheckingAuth(false);
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
-  // ✅ Profile actions
+  // Profile actions
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
@@ -125,12 +126,12 @@ export default function AppointmentSchedule() {
     }));
   };
 
-  // ✅ Month view navigation
+  // Month view navigation
   const previousYear = () => setCurrentYear(y => y - 1);
   const nextYear = () => setCurrentYear(y => y + 1);
   const goToThisMonth = () => setCurrentYear(new Date().getFullYear());
 
-  // ✅ Week view navigation
+  // Week view navigation
   const goToPreviousWeek = () => {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(newDate.getDate() - 7);
@@ -147,7 +148,7 @@ export default function AppointmentSchedule() {
     setCurrentWeekStart(new Date());
   };
 
-  // ✅ Get week range text
+  // Get week range text
   const getWeekRangeText = () => {
     const weekDays = getWeekDates(currentWeekStart);
     const start = weekDays[0];
@@ -162,7 +163,7 @@ export default function AppointmentSchedule() {
     return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
   };
 
-  // ✅ Get week dates
+  // Get week dates
   const getWeekDates = (startDate) => {
     const today = new Date(startDate);
     const currentDay = today.getDay();
@@ -180,7 +181,7 @@ export default function AppointmentSchedule() {
     return week;
   };
 
-  // ✅ Get all appointments (flatten months)
+  // Get all appointments (flatten months)
   const getAllAppointments = () => {
     const all = [];
     appointments.forEach(monthData => {
@@ -194,14 +195,20 @@ export default function AppointmentSchedule() {
     return all;
   };
 
-  // ✅ Get appointments for a specific date
-  const getAppointmentsForDate = (date) => {
-    const dateStr = date.toISOString().split('T')[0];
-    const allAppointments = getAllAppointments();
-    return allAppointments.filter(apt => apt.date === dateStr);
-  };
+  // Get appointments for a specific date
 
-  // ✅ Get event color
+const getAppointmentsForDate = (date) => {
+  // ✅ Use LOCAL date format
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const dateStr = `${year}-${month}-${day}`;
+  
+  const allAppointments = getAllAppointments();
+  return allAppointments.filter(apt => apt.date === dateStr);
+};
+
+  // Get event color
   const getEventColor = (color) => {
     const colors = {
       purple: { bg: '#8755D5', text: '#ffffff' },
@@ -218,19 +225,27 @@ export default function AppointmentSchedule() {
     return colors[color] || colors.purple;
   };
 
-  // ✅ Get event position
+  // Get event position - FIXED
   const getEventPosition = (startTime, endTime) => {
     const [startHour, startMinute] = startTime ? startTime.split(":").map(Number) : [9, 0];
     const [endHour, endMinute] = endTime ? endTime.split(":").map(Number) : [10, 0];
     const calendarStartHour = 7;
-    const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
-    const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
-    const top = (startMinutes / 60) * 58;
-    const height = ((endMinutes - startMinutes) / 60) * 58;
-    return { top, height: Math.max(height, 30) };
+    const startMinutes = (startHour - calendarStartHour) * 60 + startMinute;
+    const endMinutes = (endHour - calendarStartHour) * 60 + endMinute;
+    
+    const SLOT_HEIGHT = 58;
+    const HEADER_HEIGHT = 40;
+    
+    const top = HEADER_HEIGHT + (startMinutes / 60) * SLOT_HEIGHT;
+    const height = ((endMinutes - startMinutes) / 60) * SLOT_HEIGHT;
+    
+    return { 
+      top, 
+      height: Math.max(height, 28) // Minimum 28px
+    };
   };
 
-  // ✅ Week days and time slots
+  // Week days and time slots
   const weekDays = getWeekDates(currentWeekStart);
   const weekDayNames = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
   const today = new Date();
@@ -242,7 +257,7 @@ export default function AppointmentSchedule() {
     timeSlots.push(`${hour}:00 ${ampm}`);
   }
 
-  // ✅ Month view - Ensure all months exist
+  // Month view - Ensure all months exist
   const allMonths = MONTHS.map(month => {
     const existing = appointments.find(a => a.month === month);
     if (existing) return existing;
@@ -284,7 +299,7 @@ export default function AppointmentSchedule() {
     month.appointments.length > 0 || month.month === MONTHS[new Date().getMonth()]
   );
 
-  // ✅ Notifications
+  // Notifications
   const getUpcomingNotifications = () => {
     const now = new Date();
     const notifications = [];
@@ -588,13 +603,17 @@ export default function AppointmentSchedule() {
           )}
 
           {/* ============================================
-              WEEK VIEW - Complete Working
+              WEEK VIEW - FIXED
           ============================================ */}
           {view === "week" ? (
             <div className="week-view-container">
               {/* Week Header */}
               <div className="week-header">
-                <div className="week-header-time"></div>
+                <div className="week-header-time">
+                  <span style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280' }}>
+                    Time
+                  </span>
+                </div>
                 {weekDays.map((day, index) => {
                   const isToday = today.toDateString() === day.toDateString();
                   const dayAppointments = getAppointmentsForDate(day);
@@ -634,7 +653,7 @@ export default function AppointmentSchedule() {
                         ))}
                       </div>
 
-                      {/* Events */}
+                      {/* Events - FIXED POSITION */}
                       {dayAppointments.map((appointment) => {
                         const startTime = appointment.startTime || "09:00";
                         const endTime = appointment.endTime || "10:00";
@@ -646,7 +665,7 @@ export default function AppointmentSchedule() {
                             key={appointment.id}
                             className="week-event-item"
                             style={{
-                              top: `${top + 40}px`,
+                              top: `${top}px`,
                               height: `${height}px`,
                               background: color.bg,
                               color: color.text,
@@ -656,7 +675,9 @@ export default function AppointmentSchedule() {
                               className="week-event-delete"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                deleteAppointment(appointment.id);
+                                if (window.confirm(`Delete "${appointment.title}"?`)) {
+                                  deleteAppointment(appointment.id);
+                                }
                               }}
                             >
                               <FaTrash />
