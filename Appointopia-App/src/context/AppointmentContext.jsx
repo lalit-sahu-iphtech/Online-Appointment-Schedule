@@ -21,30 +21,9 @@ export function AppointmentProvider({ children }) {
         setAppointments([]);
       }
     } else {
-      // ✅ Default appointments if nothing in localStorage
-      const defaultAppointments = [
-        {
-          month: "AUG",
-          events: "1 Event",
-          appointments: [
-            {
-              id: Date.now(),
-              title: "Sample Meeting",
-              location: "Room 01",
-              onlineLink: "meet.com",
-              duration: "60 mins",
-              bookings: "0 bookings",
-              bookingPage: "meet.com/sample",
-              color: "teal",
-              startTime: "10:00",
-              endTime: "11:00",
-              date: new Date().toISOString().split('T')[0]
-            }
-          ]
-        }
-      ];
-      localStorage.setItem('appointments', JSON.stringify(defaultAppointments));
-      setAppointments(defaultAppointments);
+      // ✅ No default appointments - empty array
+      console.log("📭 No appointments found in localStorage");
+      setAppointments([]);
     }
     setLoading(false);
   }, []);
