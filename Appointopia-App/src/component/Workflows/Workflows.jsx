@@ -15,7 +15,7 @@ import {
 import WorkflowCard from "./WorkflowCard";
 import CreateWorkflowModal from "./CreateWorkflowModal";
 import "./workflows.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 // ✅ DEFAULT WORKFLOWS (Templates)
 const DEFAULT_WORKFLOWS = [
@@ -73,6 +73,7 @@ const DEFAULT_WORKFLOWS = [
 
 export default function Workflows({ onWorkflowsChange }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -147,7 +148,8 @@ export default function Workflows({ onWorkflowsChange }) {
       return;
     }
     try {
-      setCurrentUser(JSON.parse(stored));
+      const user = JSON.parse(stored)
+      setCurrentUser(user);
     } catch (error) {
       console.error("Invalid currentUser in storage:", error);
       localStorage.removeItem("currentUser");
@@ -155,7 +157,7 @@ export default function Workflows({ onWorkflowsChange }) {
       return;
     }
     setCheckingAuth(false);
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   // ✅ Profile actions
   const handleLogout = () => {

@@ -496,6 +496,10 @@
 ===================================================== */
 
 .workflows-container {
+  width: 100%;
+  
+  max-height: calc(100vh - 100px);
+  height: calc(100vh - 120px); 
   background: #ffffff;
   border: 1px solid #eef0f3;
   border-radius: 14px;
@@ -686,6 +690,9 @@
 
   .workflows-container {
       padding: 18px;
+      width: 100%;
+  
+    
   }
 
   .workflows-grid {
