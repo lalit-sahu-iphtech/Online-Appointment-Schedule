@@ -29,7 +29,7 @@ export default function WeekView({
   return (
     <div className="week-calendar-body">
       <div className="week-time-column" style={{ height: `${totalHeight}px` }}>
-        <div></div>
+        <div>Time</div>
         {timeSlots.map((time, index) => (
           <div key={index}>{time}</div>
         ))}

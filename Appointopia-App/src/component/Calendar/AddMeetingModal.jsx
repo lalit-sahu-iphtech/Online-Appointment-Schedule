@@ -10,6 +10,7 @@ import {
     FaUserCircle,
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
+import { useNavigate } from "react-router-dom";
 
 const AVATAR_COLORS = [
     '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
@@ -38,6 +39,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     const [formData, setFormData] = useState(buildFormData);
     const [inviteeName, setInviteeName] = useState("");
     const [errors, setErrors] = useState({});
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         if (!initialData && defaultDate && typeof defaultDate === 'string') {
@@ -302,7 +305,12 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                     </div>
 
                     <div className="meeting-modal-footer">
-                        <button type="button" className="advanced-btn">
+                        <button type="button" className="advanced-btn"
+                        onClick={()=>{
+                            onClose();
+                            navigate("/settings");
+                        }}
+                        >
                             ⚙️ Advanced settings
                         </button>
                         <button type="submit" className="save-meeting-btn">

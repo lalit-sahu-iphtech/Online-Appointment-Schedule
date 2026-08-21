@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaSearch,
   FaRegBell,
@@ -31,6 +31,7 @@ import {
 
 export default function Calendar({ onEventsChange, onDateChange }) {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [currentUser, setCurrentUser] = useState(null); // NEW: logged-in user
   const [checkingAuth, setCheckingAuth] = useState(true); // NEW: avoid flashing calendar before redirect
@@ -57,7 +58,8 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       return;
     }
     try {
-      setCurrentUser(JSON.parse(stored));
+      const user = JSON.parse(stored);
+      setCurrentUser(user);
     } catch (error) {
       console.error("Invalid currentUser in storage:", error);
       localStorage.removeItem("currentUser");
@@ -65,7 +67,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       return;
     }
     setCheckingAuth(false);
-  }, [navigate]);
+  }, [navigate,location.pathname]);
 
   // Har 30 second me "now" refresh karo taaki "starts in X min" sahi rahe
   useEffect(() => {

@@ -425,14 +425,19 @@
     position: relative;
     overflow-y: auto;
     overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: #d1d5db transparent;
     height: calc(100% - 62px);
     max-height: calc(100% - 62px);
+    
+    /* ✅ HIDE SCROLLBAR - KEEP SCROLLING */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE and Edge */
 }
 
+/* ✅ HIDE SCROLLBAR for WebKit (Chrome, Safari, Edge) */
 .calendar-body::-webkit-scrollbar {
-    width: 7px;
+    width: 0px;
+    height: 0px;
+    display: none;
 }
 
 .calendar-body::-webkit-scrollbar-track {
@@ -440,12 +445,7 @@
 }
 
 .calendar-body::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
-}
-
-.calendar-body::-webkit-scrollbar-thumb:hover {
-    background: #b8bbc1;
+    background: transparent;
 }
 
 /* =====================================================
@@ -482,6 +482,16 @@
     height: 986px;
     background-color: #fff;
     min-width: 0;
+    
+    /* ✅ HIDE SCROLLBAR - KEEP SCROLLING */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.calendar-grid::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    display: none;
 }
 
 /* =====================================================
@@ -502,8 +512,8 @@
     position: absolute;
     left: 4px;
     right: 4px;
-    border-radius: 5px;
-    padding: 10px 18px;
+    border-radius: 6px;
+    padding: 8px 15px;
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -572,15 +582,18 @@
     position: relative;
     overflow-y: auto;
     overflow-x: auto;
-    scrollbar-width: thin;
-    scrollbar-color: #d1d5db transparent;
     height: calc(100% - 62px);
     max-height: calc(100% - 62px);
+    
+    /* ✅ HIDE SCROLLBAR - KEEP SCROLLING */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
 
 .week-calendar-body::-webkit-scrollbar {
-    width: 7px;
-    height: 7px;
+    width: 0px;
+    height: 0px;
+    display: none;
 }
 
 .week-calendar-body::-webkit-scrollbar-track {
@@ -588,12 +601,7 @@
 }
 
 .week-calendar-body::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
-}
-
-.week-calendar-body::-webkit-scrollbar-thumb:hover {
-    background: #b8bbc1;
+    background: transparent;
 }
 
 /* =====================================================
@@ -753,6 +761,16 @@
     background-color: #ffffff;
     overflow: hidden;
     height: 100%;
+    
+    /* ✅ HIDE SCROLLBAR - KEEP SCROLLING */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.month-calendar::-webkit-scrollbar {
+    width: 0px;
+    height: 0px;
+    display: none;
 }
 
 /* =====================================================
@@ -905,6 +923,30 @@
 .birthday-event {
     background-color: #ffe1bd;
     color: #e77800;
+}
+
+/* =====================================================
+   SCROLLBAR HIDE - Global for all scrollable containers
+===================================================== */
+
+/* Hide scrollbar for all scrollable elements */
+* {
+    scrollbar-width: none !important; /* Firefox */
+    -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+*::-webkit-scrollbar {
+    width: 0px !important;
+    height: 0px !important;
+    display: none !important; /* Chrome, Safari, Edge */
+}
+
+*::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+*::-webkit-scrollbar-thumb {
+    background: transparent !important;
 }
 
 /* =====================================================
