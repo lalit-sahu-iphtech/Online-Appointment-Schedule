@@ -1,142 +1,216 @@
 .navbar {
-    width: 100%;
-    height: 42px;
-  
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-  
-    padding: 5px 26px 0 8px;
-  
-    background-color: #ffffff;
-  
-    box-sizing: border-box;
-  }
-  .logo-link{
-    
-    text-decoration: none;
+  width: 100%;
+  height: 42px;
 
-  }
-  
-  
-  /* =========================
-     LEFT
-  ========================= */
-  
-  .nav-left {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .nav-left h1 {
-    margin: 0;
-  
-    font-size: 24px;
-    line-height: 20px;
-  
-    font-weight: 700;
-  
-    color: #292929;
-  }
-  
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
 
-  
+  padding: 5px 26px 0 8px;
 
-  
+  background-color: #ffffff;
 
-  
+  box-sizing: border-box;
+}
+
+.logo-link{
+  text-decoration: none;
+}
+
+/* =========================
+   LEFT
+========================= */
+
+.nav-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.nav-left h1 {
+  margin: 0;
+
+  font-size: 24px;
+  line-height: 20px;
+
+  font-weight: 700;
+
+  color: #292929;
+}
+
+/* =========================
+   MIDDLE
+========================= */
+
+.nav-mid {
+  position: absolute;
+
+  left: 50%;
+  top: 11px;
+
+  transform: translateX(-50%);
+}
+
+.nav-mid ul {
+  display: flex;
+  align-items: center;
+
+  gap: 30px;
+
+  margin: 0;
+  padding: 0;
+
+  list-style: none;
+}
+
+.nav-mid li {
+  font-size: 15px;
+  font-weight: 400;
+
+  color: #454545;
+
+  cursor: pointer;
+
+  white-space: nowrap;
+}
+
+.nav-mid a {
+  text-decoration: none;
+  color: #292929;
+}
+
+.nav-mid a:hover {
+  color: #8555d5;
+}
+
+/* =========================
+   RIGHT
+========================= */
+
+.nav-right {
+  display: flex;
+  align-items: center;
+
+  gap: 10px;
+
+  margin-top: 1px;
+}
+
+.nav-right a {
+  text-decoration: none;
+}
+
+.nav-right button {
+  border: none;
+  background: none;
+
+  font-family: inherit;
+  font-size: 13px;
+
+  cursor: pointer;
+}
+
+/* =========================
+   SIGN IN
+========================= */
+
+.sign-in-btn {
+  color: #8555d5;
+  font-size: 14px;
+  padding: 4px 2px;
+}
+
+.sign-in-btn:hover {
+  color: #7346c4;
+}
+
+/* =========================
+   SIGN UP
+========================= */
+
+.sign-up-btn {
+  color: #ffffff !important;
+
+  background-color: #8555d5 !important;
+
+  padding: 6px 12px;
+
+  border-radius: 12px;
+  font-size: 14px;
+}
+
+.sign-up-btn:hover {
+  background-color: #7346c4 !important;
+}
+
+/* =========================
+   LOGOUT BUTTON
+========================= */
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 12px;
+  background-color: #f3f4f6 !important;
+  color: #ef4444 !important;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+}
+
+.logout-icon {
+  font-size: 14px;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
   .nav-mid {
-    position: absolute;
-  
-    left: 50%;
-    top: 11px;
-  
-    transform: translateX(-50%);
+    display: none;
   }
-  
-  .nav-mid ul {
-    display: flex;
-    align-items: center;
-  
-    gap: 30px;
-  
-    margin: 0;
-    padding: 0;
-  
-    list-style: none;
+
+  .navbar {
+    padding: 5px 16px 0 12px;
   }
-  
-  .nav-mid li {
-    font-size: 15px;
-    font-weight: 400;
-  
-    color: #454545;
-  
-    cursor: pointer;
-  
-    white-space: nowrap;
-   
+
+  .nav-left h1 {
+    font-size: 20px;
   }
-  .nav-mid a{
-    text-decoration: none;
-    color: #292929;
+
+  .sign-in-btn,
+  .sign-up-btn,
+  .logout-btn {
+    font-size: 12px;
+    padding: 4px 10px;
   }
-  
-  .nav-mid a:hover {
-    color: #8555d5;
+}
+
+@media (max-width: 500px) {
+  .nav-left h1 {
+    font-size: 18px;
   }
-  
-  
-  /* =========================
-     RIGHT
-  ========================= */
-  
-  .nav-right {
-    display: flex;
-    align-items: center;
-  
-    gap: 10px;
-  
-    margin-top: 1px;
-  }
-  .nav-right a{
-    text-decoration: none;
-  }
-  
-  .nav-right button {
-    border: none;
-    background: none;
-  
-    font-family: inherit;
-    font-size: 13px;
-  
-    cursor: pointer;
-  }
-  
-  
-  /* Sign In */
-  
+
   .sign-in-btn {
-    color: #8555d5;
-    font-size: 14px;
+    font-size: 11px;
     padding: 4px 2px;
   }
-  
-  
-  /* Sign Up */
-  
+
   .sign-up-btn {
-    color: #ffffff !important;
-  
-    background-color: #8555d5 !important;
-  
-    padding: 6px 12px;
-  
-    border-radius: 12px;
-    font-size: 14px;
+    font-size: 11px;
+    padding: 4px 10px;
   }
-  
-  .sign-up-btn:hover {
-    background-color: #7346c4 !important;
+
+  .logout-btn {
+    font-size: 11px;
+    padding: 4px 10px;
   }
+}
