@@ -35,6 +35,7 @@ const MONTH_LABELS = [
 export default function CreateAppointment({ onClose, onSave }) {
 
   const [step, setStep] = useState(1);
+  const [copyToast, setCopyToast] = useState(false); 
 
   /* =========================================
      STEP 1 — GENERAL INFORMATION
@@ -70,6 +71,16 @@ export default function CreateAppointment({ onClose, onSave }) {
 
   };
 
+  // ✅ Copy link handler with toast
+  const handleCopyLink = async (link) => {
+    try {
+      await navigator.clipboard.writeText(link);
+      setCopyToast(true);
+      setTimeout(() => setCopyToast(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
 
 
   /* =========================================
@@ -190,93 +201,54 @@ export default function CreateAppointment({ onClose, onSave }) {
       .trim()
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
-   // src/component/CreateAppointment/CreateAppointment.jsx
 
-const handleShare = () => {
-  // ✅ Get current time for start time
-  const now = new Date();
-  const startHour = now.getHours() + 1;
-  const startMin = now.getMinutes();
-  const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-  
-  // ✅ Parse duration
-  const durationMatch = scheduleData.duration?.match(/(\d+)/);
-  const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
-  
-  // ✅ Calculate end time
-  const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
-  const endHour = Math.floor(endTotalMinutes / 60);
-  const endMin = endTotalMinutes % 60;
-  const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-
-  // Build the appointment object
-  const newAppointment = {
-      id: Date.now(),
-      title: formData.eventName,
-      location: formData.location,
-      onlineLink: formData.onlineLink,
-      duration: scheduleData.duration,
-      bookings: "0 bookings",
-      bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
-      color: selectedColor,
-      startTime: startTime,
-      endTime: endTime,
-      date: new Date().toISOString().split('T')[0]
-  };
-
-  // Call onSave with the new appointment and target month
-  if (onSave) {
-      onSave(newAppointment, scheduleData.targetMonth);
-  }
-
-  // Close the modal
-  onClose();
-};
-// const handleShare = () => {
-//   // ✅ Get current date
-//   const today = new Date();
-//   const dateStr = today.toISOString().split('T')[0];
-  
-//   // ✅ Get current time for start time
-//   const now = new Date();
-//   const startHour = now.getHours() + 1;
-//   const startMin = now.getMinutes();
-//   const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-  
-//   // ✅ Parse duration
-//   const durationMatch = scheduleData.duration?.match(/(\d+)/);
-//   const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
-  
-//   // ✅ Calculate end time
-//   const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
-//   const endHour = Math.floor(endTotalMinutes / 60);
-//   const endMin = endTotalMinutes % 60;
-//   const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-
-//   // Build the appointment object
-//   const newAppointment = {
-//       id: Date.now(),
-//       title: formData.eventName,
-//       location: formData.location,
-//       onlineLink: formData.onlineLink,
-//       duration: scheduleData.duration,
-//       bookings: "0 bookings",
-//       bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
-//       color: selectedColor,
-//       startTime: startTime,
-//       endTime: endTime,
-//       date: dateStr, // ✅ ADD DATE
-//   };
-
-//   // Call onSave with the new appointment and target month
-//   if (onSave) {
-//       onSave(newAppointment, scheduleData.targetMonth);
-//   }
-
-//   // Close the modal
-//   onClose();
-// };
-    
+      const handleShare = () => {
+        // ✅ Get current time for start time
+        const now = new Date();
+        const startHour = now.getHours() + 1;
+        const startMin = now.getMinutes();
+        const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+        
+        // ✅ Parse duration
+        const durationMatch = scheduleData.duration?.match(/(\d+)/);
+        const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+        
+        // ✅ Calculate end time
+        const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
+        const endHour = Math.floor(endTotalMinutes / 60);
+        const endMin = endTotalMinutes % 60;
+        const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+      
+        // ✅ Get LOCAL date (not UTC)
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const localDateStr = `${year}-${month}-${day}`;
+      
+        // Build the appointment object
+        const newAppointment = {
+          id: Date.now(),
+          title: formData.eventName,
+          location: formData.location,
+          onlineLink: formData.onlineLink,
+          duration: scheduleData.duration,
+          bookings: "0 bookings",
+          bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
+          color: selectedColor,
+          startTime: startTime,
+          endTime: endTime,
+          date: localDateStr // ✅ Use LOCAL date
+        };
+      
+        // Call onSave with the new appointment and target month
+        if (onSave) {
+          onSave(newAppointment, scheduleData.targetMonth);
+        }
+      
+        // Close the modal
+        onClose();
+      };
 
   const selectedColorHex = colors.find(
     (c) => c.id === selectedColor
@@ -341,7 +313,7 @@ const handleShare = () => {
 
               {/* EVENT NAME */}
 
-              <div className="form-field full-field">
+              <div className="gi-field gi-full-field">
 
                 <label htmlFor="eventName">
                   Event Name
@@ -360,9 +332,9 @@ const handleShare = () => {
 
               {/* LOCATION + ONLINE LINK */}
 
-              <div className="form-row">
+              <div className="gi-row">
 
-                <div className="form-field">
+                <div className="gi-field">
 
                   <label htmlFor="location">
                     Location
@@ -384,7 +356,7 @@ const handleShare = () => {
 
                 </div>
 
-                <div className="form-field">
+                <div className="gi-field">
 
                   <label htmlFor="onlineLink">
                     Online Event Link
@@ -402,11 +374,7 @@ const handleShare = () => {
 
                     <FaRegCopy
                       className="copy-link-icon"
-                      onClick={() =>
-                        navigator.clipboard?.writeText(
-                          formData.onlineLink
-                        )
-                      }
+                      onClick={() => handleCopyLink(formData.onlineLink)} // ✅ Updated
                     />
 
                   </div>
@@ -418,9 +386,9 @@ const handleShare = () => {
 
               {/* MAX INVITEES + COLOR */}
 
-              <div className="form-row">
+              <div className="gi-row">
 
-                <div className="form-field">
+                <div className="gi-field">
 
                   <label htmlFor="maxInvitees">
                     Max invitees
@@ -437,7 +405,7 @@ const handleShare = () => {
 
                 </div>
 
-                <div className="form-field event-color-field">
+                <div className="gi-field event-color-field">
 
                   <label>
                     Event Color
@@ -475,7 +443,7 @@ const handleShare = () => {
 
               {/* DESCRIPTION */}
 
-              <div className="form-field description-field">
+              <div className="gi-field description-field">
 
                 <label htmlFor="description">
                   Description
@@ -530,7 +498,7 @@ const handleShare = () => {
 
               {/* SCHEDULE TITLE */}
 
-              <div className="general-title schedule-title">
+              <div className="schedule-section-title">
 
                 <FaCalendarAlt />
 
@@ -621,9 +589,9 @@ const handleShare = () => {
 
               {/* DURATION + TIMEZONE */}
 
-              <div className="form-row schedule-row">
+              <div className="schedule-duration-row">
 
-                <div className="form-field">
+                <div className="schedule-field">
 
                   <label>
                     Duration
@@ -647,7 +615,7 @@ const handleShare = () => {
 
                 </div>
 
-                <div className="form-field">
+                <div className="schedule-field">
 
                   <label>
                     Timezone
@@ -682,7 +650,7 @@ const handleShare = () => {
 
               {/* ADD TO MONTH */}
 
-              <div className="form-field target-month-field">
+              <div className="schedule-field target-month-field">
 
                 <label>
                   Add to Month
@@ -840,11 +808,16 @@ const handleShare = () => {
               </div>
 
 
-              {/* ADD WORKFLOW */}
+              {/* ✅ ADD WORKFLOW - CLICKABLE */}
 
               <button
                 type="button"
                 className="add-workflow-box"
+                onClick={() => {
+                  console.log("Add Workflow clicked!");
+                  // TODO: Open workflow modal or navigate
+                  alert("Add Workflow feature coming soon!");
+                }}
               >
 
                 <div className="add-workflow-title">
@@ -867,7 +840,7 @@ const handleShare = () => {
           ) : (
 
             /* =========================================
-               STEP 3 — REVIEW INFORMATION
+               STEP 3 — REVIEW INFORMATION (Updated Design)
             ========================================= */
 
             <div className="review-step">
@@ -876,7 +849,7 @@ const handleShare = () => {
 
               <div className="review-section">
 
-                <div className="general-title">
+                <div className="review-title">
 
                   <FaInfoCircle />
 
@@ -886,70 +859,65 @@ const handleShare = () => {
 
                 <div className="review-grid">
 
+                  {/* Location */}
                   <div className="review-field">
-
                     <label>
                       <FaMapMarkerAlt />
                       Location
                     </label>
-
                     <div className="review-value">
                       {formData.location}
                     </div>
-
                   </div>
 
+                  {/* Online Link */}
                   <div className="review-field">
-
                     <label>
                       <FaLink />
                       Online Link
                     </label>
-
-                    <a
-                      className="review-value review-link"
-                      href={`https://${formData.onlineLink.replace(
-                        /^https?:\/\//,
-                        ""
-                      )}`}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {formData.onlineLink}
-                    </a>
-
+                    <div className="review-link-wrapper">
+                      <span className="review-value review-link">
+                        {formData.onlineLink}
+                      </span>
+                      <button
+                        className="review-copy-btn"
+                        onClick={() => handleCopyLink(formData.onlineLink)}
+                        aria-label="Copy link"
+                        type="button"
+                      >
+                        <FaRegCopy />
+                      </button>
+                    </div>
                   </div>
 
+                  {/* Max Invitees */}
                   <div className="review-field">
-
                     <label>
                       <FaUsers />
                       Max invitees
                     </label>
-
                     <div className="review-value">
                       {formData.maxInvitees}
                     </div>
-
                   </div>
 
+                  {/* Event Color */}
                   <div className="review-field">
-
                     <label>
                       <FaPalette />
                       Event Color
                     </label>
-
                     <div
                       className="review-color-dot"
                       style={{ backgroundColor: selectedColorHex }}
                     />
-
                   </div>
 
                 </div>
 
-                <div className="review-field full-field">
+                {/* Description - Full Width */}
+                <div className="review-field review-full-field">
 
                   <label>
                     <FaAlignLeft />
@@ -969,7 +937,7 @@ const handleShare = () => {
 
               <div className="review-section">
 
-                <div className="general-title">
+                <div className="review-title">
 
                   <FaCalendarAlt />
 
@@ -977,9 +945,10 @@ const handleShare = () => {
 
                 </div>
 
-                <div className="review-field full-field">
+                {/* Invitees can select */}
+                <div className="review-field review-full-field">
 
-                  <label>
+                  <label className="ap-invitee">
                     <FaUsers />
                     Invitees can select
                   </label>
@@ -992,7 +961,8 @@ const handleShare = () => {
 
                 </div>
 
-                <div className="review-field full-field">
+                {/* General Availability */}
+                <div className="review-field review-full-field">
 
                   <label>
                     <FaRegClock />
@@ -1004,13 +974,12 @@ const handleShare = () => {
                     {DAYS.map((day) => {
 
                       const dayData = availability[day];
+                      const isAvailable = dayData.enabled && dayData.slots.length > 0;
 
                       return (
 
                         <div
-                          className={`availability-review-row ${
-                            dayData.enabled ? "has-slot" : ""
-                          }`}
+                          className={`availability-review-row ${isAvailable ? "has-slot" : ""}`}
                           key={day}
                         >
 
@@ -1018,7 +987,7 @@ const handleShare = () => {
                             {day}
                           </span>
 
-                          {dayData.enabled ? (
+                          {isAvailable ? (
 
                             <div className="review-slots">
 
@@ -1028,9 +997,9 @@ const handleShare = () => {
                                   className="review-slot-time"
                                   key={index}
                                 >
-                                  {slot.start}
+                                  <span className="review-slot-start">{slot.start}</span>
                                   <FaArrowRight className="review-slot-arrow" />
-                                  {slot.end}
+                                  <span className="review-slot-end">{slot.end}</span>
                                 </span>
 
                               ))}
@@ -1133,6 +1102,13 @@ const handleShare = () => {
         </div>
 
       </aside>
+
+      {/* ✅ COPY TOAST */}
+      {copyToast && (
+        <div className="copy-toast">
+          Link copied to clipboard! ✓
+        </div>
+      )}
 
     </div>
   );
