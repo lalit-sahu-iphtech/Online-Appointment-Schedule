@@ -17,6 +17,120 @@
     font-family: "Poppins", sans-serif;
     overflow: visible; 
     flex-shrink: 0;  
+    transition: transform 0.3s ease;
+    position: relative;
+    z-index: 100;
+}
+
+/* =========================
+   MOBILE MENU BUTTON
+========================= */
+
+.sidebar-mobile-toggle {
+    display: none;
+    position: fixed;
+    top: 16px;
+    left: 16px;
+    width: 42px;
+    height: 42px;
+
+    border: none;
+    border-radius: 10px;
+
+    background: #ffffff;
+    color: #8555D5;
+
+    font-size: 20px;
+
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+
+    z-index: 1100;
+
+    transition:
+        background 0.2s ease,
+        transform 0.2s ease;
+}
+
+.sidebar-mobile-toggle:hover {
+    background: #f4effd;
+    transform: scale(1.05);
+}
+
+.sidebar-mobile-toggle:active {
+    transform: scale(0.95);
+}
+
+
+/* =========================
+   MOBILE OVERLAY
+========================= */
+
+.sidebar-overlay {
+    display: none;
+
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.35);
+    backdrop-filter: blur(2px);
+
+    z-index: 999;
+
+    animation: overlayFadeIn 0.25s ease;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+
+/* =========================
+   MOBILE CLOSE BUTTON
+========================= */
+
+.sidebar-close-mobile {
+    display: none;
+
+    width: 34px;
+    height: 34px;
+
+    border: none;
+    border-radius: 50%;
+
+    background: #f3f4f6;
+    color: #6b7280;
+
+    cursor: pointer;
+
+    align-items: center;
+    justify-content: center;
+
+    font-size: 15px;
+
+    flex-shrink: 0;
+
+    transition: all 0.2s ease;
+}
+
+.sidebar-close-mobile:hover {
+    background: #f4effd;
+    color: #8555D5;
+    transform: rotate(90deg);
+}
+
+.sidebar-close-mobile:active {
+    transform: scale(0.9);
 }
 
 /* =========================
@@ -38,6 +152,9 @@
 .sidebar-logo {
     width: 100%;
     margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .logo-icon {
@@ -237,6 +354,7 @@
     align-items: center;
     gap: 8px;
     margin-bottom: 8px;
+    flex-wrap: wrap;
 }
 
 .invitees-icon {
@@ -250,7 +368,7 @@
     color: #7A8299;
 }
 
-/* ✅ Toggle Button */
+/* Toggle Button */
 .invitees-toggle-btn {
     display: flex;
     align-items: center;
@@ -278,7 +396,7 @@
     font-size: 10px;
 }
 
-/* ✅ Avatars Row 1 */
+/* Avatars Row 1 */
 .invitees-avatars-row {
     display: flex;
     align-items: center;
@@ -287,7 +405,7 @@
     margin-top: 4px;
 }
 
-/* ✅ Avatars Row 2 (Expanded) */
+/* Avatars Row 2 (Expanded) */
 .invitees-avatars-row.expanded-row {
     margin-top: 6px;
     padding-top: 6px;
@@ -306,7 +424,7 @@
     }
 }
 
-/* ✅ Individual avatar circle */
+/* Individual avatar circle */
 .invitee-avatar-circle {
     width: 32px;
     height: 32px;
@@ -329,7 +447,7 @@
     z-index: 2;
 }
 
-/* ✅ More badge - Clickable */
+/* More badge - Clickable */
 .invitee-more-clickable {
     width: 32px;
     height: 32px;
@@ -366,7 +484,7 @@
     margin-top: auto;
     background: #F8F6FF;
     border-radius: 14px;
-    padding: 30px 20px;
+    padding: 30px 10px;
     text-align: center;
     border: 2px dashed #D4C8F0;
     flex-shrink: 0;
@@ -396,6 +514,7 @@
     font-size: 13px;
     color: #7A8299;
 }
+
 /* =========================
    INVITEE AVATAR - CLICKABLE
 ========================= */
@@ -640,7 +759,7 @@
 }
 
 /* =========================
-   RESPONSIVE
+   RESPONSIVE - TABLET (768px - 1000px)
 ========================= */
 
 @media (max-width: 1000px) {
@@ -662,108 +781,404 @@
     }
 }
 
+/* =========================
+   RESPONSIVE - MOBILE (up to 768px)
+========================= */
+
+/* =========================
+   RESPONSIVE - MOBILE
+========================= */
+
 @media (max-width: 768px) {
+
+    /* =========================
+       MENU BUTTON
+    ========================= */
+
+    .sidebar-mobile-toggle {
+        display: flex;
+    }
+
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
     .sidebar {
-        padding: 20px 10px;
-        min-width: 75px;
-        max-width: 75px;
+        position: fixed;
+
+        top: 0;
+        left: 0;
+
+        width: 280px;
+        max-width: 85vw;
+        min-width: 0;
+
+        height: 100dvh;
+
+        padding: 20px 16px;
+
+        background: #ffffff;
+
+        box-shadow: 4px 0 30px rgba(0, 0, 0, 0.12);
+
+        border-right: 1px solid #e5e7eb;
+
+        z-index: 1000;
+
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        transform: translateX(-105%);
+
+        transition: transform 0.3s ease;
+
+        visibility: hidden;
     }
-    
+
+
+    /* =========================
+       SIDEBAR OPEN
+    ========================= */
+
+    .sidebar.sidebar-open {
+        transform: translateX(0);
+
+        visibility: visible;
+    }
+
+
+    /* =========================
+       OVERLAY
+    ========================= */
+
+    .sidebar-overlay {
+        display: block;
+    }
+
+
+    /* =========================
+       LOGO
+    ========================= */
+
+    .sidebar-logo {
+        margin-bottom: 28px;
+    }
+
     .logo-icon {
-        justify-content: center;
+        padding-left: 0;
     }
+
     .logo-icon img {
-        width: 30px;
-        height: 30px;
+        width: 32px;
+        height: 32px;
     }
+
     .logo-icon span {
-        display: none;
+        display: block;
+        font-size: 18px;
     }
-    
+
+
+    /* =========================
+       CLOSE BUTTON
+    ========================= */
+
+    .sidebar-close-mobile {
+        display: flex;
+    }
+
+
+    /* =========================
+       MENU
+    ========================= */
+
+    .sidebar-menu {
+        gap: 8px;
+    }
+
     .sidebar-item,
     .sidebar-item-active {
-        justify-content: center;
-        padding: 0;
-        height: 45px;
+        height: 44px;
+
+        padding: 0 14px;
+
+        font-size: 14px;
+
+        gap: 12px;
     }
+
     .sidebar-item span,
     .sidebar-item-active span {
-        display: none;
+        display: inline;
     }
-    
+
+
+    /* =========================
+       NEXT EVENT
+    ========================= */
+
     .next-event-card {
-        padding: 12px 8px;
-        border-radius: 10px;
+        margin-top: 20px;
+        padding: 14px 12px;
     }
-    
+
     .event-title {
-        font-size: 13px;
+        font-size: 15px;
     }
+
     .time-badge {
-        font-size: 10px;
-        padding: 3px 10px;
+        font-size: 11px;
+        padding: 4px 12px;
     }
+
     .event-location {
-        font-size: 11px;
-    }
-    .event-link {
-        font-size: 11px;
-    }
-    .next-event-label {
-        font-size: 10px;
-    }
-    
-    /* ✅ Smaller avatars on tablet */
-    .invitee-avatar-circle {
-        width: 26px;
-        height: 26px;
-        font-size: 9px;
-    }
-    .invitee-more-clickable {
-        width: 26px;
-        height: 26px;
-        font-size: 9px;
-    }
-    .invitees-label {
-        font-size: 10px;
-    }
-    .invitees-toggle-btn {
-        font-size: 8px;
-        padding: 2px 8px;
-    }
-    
-    .no-event-card {
-        padding: 16px 12px;
-    }
-    .no-event-card h3 {
         font-size: 12px;
     }
+
+    .event-link {
+        font-size: 12px;
+    }
+
+    .next-event-label {
+        font-size: 11px;
+    }
+
+
+    /* =========================
+       AVATARS
+    ========================= */
+
+    .invitee-avatar-circle {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+
+    .invitee-more-clickable {
+        width: 28px;
+        height: 28px;
+        font-size: 10px;
+    }
+
+    .invitees-label {
+        font-size: 11px;
+    }
+
+    .invitees-toggle-btn {
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+
+
+    /* =========================
+       NO EVENT
+    ========================= */
+
+    .no-event-card {
+        width: 80%;
+        padding: 20px 12px;
+    }
+
+    .no-event-card h3 {
+        font-size: 14px;
+    }
+
     .celebration-icon {
-        font-size: 24px;
+        font-size: 28px;
     }
 }
+/* =========================
+   RESPONSIVE - EXTRA SMALL (up to 500px)
+========================= */
 
 @media (max-width: 500px) {
     .sidebar {
-        padding: 15px 7px;
-        min-width: 60px;
-        max-width: 60px;
+        width: 280px;
+        max-width: 85vw;
+        padding: 16px 14px;
     }
-    
+
+    .sidebar-mobile-toggle {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+        top: 12px;
+        left: 12px;
+    }
+
+    .logo-icon img {
+        width: 28px;
+        height: 28px;
+    }
+
+    .logo-icon span {
+        font-size: 16px;
+    }
+
     .sidebar-item,
     .sidebar-item-active {
-        height: 42px;
+        height: 40px;
+        font-size: 13px;
+        padding: 0 12px;
+        gap: 10px;
     }
+
     .sidebar-icon {
         width: 18px;
         height: 18px;
         font-size: 18px;
     }
-    
+
     .next-event-card {
-        display: none;
+        padding: 12px 10px;
+        border-radius: 10px;
     }
+
+    .event-title {
+        font-size: 14px;
+    }
+
+    .time-badge {
+        font-size: 10px;
+        padding: 3px 10px;
+    }
+
+    .event-location {
+        font-size: 11px;
+    }
+
+    .event-link {
+        font-size: 11px;
+    }
+
+    .next-event-label {
+        font-size: 10px;
+    }
+
+    .invitee-avatar-circle {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+        border-width: 1.5px;
+    }
+
+    .invitee-more-clickable {
+        width: 24px;
+        height: 24px;
+        font-size: 9px;
+    }
+
+    .invitees-label {
+        font-size: 10px;
+    }
+
+    .invitees-toggle-btn {
+        font-size: 8px;
+        padding: 2px 6px;
+    }
+
     .no-event-card {
-        display: none;
+        padding: 16px 10px;
+    }
+
+    .no-event-card h3 {
+        font-size: 13px;
+    }
+
+    .celebration-icon {
+        font-size: 24px;
+    }
+}
+
+/* =========================
+   RESPONSIVE - VERY SMALL (up to 400px)
+========================= */
+
+@media (max-width: 400px) {
+    .sidebar {
+        width: 260px;
+        max-width: 90vw;
+        padding: 14px 12px;
+    }
+
+    .sidebar-mobile-toggle {
+        width: 34px;
+        height: 34px;
+        font-size: 16px;
+        top: 10px;
+        left: 10px;
+    }
+
+    .logo-icon img {
+        width: 24px;
+        height: 24px;
+    }
+
+    .logo-icon span {
+        font-size: 14px;
+    }
+
+    .sidebar-item,
+    .sidebar-item-active {
+        height: 36px;
+        font-size: 12px;
+        padding: 0 10px;
+        gap: 8px;
+        border-radius: 8px;
+    }
+
+    .sidebar-icon {
+        width: 16px;
+        height: 16px;
+        font-size: 16px;
+    }
+
+    .next-event-card {
+        padding: 10px 8px;
+        border-radius: 8px;
+    }
+
+    .event-title {
+        font-size: 13px;
+    }
+
+    .time-badge {
+        font-size: 9px;
+        padding: 2px 8px;
+    }
+
+    .event-location {
+        font-size: 10px;
+    }
+
+    .event-link {
+        font-size: 10px;
+    }
+
+    .next-event-label {
+        font-size: 9px;
+    }
+
+    .invitee-avatar-circle {
+        width: 22px;
+        height: 22px;
+        font-size: 8px;
+        border-width: 1.5px;
+    }
+
+    .invitee-more-clickable {
+        width: 22px;
+        height: 22px;
+        font-size: 8px;
+    }
+
+    .invitees-label {
+        font-size: 9px;
+    }
+
+    .invitees-toggle-btn {
+        font-size: 7px;
+        padding: 2px 6px;
     }
 }

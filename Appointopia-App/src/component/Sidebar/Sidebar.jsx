@@ -13,7 +13,8 @@ import {
   FaEnvelope,
   FaCalendarCheck,
   FaMapPin,
-  FaTimes
+  FaTimes,
+  FaBars
 } from "react-icons/fa";
 import { MdEventNote } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
@@ -64,6 +65,9 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
   // ✅ State for selected invitee popup
   const [selectedInvitee, setSelectedInvitee] = useState(null);
 
+  // ✅ Mobile sidebar toggle
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+
   const memoizedEvents = useMemo(() => events, [events]);
   const memoizedDate = useMemo(() => selectedDate, [selectedDate]);
 
@@ -82,6 +86,39 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     setShowAllInvitees(false);
     setSelectedInvitee(null);
   }, [nextEvent]);
+
+  // ✅ Close mobile sidebar on route change
+  useEffect(() => {
+    setIsMobileOpen(false);
+  }, [location.pathname]);
+
+  // ✅ Close mobile sidebar on window resize (desktop)
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileOpen(false);
+      }
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // ✅ Close sidebar when clicking outside on mobile
+  useEffect(() => {
+    if (!isMobileOpen) return;
+    
+    const handleClickOutside = (e) => {
+      const sidebar = document.querySelector('.sidebar');
+      const toggleBtn = document.querySelector('.sidebar-mobile-toggle');
+      
+      if (sidebar && !sidebar.contains(e.target) && toggleBtn && !toggleBtn.contains(e.target)) {
+        setIsMobileOpen(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileOpen]);
 
   const getInvitees = (event) => {
     if (event.invitees && event.invitees.length > 0) {
@@ -116,6 +153,11 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     setSelectedInvitee(null);
   };
 
+  // ✅ Toggle mobile sidebar
+  const toggleMobileSidebar = () => {
+    setIsMobileOpen(!isMobileOpen);
+  };
+
   // ✅ Render invitee avatar with click handler
   const renderInviteeAvatar = (person, index) => {
     const name = person.name || person;
@@ -136,180 +178,208 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
   };
 
   return (
-    <aside className="sidebar">
-      {/* Logo */}
-      <div className="sidebar-logo">
-        <Link to="/" className="sidebar-link">
-          <div className="logo-icon">
-            <img src={logo} alt="Appointopia" />
-            <span>Appointopia</span>
-          </div>
-        </Link>
-      </div>
+    <>
+      {/* Mobile Menu Button */}
+    {!isMobileOpen && (
+      <button
+        className="sidebar-mobile-toggle"
+        onClick={() => setIsMobileOpen(true)}
+        aria-label="Open sidebar"
+      >
+        <FaBars />
+      </button>
+    )}
 
-      {/* Menu */}
-      <nav className="sidebar-menu">
-        {menuItems.map(({ path, label, icon: Icon }) => {
-          const isActive = location.pathname.startsWith(path);
-          return (
-            <Link to={path} key={path} className="sidebar-link">
-              <div className={isActive ? "sidebar-item-active" : "sidebar-item"}>
-                <Icon className="sidebar-icon" />
-                <span>{label}</span>
-              </div>
-            </Link>
-          );
-        })}
-      </nav>
+    {/* Mobile Overlay */}
+    {isMobileOpen && (
+      <div
+        className="sidebar-overlay"
+        onClick={() => setIsMobileOpen(false)}
+      />
+    )}
 
-      {/* Next Event Card */}
-      {nextEvent ? (
-        <div className="next-event-card">
-          <div className="next-event-header">
-            <span className="next-event-label">Next Event</span>
-          </div>
-          
-          <div className="next-event-content">
-            <h4 className="event-title">{nextEvent.meetingName || nextEvent.title}</h4>
-            
-            <div className="event-time">
-              <FaClock className="event-icon" />
-              <span className="time-badge">
-                {formatTimeDisplay(nextEvent.startTime)} - {formatTimeDisplay(nextEvent.endTime)}
-              </span>
+      <aside className={`sidebar ${isMobileOpen ? 'sidebar-open' : ''}`}>
+        {/* Logo */}
+        <div className="sidebar-logo">
+          <Link to="/" className="sidebar-link" onClick={() => setIsMobileOpen(false)}>
+            <div className="logo-icon">
+              <img src={logo} alt="Appointopia" />
+              <span>Appointopia</span>
+            </div>
+          </Link>
+          <button
+            className="sidebar-close-mobile"
+            onClick={() => setIsMobileOpen(false)}
+            aria-label="Close sidebar"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        {/* Menu */}
+        <nav className="sidebar-menu">
+          {menuItems.map(({ path, label, icon: Icon }) => {
+            const isActive = location.pathname.startsWith(path);
+            return (
+              <Link to={path} key={path} className="sidebar-link" onClick={() => setIsMobileOpen(false)}>
+                <div className={isActive ? "sidebar-item-active" : "sidebar-item"}>
+                  <Icon className="sidebar-icon" />
+                  <span>{label}</span>
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Next Event Card */}
+        {nextEvent ? (
+          <div className="next-event-card">
+            <div className="next-event-header">
+              <span className="next-event-label">Next Event</span>
             </div>
             
-            {nextEvent.location && (
-              <div className="event-location">
-                <FaMapMarkerAlt className="event-icon" />
-                <span>{nextEvent.location}</span>
+            <div className="next-event-content">
+              <h4 className="event-title">{nextEvent.meetingName || nextEvent.title}</h4>
+              
+              <div className="event-time">
+                <FaClock className="event-icon" />
+                <span className="time-badge">
+                  {formatTimeDisplay(nextEvent.startTime)} - {formatTimeDisplay(nextEvent.endTime)}
+                </span>
               </div>
-            )}
-            
-            {nextEvent.onlineLink && (
-              <a href={nextEvent.onlineLink} className="event-link">
-                <FaLink className="event-icon" />
-                <span>{nextEvent.onlineLink}</span>
-              </a>
-            )}
+              
+              {nextEvent.location && (
+                <div className="event-location">
+                  <FaMapMarkerAlt className="event-icon" />
+                  <span>{nextEvent.location}</span>
+                </div>
+              )}
+              
+              {nextEvent.onlineLink && (
+                <a href={nextEvent.onlineLink} className="event-link">
+                  <FaLink className="event-icon" />
+                  <span>{nextEvent.onlineLink}</span>
+                </a>
+              )}
 
-            {/* INVITEES SECTION */}
-            {(() => {
-              const invitees = getInvitees(nextEvent);
-              if (invitees.length === 0) return null;
-              
-              const displayInvitees = showAllInvitees 
-                  ? invitees 
-                  : invitees.slice(0, 4);
-              
-              const hasMore = invitees.length > 4;
-              
-              return (
-                <div className="event-invitees">
-                  <div className="invitees-header">
-                    <FaUserFriends className="invitees-icon" />
-                    <span className="invitees-label">
-                      {invitees.length} Invitee{invitees.length > 1 ? 's' : ''}
-                    </span>
-                    {hasMore && (
-                      <button 
-                        className="invitees-toggle-btn"
-                        onClick={toggleExpandInvitees}
-                      >
-                        {showAllInvitees ? (
-                          <><FaChevronUp /> Show less</>
-                        ) : (
-                          <><FaChevronDown /> Show all</>
+              {/* INVITEES SECTION */}
+              {(() => {
+                const invitees = getInvitees(nextEvent);
+                if (invitees.length === 0) return null;
+                
+                const displayInvitees = showAllInvitees 
+                    ? invitees 
+                    : invitees.slice(0, 4);
+                
+                const hasMore = invitees.length > 4;
+                
+                return (
+                  <div className="event-invitees">
+                    <div className="invitees-header">
+                      <FaUserFriends className="invitees-icon" />
+                      <span className="invitees-label">
+                        {invitees.length} Invitee{invitees.length > 1 ? 's' : ''}
+                      </span>
+                      {hasMore && (
+                        <button 
+                          className="invitees-toggle-btn"
+                          onClick={toggleExpandInvitees}
+                        >
+                          {showAllInvitees ? (
+                            <><FaChevronUp /> Show less</>
+                          ) : (
+                            <><FaChevronDown /> Show all</>
+                          )}
+                        </button>
+                      )}
+                    </div>
+                    
+                    {/* Row 1 - First 4 invitees */}
+                    <div className="invitees-avatars-row">
+                      {displayInvitees.slice(0, 4).map((person, index) => 
+                        renderInviteeAvatar(person, index)
+                      )}
+                      {!showAllInvitees && hasMore && (
+                        <div 
+                          className="invitee-more-clickable"
+                          onClick={toggleExpandInvitees}
+                        >
+                          +{invitees.length - 4}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Row 2 - Remaining invitees */}
+                    {showAllInvitees && invitees.length > 4 && (
+                      <div className="invitees-avatars-row expanded-row">
+                        {invitees.slice(4).map((person, index) => 
+                          renderInviteeAvatar(person, index + 4)
                         )}
-                      </button>
-                    )}
-                  </div>
-                  
-                  {/* Row 1 - First 4 invitees */}
-                  <div className="invitees-avatars-row">
-                    {displayInvitees.slice(0, 4).map((person, index) => 
-                      renderInviteeAvatar(person, index)
-                    )}
-                    {!showAllInvitees && hasMore && (
-                      <div 
-                        className="invitee-more-clickable"
-                        onClick={toggleExpandInvitees}
-                      >
-                        +{invitees.length - 4}
                       </div>
                     )}
                   </div>
+                );
+              })()}
+            </div>
+          </div>
+        ) : (
+          <div className="no-event-card">
+            <div className="no-event-content">
+              <FaSmile className="celebration-icon" />
+              <h3>No more events today</h3>
+              <p>Enjoy your free time!</p>
+            </div>
+          </div>
+        )}
 
-                  {/* Row 2 - Remaining invitees */}
-                  {showAllInvitees && invitees.length > 4 && (
-                    <div className="invitees-avatars-row expanded-row">
-                      {invitees.slice(4).map((person, index) => 
-                        renderInviteeAvatar(person, index + 4)
-                      )}
-                    </div>
-                  )}
+        {/* ✅ INVITEE PROFILE CARD - POPUP */}
+        {selectedInvitee && (
+          <div className="invitee-profile-overlay" onClick={closeProfileCard}>
+            <div className="invitee-profile-card" onClick={(e) => e.stopPropagation()}>
+              <button className="profile-close-btn" onClick={closeProfileCard}>
+                <FaTimes />
+              </button>
+              
+              <div className="profile-header">
+                <div 
+                  className="profile-avatar-large"
+                  style={{ backgroundColor: selectedInvitee.avatarColor }}
+                >
+                  {selectedInvitee.initials}
                 </div>
-              );
-            })()}
-          </div>
-        </div>
-      ) : (
-        <div className="no-event-card">
-          <div className="no-event-content">
-            <FaSmile className="celebration-icon" />
-            <h3>No more events today</h3>
-            <p>Enjoy your free time!</p>
-          </div>
-        </div>
-      )}
+                <div className="profile-name-section">
+                  <h3>{selectedInvitee.name}</h3>
+                  <span className="profile-email">
+                    <FaEnvelope className="profile-icon" />
+                    {selectedInvitee.email}
+                  </span>
+                </div>
+              </div>
 
-      {/* ✅ INVITEE PROFILE CARD - POPUP */}
-      {selectedInvitee && (
-        <div className="invitee-profile-overlay" onClick={closeProfileCard}>
-          <div className="invitee-profile-card" onClick={(e) => e.stopPropagation()}>
-            <button className="profile-close-btn" onClick={closeProfileCard}>
-              <FaTimes />
-            </button>
-            
-            <div className="profile-header">
-              <div 
-                className="profile-avatar-large"
-                style={{ backgroundColor: selectedInvitee.avatarColor }}
-              >
-                {selectedInvitee.initials}
+              <div className="profile-divider"></div>
+
+              <div className="profile-details">
+                <div className="profile-detail-item">
+                  <FaCalendarCheck className="profile-detail-icon" />
+                  <span>2 meetings with {selectedInvitee.name}</span>
+                </div>
+                <div className="profile-detail-item">
+                  <FaMapPin className="profile-detail-icon" />
+                  <span>New York, USA</span>
+                </div>
+                <div className="profile-detail-item">
+                  <FaUserFriends className="profile-detail-icon" />
+                  <span>Joined Appointopia in 2024</span>
+                </div>
               </div>
-              <div className="profile-name-section">
-                <h3>{selectedInvitee.name}</h3>
-                <span className="profile-email">
-                  <FaEnvelope className="profile-icon" />
-                  {selectedInvitee.email}
-                </span>
-              </div>
+
+              <button className="profile-view-btn">
+                View Full Profile
+              </button>
             </div>
-
-            <div className="profile-divider"></div>
-
-            <div className="profile-details">
-              <div className="profile-detail-item">
-                <FaCalendarCheck className="profile-detail-icon" />
-                <span>2 meetings with {selectedInvitee.name}</span>
-              </div>
-              <div className="profile-detail-item">
-                <FaMapPin className="profile-detail-icon" />
-                <span>New York, USA</span>
-              </div>
-              <div className="profile-detail-item">
-                <FaUserFriends className="profile-detail-icon" />
-                <span>Joined Appointopia in 2024</span>
-              </div>
-            </div>
-
-            <button className="profile-view-btn">
-              View Full Profile
-            </button>
           </div>
-        </div>
-      )}
-    </aside>
+        )}
+      </aside>
+    </>
   );
 }
