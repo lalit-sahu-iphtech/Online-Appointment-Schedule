@@ -124,6 +124,9 @@ export default function Profile() {
     setCurrentUser(updatedUser);
     setSavedMessage("Profile updated successfully!");
     setTimeout(() => setSavedMessage(""), 2500);
+    
+    navigate(-1);
+  
   };
 
   if (checkingAuth) return null;
