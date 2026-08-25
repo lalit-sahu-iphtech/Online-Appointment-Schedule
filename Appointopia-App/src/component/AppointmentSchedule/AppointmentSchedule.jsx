@@ -1,7 +1,7 @@
+// src/component/AppointmentSchedule/AppointmentSchedule.jsx
 import { getEventColor } from "../../utils/colorUtils";
 
-
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FaPlus,
   FaSearch,
@@ -25,13 +25,22 @@ import { useAppointments } from "../../context/AppointmentContext";
 import "./appointmentSchedule.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
+import Topbar from "../Comman/Topbar";
+
+import { useNotifications } from "../../hooks/useNotifications";
+import { getNotificationLabel } from "../../utils/notificationService";
+import { useNotificationsContext } from "../../context/NotificationContext";
+
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
 export default function AppointmentSchedule() {
+
   const navigate = useNavigate();
   const location = useLocation();
-  const { appointments, addAppointment, deleteAppointment, loading } = useAppointments();
+  const { appointments, addAppointment, deleteAppointment, updateAppointment, loading } = useAppointments();
+  
+  // ===== ALL STATE HOOKS (Top par) =====
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
   const [showFilter, setShowFilter] = useState(false);
@@ -47,6 +56,17 @@ export default function AppointmentSchedule() {
   // Week view state
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
+  // Initialize expanded months
+  const [expandedMonths, setExpandedMonths] = useState(() => {
+    const state = {};
+    appointments.forEach(month => {
+      state[month.month] = month.appointments.length > 0;
+    });
+    return state;
+  });
+
+  // ===== ALL EFFECTS (Top par) =====
+  
   // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
@@ -63,15 +83,6 @@ export default function AppointmentSchedule() {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
-
-  // Initialize expanded months
-  const [expandedMonths, setExpandedMonths] = useState(() => {
-    const state = {};
-    appointments.forEach(month => {
-      state[month.month] = month.appointments.length > 0;
-    });
-    return state;
-  });
 
   useEffect(() => {
     const state = {};
@@ -100,6 +111,57 @@ export default function AppointmentSchedule() {
     setCheckingAuth(false);
   }, [navigate, location.pathname]);
 
+  // ===== HOOKS THAT MUST BE BEFORE CONDITIONAL RETURNS =====
+  // Get all appointments for notifications
+  const getAllAppointments = useMemo(() => {
+    const all = [];
+    appointments.forEach(monthData => {
+        monthData.appointments.forEach(apt => {
+            all.push({
+                ...apt,
+                month: monthData.month
+            });
+        });
+    });
+    return all;
+  }, [appointments]);
+
+  // ✅ useNotifications hook - stable reference
+  const allAppointments = getAllAppointments;
+  const {
+    notifications: upcomingNotifications,
+    count: notificationCount,
+    getLabel,
+  } = useNotifications(allAppointments, 60);
+
+  // Get notification context
+  const { addNotifications } = useNotificationsContext();
+
+  // ✅ Add schedule notifications to global context
+  useEffect(() => {
+    const formattedNotifications = upcomingNotifications.map(n => ({
+      id: n.id,
+      title: n.title,
+      diffMinutes: n.diffMinutes,
+      date: n.date,
+      time: n.startTime,
+      location: n.location,
+      source: "schedule",
+    }));
+    addNotifications("schedule", formattedNotifications);
+  }, [upcomingNotifications, addNotifications]);
+
+  // ===== CONDITIONAL RETURNS (hooks ke BAAD) =====
+  if (checkingAuth) {
+    return null;
+  }
+
+  if (loading) {
+    return <div className="appointment-layout">Loading...</div>;
+  }
+
+  // ===== REST OF THE FUNCTIONS =====
+
   // Profile actions
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
@@ -114,10 +176,6 @@ export default function AppointmentSchedule() {
     setActivePanel(null);
     navigate("/settings");
   };
-
-  if (checkingAuth) {
-    return null;
-  }
 
   const toggleMonth = (monthName) => {
     setExpandedMonths(prev => ({
@@ -181,51 +239,18 @@ export default function AppointmentSchedule() {
     return week;
   };
 
-  // Get all appointments (flatten months)
-  const getAllAppointments = () => {
-    const all = [];
-    appointments.forEach(monthData => {
-      monthData.appointments.forEach(apt => {
-        all.push({
-          ...apt,
-          month: monthData.month
-        });
-      });
-    });
-    return all;
-  };
-
   // Get appointments for a specific date
-
-const getAppointmentsForDate = (date) => {
-  // ✅ Use LOCAL date format
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const dateStr = `${year}-${month}-${day}`;
-  
-  const allAppointments = getAllAppointments();
-  return allAppointments.filter(apt => apt.date === dateStr);
-};
-
-  // Get event color
-  const getEventColor = (color) => {
-    const colors = {
-      purple: { bg: '#8755D5', text: '#ffffff' },
-      teal: { bg: '#16A6AD', text: '#ffffff' },
-      orange: { bg: '#FF7800', text: '#ffffff' },
-      blue: { bg: '#2F80D7', text: '#ffffff' },
-      pink: { bg: '#E84C8A', text: '#ffffff' },
-      green: { bg: '#27AE60', text: '#ffffff' },
-      red: { bg: '#E74C3C', text: '#ffffff' },
-      yellow: { bg: '#F2C94C', text: '#1a1a1a' },
-      indigo: { bg: '#4A56E2', text: '#ffffff' },
-      brown: { bg: '#8B5E3C', text: '#ffffff' },
-    };
-    return colors[color] || colors.purple;
+  const getAppointmentsForDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    const allAppointments = getAllAppointments();
+    return allAppointments.filter(apt => apt.date === dateStr);
   };
 
-  // Get event position - FIXED
+  // Get event position
   const getEventPosition = (startTime, endTime) => {
     const [startHour, startMinute] = startTime ? startTime.split(":").map(Number) : [9, 0];
     const [endHour, endMinute] = endTime ? endTime.split(":").map(Number) : [10, 0];
@@ -241,7 +266,7 @@ const getAppointmentsForDate = (date) => {
     
     return { 
       top, 
-      height: Math.max(height, 28) // Minimum 28px
+      height: Math.max(height, 28)
     };
   };
 
@@ -299,38 +324,7 @@ const getAppointmentsForDate = (date) => {
     month.appointments.length > 0 || month.month === MONTHS[new Date().getMonth()]
   );
 
-  // Notifications
-  const getUpcomingNotifications = () => {
-    const now = new Date();
-    const notifications = [];
-    const allAppointments = getAllAppointments();
-    
-    allAppointments.forEach(apt => {
-      if (apt.startTime) {
-        const [hours, minutes] = apt.startTime.split(":").map(Number);
-        const eventDate = new Date();
-        eventDate.setHours(hours, minutes, 0, 0);
-        
-        const diffMinutes = (eventDate - now) / 60000;
-        if (diffMinutes >= -10 && diffMinutes <= 60) {
-          notifications.push({
-            item: apt,
-            diffMinutes
-          });
-        }
-      }
-    });
-    return notifications.sort((a, b) => a.diffMinutes - b.diffMinutes);
-  };
-
-  const upcomingNotifications = getUpcomingNotifications();
-
-  const getNotificationLabel = (diffMinutes) => {
-    if (diffMinutes > 1) return `Starts in ${Math.round(diffMinutes)} min`;
-    if (diffMinutes >= -1) return "Starting now";
-    return `Started ${Math.round(-diffMinutes)} min ago`;
-  };
-
+  // ===== COMMENTS COUNT =====
   const getCommentsCount = () => {
     let count = 0;
     appointments.forEach(monthData => {
@@ -341,13 +335,18 @@ const getAppointmentsForDate = (date) => {
     return count;
   };
 
+  // ===== SEARCH RESULTS =====
   const getSearchResults = () => {
     if (!search.trim()) return [];
     const results = [];
     const allAppointments = getAllAppointments();
     allAppointments.forEach(apt => {
       if (apt.title.toLowerCase().includes(search.trim().toLowerCase())) {
-        results.push(apt);
+        results.push({
+          id: apt.id,
+          title: apt.title,
+          date: apt.date || "Today",
+        });
       }
     });
     return results;
@@ -355,165 +354,28 @@ const getAppointmentsForDate = (date) => {
 
   const searchResults = getSearchResults();
 
-  if (loading) {
-    return <div className="appointment-layout">Loading...</div>;
-  }
-
   return (
     <div className="appointment-layout">
       <section className="appointment-main">
         
-        {/* TOPBAR */}
-        <div className="appointment-topbar">
-          <h1>Appointment Schedule</h1>
-          
-          <div className="appointment-topbar-right">
-            <button 
-              className="appointment-create-btn" 
-              onClick={() => setShowCreate(true)}
-            >
-              <span>+</span> Create
-            </button>
-
-            <div className="appointment-topbar-icons">
-              
-              {/* SEARCH */}
-              <div className="appointment-icon-wrap">
-                <button
-                  className="appointment-icon-btn"
-                  onClick={() => togglePanel("search")}
-                >
-                  <FaSearch />
-                </button>
-                {activePanel === "search" && (
-                  <div className="appointment-icon-dropdown">
-                    <h4>Search appointments</h4>
-                    <div className="appointment-search-input-wrap">
-                      <input
-                        type="text"
-                        autoFocus
-                        placeholder="Search by appointment name"
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                      />
-                    </div>
-                    {search.trim() === "" && (
-                      <div className="appointment-dropdown-empty">Type to search your appointments</div>
-                    )}
-                    {search.trim() !== "" && searchResults.length === 0 && (
-                      <div className="appointment-dropdown-empty">No appointments found</div>
-                    )}
-                    {searchResults.length > 0 && (
-                      <div className="appointment-search-result-list">
-                        {searchResults.map((item) => (
-                          <div
-                            key={item.id}
-                            className="appointment-search-result-item"
-                            onClick={() => {
-                              setActivePanel(null);
-                              setSearch("");
-                            }}
-                          >
-                            <span>{item.title}</span>
-                            <span className="appointment-search-result-date">
-                              {item.date || "Today"}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* NOTIFICATIONS */}
-              <div className="appointment-icon-wrap">
-                <button
-                  className="appointment-icon-btn"
-                  onClick={() => togglePanel("notifications")}
-                >
-                  <FaRegBell />
-                  {upcomingNotifications.length > 0 && (
-                    <span className="appointment-icon-badge"></span>
-                  )}
-                </button>
-                {activePanel === "notifications" && (
-                  <div className="appointment-icon-dropdown">
-                    <h4>Upcoming meetings</h4>
-                    {upcomingNotifications.length === 0 ? (
-                      <div className="appointment-dropdown-empty">No meeting starting soon</div>
-                    ) : (
-                      <div className="appointment-search-result-list">
-                        {upcomingNotifications.map(({ item, diffMinutes }) => (
-                          <div
-                            key={item.id}
-                            className="appointment-search-result-item"
-                            onClick={() => setActivePanel(null)}
-                          >
-                            <span>{item.title}</span>
-                            <span className="appointment-search-result-date">
-                              {getNotificationLabel(diffMinutes)}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              {/* COMMENTS */}
-              <div className="appointment-icon-wrap">
-                <button
-                  className="appointment-icon-btn"
-                  onClick={() => togglePanel("comments")}
-                >
-                  <FaRegCommentDots />
-                  {getCommentsCount() > 0 && (
-                    <span className="appointment-icon-badge"></span>
-                  )}
-                </button>
-                {activePanel === "comments" && (
-                  <div className="appointment-icon-dropdown">
-                    <h4>Comments</h4>
-                    <div className="appointment-dropdown-empty">
-                      {getCommentsCount() === 0 ? "No comments yet" : "Comments coming soon"}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              {/* PROFILE */}
-              <div className="appointment-icon-wrap appointment-avatar-wrap" onClick={() => togglePanel("profile")}>
-                <FaUserCircle className="appointment-avatar-icon" />
-                <FaChevronDown className="appointment-avatar-chevron" />
-                {activePanel === "profile" && (
-                  <div className="appointment-icon-dropdown appointment-profile-dropdown">
-                    <div className="appointment-profile-dropdown-header">
-                      <FaUserCircle className="appointment-profile-avatar" />
-                      <div>
-                        <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
-                        <span>{currentUser?.email || "Manage your profile"}</span>
-                      </div>
-                    </div>
-                    <div className="appointment-profile-menu">
-                      <button type="button" className="appointment-profile-menu-item" onClick={handleProfileClick}>
-                        <FaUser /> Profile
-                      </button>
-                      <button type="button" className="appointment-profile-menu-item" onClick={handleSettingsClick}>
-                        <FaCog /> Settings
-                      </button>
-                      <button type="button" className="appointment-profile-menu-item appointment-profile-menu-logout" onClick={handleLogout}>
-                        <FaSignOutAlt /> Logout
-                      </button>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-            </div>
-          </div>
-        </div>
+        {/* TOPBAR - No notifications props needed, reads from context */}
+        <Topbar
+          title="Appointment Schedule"
+          createButtonLabel="Create"
+          onCreateClick={() => setShowCreate(true)}
+          searchPlaceholder="Search by appointment name"
+          searchResults={searchResults}
+          onSearchChange={(value) => setSearch(value)}
+          onSearchResultClick={() => {
+            setActivePanel(null);
+            setSearch("");
+          }}
+          commentsCount={getCommentsCount()}
+          currentUser={currentUser}
+          onLogout={handleLogout}
+          onProfileClick={handleProfileClick}
+          onSettingsClick={handleSettingsClick}
+        />
 
         {/* SCHEDULE CONTAINER */}
         <div className="schedule-container">
@@ -602,12 +464,9 @@ const getAppointmentsForDate = (date) => {
             </div>
           )}
 
-          {/* ============================================
-              WEEK VIEW - FIXED
-          ============================================ */}
+          {/* WEEK VIEW */}
           {view === "week" ? (
             <div className="week-view-container">
-              {/* Week Header */}
               <div className="week-header">
                 <div className="week-header-time">
                   <span style={{ fontSize: '11px', fontWeight: '600', color: '#6b7280' }}>
@@ -629,9 +488,7 @@ const getAppointmentsForDate = (date) => {
                 })}
               </div>
 
-              {/* Week Body */}
               <div className="week-body">
-                {/* Time Column */}
                 <div className="week-time-column">
                   <div className="week-time-header">Time</div>
                   {timeSlots.map((time, index) => (
@@ -639,21 +496,18 @@ const getAppointmentsForDate = (date) => {
                   ))}
                 </div>
 
-                {/* Day Columns */}
                 {weekDays.map((day, dayIndex) => {
                   const dayAppointments = getAppointmentsForDate(day);
                   const isToday = today.toDateString() === day.toDateString();
                   
                   return (
                     <div key={dayIndex} className={`week-day-column ${isToday ? 'today-column' : ''}`}>
-                      {/* Grid lines */}
                       <div className="week-grid-lines">
                         {timeSlots.map((_, index) => (
                           <div key={index} className="week-grid-line"></div>
                         ))}
                       </div>
 
-                      {/* Events - FIXED POSITION */}
                       {dayAppointments.map((appointment) => {
                         const startTime = appointment.startTime || "09:00";
                         const endTime = appointment.endTime || "10:00";
@@ -688,7 +542,6 @@ const getAppointmentsForDate = (date) => {
                         );
                       })}
 
-                      {/* Empty state */}
                       {dayAppointments.length === 0 && (
                         <div className="week-day-empty">
                           <span>No events</span>
@@ -699,7 +552,6 @@ const getAppointmentsForDate = (date) => {
                 })}
               </div>
 
-              {/* Create button in week view */}
               <div className="week-create-btn-wrap">
                 <button 
                   className="week-create-btn"
@@ -710,9 +562,7 @@ const getAppointmentsForDate = (date) => {
               </div>
             </div>
           ) : (
-            /* ============================================
-                MONTH VIEW
-            ============================================ */
+            /* MONTH VIEW */
             <div className="months-container">
               {visibleMonths.map((month) => (
                 <div className="month-section" key={month.month}>
@@ -734,6 +584,7 @@ const getAppointmentsForDate = (date) => {
                             key={appointment.id} 
                             appointment={appointment}
                             onDelete={deleteAppointment}
+                            onUpdate={updateAppointment}
                           />
                         ))
                       ) : (
@@ -775,7 +626,6 @@ const getAppointmentsForDate = (date) => {
             addAppointment(appointmentWithDate, targetMonth);
             setShowCreate(false);
             
-            // Refresh week view
             if (view === "week") {
               setCurrentWeekStart(new Date(currentWeekStart));
             }
