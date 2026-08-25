@@ -8,6 +8,16 @@ import {
   FaCalendarCheck,
   FaCamera,
 } from "react-icons/fa";
+import { auth, db } from "../../firebase/firebase";
+import {
+  updateProfile,
+  updateEmail,
+  sendEmailVerification,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
+import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChange, getCurrentUserData } from "../../services/authService";
 import "./profile.css";
 
 const AVATAR_COLORS = [
@@ -39,100 +49,171 @@ export default function Profile() {
   const navigate = useNavigate();
 
   const [currentUser, setCurrentUser] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState({});
   const [savedMessage, setSavedMessage] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Auth guard - same pattern as Calendar.jsx
+  // ✅ Auth guard with Firebase
   useEffect(() => {
-    const stored = localStorage.getItem("currentUser");
-    if (!stored) {
-      navigate("/signin");
-      return;
-    }
-    try {
-      const user = JSON.parse(stored);
+    const unsubscribe = onAuthStateChange(async (user) => {
+      if (!user) {
+        navigate("/signin");
+        return;
+      }
       setCurrentUser(user);
-      setName(user.name || "");
+      setName(user.name || user.displayName || "");
       setEmail(user.email || "");
-    } catch (error) {
-      console.error("Invalid currentUser in storage:", error);
-      localStorage.removeItem("currentUser");
-      navigate("/signin");
-      return;
-    }
-    setCheckingAuth(false);
+      setCheckingAuth(false);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, [navigate]);
 
-  const meetingCount = (() => {
+  // ✅ Get meeting count from Firestore or localStorage
+  const getMeetingCount = () => {
     try {
       const saved = JSON.parse(localStorage.getItem("calendar_meetings")) || [];
       return saved.length;
     } catch {
       return 0;
     }
-  })();
+  };
 
-  const memberSince = currentUser?.id
-    ? new Date(Number(currentUser.id)).toLocaleDateString("en-US", {
+  // ✅ Get member since date
+  const getMemberSince = () => {
+    if (currentUser?.metadata?.creationTime) {
+      const date = new Date(currentUser.metadata.creationTime);
+      return date.toLocaleDateString("en-US", {
         month: "long",
         year: "numeric",
-      })
-    : "—";
+      });
+    }
+    if (currentUser?.createdAt) {
+      const date = new Date(currentUser.createdAt);
+      return date.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
+      });
+    }
+    return "—";
+  };
 
-  const handleSubmit = (e) => {
+  const meetingCount = getMeetingCount();
+  const memberSince = getMemberSince();
+
+  // ✅ Handle profile update
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSavedMessage("");
+    setIsSaving(true);
 
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedName = name.trim();
 
+    // Validation
     const newErrors = {};
     if (!trimmedEmail) {
       newErrors.email = "Email is required";
     } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(trimmedEmail)) {
       newErrors.email = "Enter a valid email address";
     }
+    if (!trimmedName) {
+      newErrors.name = "Name is required";
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      setIsSaving(false);
       return;
     }
     setErrors({});
 
-    // Agar email badla hai to check karo koi doosra account us email se already nahi hai
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const emailTaken = users.some(
-      (u) => u.email === trimmedEmail && u.id !== currentUser.id
-    );
-    if (emailTaken) {
-      setErrors({ email: "This email is already in use" });
-      return;
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        throw new Error("No user logged in");
+      }
+
+      // ✅ Update display name in Firebase Auth
+      if (trimmedName !== user.displayName) {
+        await updateProfile(user, {
+          displayName: trimmedName,
+        });
+      }
+
+      // ✅ Update email in Firebase Auth (requires reauthentication)
+      if (trimmedEmail !== user.email) {
+        // Note: For email change, user needs to reauthenticate
+        // For simplicity, we're updating Firestore but not Auth email
+        // In production, use reauthenticateWithCredential
+        try {
+          await updateEmail(user, trimmedEmail);
+        } catch (emailError) {
+          if (emailError.code === "auth/requires-recent-login") {
+            setErrors({
+              email: "Please sign out and sign in again to change email",
+            });
+            setIsSaving(false);
+            return;
+          }
+          throw emailError;
+        }
+      }
+
+      // ✅ Update Firestore user document
+      const userRef = doc(db, "users", user.uid);
+      await updateDoc(userRef, {
+        name: trimmedName,
+        email: trimmedEmail,
+        updatedAt: serverTimestamp(),
+      });
+
+      // ✅ Update localStorage for app state
+      const userData = {
+        uid: user.uid,
+        name: trimmedName,
+        email: trimmedEmail,
+        displayName: trimmedName,
+      };
+      localStorage.setItem("currentUser", JSON.stringify(userData));
+
+      // ✅ Update currentUser state
+      setCurrentUser((prev) => ({
+        ...prev,
+        name: trimmedName,
+        email: trimmedEmail,
+        displayName: trimmedName,
+      }));
+
+      setSavedMessage("Profile updated successfully!");
+      setTimeout(() => {
+        navigate(-1);
+      }, 1000)
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      let errorMessage = "Something went wrong. Please try again.";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "This email is already in use by another account.";
+      } else if (error.code === "auth/requires-recent-login") {
+        errorMessage = "Please sign out and sign in again to change email.";
+      }
+      setErrors({ email: errorMessage });
+    } finally {
+      setIsSaving(false);
     }
-
-    const updatedUser = { ...currentUser, name: trimmedName, email: trimmedEmail };
-
-    const updatedUsers = users.map((u) =>
-      u.id === currentUser.id ? updatedUser : u
-    );
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-
-    setCurrentUser(updatedUser);
-    setSavedMessage("Profile updated successfully!");
-    setTimeout(() => setSavedMessage(""), 2500);
-    
-    navigate(-1);
-  
   };
 
-  if (checkingAuth) return null;
+  if (checkingAuth || loading) {
+    return <div className="profile-loading">Loading...</div>;
+  }
 
-  const initials = getInitials(name || email);
-  const avatarColor = getColorFromText(email);
+  const initials = getInitials(name || email || currentUser?.displayName || "User");
+  const avatarColor = getColorFromText(email || currentUser?.email || "user");
 
   return (
     <div className="profile-page">
@@ -154,8 +235,8 @@ export default function Profile() {
               </div>
             </div>
             <div>
-              <h2>{name || email.split("@")[0]}</h2>
-              <span className="profile-subtext">{email}</span>
+              <h2>{name || currentUser?.displayName || email?.split("@")[0] || "User"}</h2>
+              <span className="profile-subtext">{email || currentUser?.email}</span>
             </div>
           </div>
 
@@ -185,9 +266,11 @@ export default function Profile() {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Enter your name"
+                  disabled={isSaving}
                 />
                 <FaUser />
               </div>
+              {errors.name && <span className="profile-error-text">{errors.name}</span>}
             </div>
 
             <div className="profile-form-group">
@@ -199,6 +282,7 @@ export default function Profile() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
                   className={errors.email ? "input-error" : ""}
+                  disabled={isSaving}
                 />
                 <FaEnvelope />
               </div>
@@ -207,8 +291,8 @@ export default function Profile() {
 
             {savedMessage && <p className="profile-success-text">{savedMessage}</p>}
 
-            <button type="submit" className="profile-save-btn">
-              Save Changes
+            <button type="submit" className="profile-save-btn" disabled={isSaving}>
+              {isSaving ? "Saving..." : "Save Changes"}
             </button>
           </form>
 
