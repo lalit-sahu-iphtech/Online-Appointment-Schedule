@@ -1,5 +1,5 @@
 // src/component/Workflows/Workflows.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import {
   FaSearch,
   FaRegBell,
@@ -17,7 +17,13 @@ import CreateWorkflowModal from "./CreateWorkflowModal";
 import "./workflows.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
-// ✅ DEFAULT WORKFLOWS (Templates)
+// Import Common Topbar & Notification System
+import Topbar from "../Comman/Topbar";
+import { useNotifications } from "../../hooks/useNotifications";
+import { getNotificationLabel } from "../../utils/notificationService";
+import { useNotificationsContext } from "../../context/NotificationContext";
+
+// DEFAULT WORKFLOWS (Templates)
 const DEFAULT_WORKFLOWS = [
   {
     id: 1,
@@ -75,6 +81,7 @@ export default function Workflows({ onWorkflowsChange }) {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // ===== ALL STATE HOOKS (Top par) =====
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -90,7 +97,9 @@ export default function Workflows({ onWorkflowsChange }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [activePanel, setActivePanel] = useState(null);
 
-  // ✅ Toggle panels
+  // ===== ALL EFFECTS (Top par) =====
+
+  // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
@@ -106,13 +115,12 @@ export default function Workflows({ onWorkflowsChange }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // ✅ Load workflows from localStorage
+  // Load workflows from localStorage
   useEffect(() => {
     const saved = localStorage.getItem('workflows');
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // ✅ Merge templates with saved data
         const merged = DEFAULT_WORKFLOWS.map(template => {
           const existing = parsed.find(w => w.id === template.id && w.isTemplate);
           return existing || template;
@@ -130,7 +138,7 @@ export default function Workflows({ onWorkflowsChange }) {
     setLoading(false);
   }, []);
 
-  // ✅ Save to localStorage
+  // Save to localStorage
   useEffect(() => {
     if (!loading) {
       localStorage.setItem('workflows', JSON.stringify(workflows));
@@ -140,7 +148,7 @@ export default function Workflows({ onWorkflowsChange }) {
     }
   }, [workflows, loading, onWorkflowsChange]);
 
-  // ✅ Auth check
+  // Auth check
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
     if (!stored) {
@@ -148,7 +156,7 @@ export default function Workflows({ onWorkflowsChange }) {
       return;
     }
     try {
-      const user = JSON.parse(stored)
+      const user = JSON.parse(stored);
       setCurrentUser(user);
     } catch (error) {
       console.error("Invalid currentUser in storage:", error);
@@ -159,7 +167,55 @@ export default function Workflows({ onWorkflowsChange }) {
     setCheckingAuth(false);
   }, [navigate, location.pathname]);
 
-  // ✅ Profile actions
+  // ===== ✅ HOOKS - CONDITIONAL RETURN SE PEHLE =====
+
+  // ✅ Workflow notifications with useMemo
+  const workflowEvents = useMemo(() => {
+    return workflows.map(w => ({
+      id: w.id,
+      title: w.title,
+      date: new Date().toISOString().split('T')[0],
+      startTime: "09:00",
+      endTime: "10:00",
+      location: w.category,
+    }));
+  }, [workflows]);
+
+  // ✅ useNotifications hook
+  const {
+    notifications: workflowNotifs,
+    count: workflowNotifCount,
+    getLabel: getWorkflowLabel,
+  } = useNotifications(workflowEvents, 60);
+
+  // Get notification context
+  const { addNotifications } = useNotificationsContext();
+
+  // ✅ Add workflow notifications to global context
+  useEffect(() => {
+    const formattedNotifications = workflowNotifs.map(n => ({
+      id: n.id,
+      title: n.title,
+      diffMinutes: n.diffMinutes,
+      category: n.category || "Workflow",
+      source: "workflows",
+    }));
+    addNotifications("workflows", formattedNotifications);
+  }, [workflowNotifs, addNotifications]);
+
+  // ===== CONDITIONAL RETURNS (hooks ke BAAD) =====
+
+  if (checkingAuth) {
+    return null;
+  }
+
+  if (loading) {
+    return <div className="workflows-container">Loading workflows...</div>;
+  }
+
+  // ===== REST OF THE FUNCTIONS =====
+
+  // Profile actions
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
@@ -176,10 +232,6 @@ export default function Workflows({ onWorkflowsChange }) {
     navigate("/settings");
   };
 
-  if (checkingAuth) {
-    return null;
-  }
-
   const toggleCollapse = (key) =>
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -188,7 +240,7 @@ export default function Workflows({ onWorkflowsChange }) {
     setFilterOpen(false);
   };
 
-  // ✅ Get workflows based on active tab
+  // Get workflows based on active tab
   const getWorkflowsByTab = () => {
     if (activeTab === "my") {
       return workflows.filter(w => !w.isTemplate);
@@ -199,7 +251,7 @@ export default function Workflows({ onWorkflowsChange }) {
 
   const filteredWorkflows = getWorkflowsByTab();
 
-  // ✅ Filter by category
+  // Filter by category
   const beforeEvents = filteredWorkflows.filter(
     (w) => w.category === "Before Event/Meeting"
   );
@@ -207,7 +259,7 @@ export default function Workflows({ onWorkflowsChange }) {
     (w) => w.category === "After Event/Meeting"
   );
 
-  // ✅ Search filter
+  // Search filter
   const filterBySearch = (items) => {
     if (!search) return items;
     return items.filter(
@@ -220,24 +272,24 @@ export default function Workflows({ onWorkflowsChange }) {
   const searchedBefore = filterBySearch(beforeEvents);
   const searchedAfter = filterBySearch(afterEvents);
 
-  // ✅ Category filter
+  // Category filter
   const filteredBefore = activeFilter === "after" ? [] : searchedBefore;
   const filteredAfter = activeFilter === "before" ? [] : searchedAfter;
 
-  // ✅ Show more logic
+  // Show more logic
   const displayBefore = showAll ? filteredBefore : filteredBefore.slice(0, 2);
   const displayAfter = showAll ? filteredAfter : filteredAfter.slice(0, 3);
 
   const totalCount = filteredBefore.length + filteredAfter.length;
   const visibleCount = displayBefore.length + displayAfter.length;
 
-  // ✅ Use workflow
+  // Use workflow
   const handleUseWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     alert(`"${workflow?.title}" workflow activated!`);
   };
 
-  // ✅ ✅ FIX: Edit workflow - Sabke liye allow
+  // Edit workflow
   const handleEditWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
@@ -246,7 +298,7 @@ export default function Workflows({ onWorkflowsChange }) {
     }
   };
 
-  // ✅ ✅ FIX: Delete workflow - Sabke liye allow
+  // Delete workflow
   const handleDeleteWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
@@ -256,10 +308,9 @@ export default function Workflows({ onWorkflowsChange }) {
     }
   };
 
-  // ✅ Add/Edit workflow
+  // Add/Edit workflow
   const addWorkflow = (newWorkflow) => {
     if (editingWorkflow) {
-      // ✅ Edit mode
       setWorkflows(prev =>
         prev.map(w =>
           w.id === editingWorkflow.id
@@ -273,7 +324,6 @@ export default function Workflows({ onWorkflowsChange }) {
       );
       setEditingWorkflow(null);
     } else {
-      // ✅ Create mode
       setWorkflows([
         ...workflows,
         {
@@ -287,197 +337,48 @@ export default function Workflows({ onWorkflowsChange }) {
     setShowCreateModal(false);
   };
 
-  // ✅ Search results
+  // Search results
   const getSearchResults = () => {
     if (!search.trim()) return [];
     return workflows.filter(
       (item) =>
         item.title.toLowerCase().includes(search.trim().toLowerCase()) ||
         item.description.toLowerCase().includes(search.trim().toLowerCase())
-    );
+    ).map(item => ({
+      id: item.id,
+      title: item.title,
+      category: item.isTemplate ? "Template" : "My Workflow",
+    }));
   };
 
   const searchResults = getSearchResults();
 
-  // ✅ Notifications
-  const getNotifications = () => {
-    return workflows.slice(0, 3).map((w) => ({
-      id: w.id,
-      title: w.title,
-      category: w.category,
-    }));
-  };
-
-  const notifications = getNotifications();
+  // Comments count
   const commentsCount = workflows.length > 0 ? workflows.length : 0;
-
-  if (loading) {
-    return <div className="workflows-container">Loading workflows...</div>;
-  }
 
   return (
     <>
-      {/* TOPBAR */}
-      <div className="workflows-topbar">
-        <h1>Workflows</h1>
-
-        <div className="workflows-topbar-right">
-          <button
-            className="workflows-create-btn"
-            onClick={() => {
-              setEditingWorkflow(null);
-              setShowCreateModal(true);
-            }}
-          >
-            <span>+</span> Create
-          </button>
-
-          <div className="workflows-topbar-icons">
-            {/* SEARCH */}
-            <div className="workflows-icon-wrap">
-              <button
-                className="workflows-icon-btn"
-                onClick={() => togglePanel("search")}
-              >
-                <FaSearch />
-              </button>
-
-              {activePanel === "search" && (
-                <div className="workflows-icon-dropdown">
-                  <h4>Search workflows</h4>
-                  <div className="workflows-search-input-wrap">
-                    <input
-                      type="text"
-                      autoFocus
-                      placeholder="Search by workflow name"
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </div>
-
-                  {search.trim() === "" && (
-                    <div className="workflows-dropdown-empty">Type to search your workflows</div>
-                  )}
-
-                  {search.trim() !== "" && searchResults.length === 0 && (
-                    <div className="workflows-dropdown-empty">No workflows found</div>
-                  )}
-
-                  {searchResults.length > 0 && (
-                    <div className="workflows-search-result-list">
-                      {searchResults.map((item) => (
-                        <div
-                          key={item.id}
-                          className="workflows-search-result-item"
-                          onClick={() => {
-                            setActivePanel(null);
-                            setSearch("");
-                          }}
-                        >
-                          <span>{item.title}</span>
-                          <span className="workflows-search-result-date">
-                            {item.isTemplate ? "Template" : "My Workflow"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* NOTIFICATIONS */}
-            <div className="workflows-icon-wrap">
-              <button
-                className="workflows-icon-btn"
-                onClick={() => togglePanel("notifications")}
-              >
-                <FaRegBell />
-                {notifications.length > 0 && (
-                  <span className="workflows-icon-badge"></span>
-                )}
-              </button>
-
-              {activePanel === "notifications" && (
-                <div className="workflows-icon-dropdown">
-                  <h4>Recent Workflows</h4>
-                  {notifications.length === 0 ? (
-                    <div className="workflows-dropdown-empty">No recent workflows</div>
-                  ) : (
-                    <div className="workflows-search-result-list">
-                      {notifications.map((item) => (
-                        <div
-                          key={item.id}
-                          className="workflows-search-result-item"
-                          onClick={() => setActivePanel(null)}
-                        >
-                          <span>{item.title}</span>
-                          <span className="workflows-search-result-date">
-                            {item.category === "Before Event/Meeting" ? "Before" : "After"}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* COMMENTS */}
-            <div className="workflows-icon-wrap">
-              <button
-                className="workflows-icon-btn"
-                onClick={() => togglePanel("comments")}
-              >
-                <FaRegCommentDots />
-                {commentsCount > 0 && (
-                  <span className="workflows-icon-badge"></span>
-                )}
-              </button>
-
-              {activePanel === "comments" && (
-                <div className="workflows-icon-dropdown">
-                  <h4>Workflow Comments</h4>
-                  <div className="workflows-dropdown-empty">
-                    {commentsCount === 0 ? "No comments yet" : `${commentsCount} workflows available`}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* PROFILE */}
-            <div className="workflows-icon-wrap workflows-avatar-wrap" onClick={() => togglePanel("profile")}>
-              <FaUserCircle className="workflows-avatar-icon" />
-              <FaChevronDown className="workflows-avatar-chevron" />
-
-              {activePanel === "profile" && (
-                <div className="workflows-icon-dropdown workflows-profile-dropdown">
-                  <div className="workflows-profile-dropdown-header">
-                    <FaUserCircle className="workflows-profile-avatar" />
-                    <div>
-                      <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
-                      <span>{currentUser?.email || "Manage your profile"}</span>
-                    </div>
-                  </div>
-
-                  <div className="workflows-profile-menu">
-                    <button type="button" className="workflows-profile-menu-item" onClick={handleProfileClick}>
-                      <FaUser /> Profile
-                    </button>
-                    <button type="button" className="workflows-profile-menu-item" onClick={handleSettingsClick}>
-                      <FaCog /> Settings
-                    </button>
-                    <button type="button" className="workflows-profile-menu-item workflows-profile-menu-logout" onClick={handleLogout}>
-                      <FaSignOutAlt /> Logout
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-
-          </div>
-        </div>
-      </div>
+      {/* TOPBAR - No notifications props needed, reads from context */}
+      <Topbar
+        title="Workflows"
+        createButtonLabel="Create"
+        onCreateClick={() => {
+          setEditingWorkflow(null);
+          setShowCreateModal(true);
+        }}
+        searchPlaceholder="Search by workflow name"
+        searchResults={searchResults}
+        onSearchChange={(value) => setSearch(value)}
+        onSearchResultClick={() => {
+          setActivePanel(null);
+          setSearch("");
+        }}
+        commentsCount={0}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onProfileClick={handleProfileClick}
+        onSettingsClick={handleSettingsClick}
+      />
 
       {/* WORKFLOWS CONTAINER */}
       <div className="workflows-container">
@@ -547,7 +448,7 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         </div>
 
-        {/* ✅ Empty State for My Workflow */}
+        {/* Empty State for My Workflow */}
         {activeTab === "my" && filteredWorkflows.length === 0 && (
           <div className="workflows-empty">
             <div className="workflows-empty-icon">📋</div>
@@ -584,8 +485,8 @@ export default function Workflows({ onWorkflowsChange }) {
                     key={workflow.id}
                     workflow={workflow}
                     onUse={handleUseWorkflow}
-                    onEdit={handleEditWorkflow}      // ✅ Sabko edit dena
-                    onDelete={handleDeleteWorkflow}  // ✅ Sabko delete dena
+                    onEdit={handleEditWorkflow}
+                    onDelete={handleDeleteWorkflow}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}
@@ -613,8 +514,8 @@ export default function Workflows({ onWorkflowsChange }) {
                     key={workflow.id}
                     workflow={workflow}
                     onUse={handleUseWorkflow}
-                    onEdit={handleEditWorkflow}      
-                    onDelete={handleDeleteWorkflow}  
+                    onEdit={handleEditWorkflow}
+                    onDelete={handleDeleteWorkflow}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}

@@ -51,12 +51,6 @@ const getColorFromName = (name) => {
     return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 };
 
-// ✅ Generate email from name
-const generateEmail = (name) => {
-    if (!name) return "unknown@example.com";
-    return name.toLowerCase().replace(/\s/g, '.') + '@example.com';
-};
-
 export default function Sidebar({ events = [], selectedDate = new Date() }) {
   const location = useLocation();
   const [nextEvent, setNextEvent] = useState(null);
@@ -70,6 +64,22 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
 
   const memoizedEvents = useMemo(() => events, [events]);
   const memoizedDate = useMemo(() => selectedDate, [selectedDate]);
+
+  // ✅ Get meeting count for a specific invitee (DYNAMIC)
+  const getMeetingCount = (email) => {
+    if (!email || !events || events.length === 0) return 0;
+    
+    let count = 0;
+    events.forEach(event => {
+      if (event.invitees && Array.isArray(event.invitees)) {
+        const found = event.invitees.some(
+          invitee => invitee.email?.toLowerCase() === email.toLowerCase()
+        );
+        if (found) count++;
+      }
+    });
+    return count;
+  };
 
   // Calculate next event
   useEffect(() => {
@@ -126,7 +136,12 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     }
     if (event.meetingName) {
       return [
-        { name: event.meetingName, initials: getInitials(event.meetingName) }
+        { 
+          name: event.meetingName, 
+          initials: getInitials(event.meetingName),
+          email: null,
+          avatarColor: getColorFromName(event.meetingName)
+        }
       ];
     }
     return [];
@@ -136,15 +151,25 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     setShowAllInvitees(!showAllInvitees);
   };
 
-  // ✅ Handle invitee click - Show profile card
+  // ✅ Handle invitee click - Show profile card with DYNAMIC data
   const handleInviteeClick = (person, e) => {
     e.stopPropagation();
+    
+    const name = person.name || person;
+    const email = person.email || null;
+    const avatarColor = person.avatarColor || getColorFromName(name);
+    const initials = person.initials || getInitials(name);
+    const meetingCount = email ? getMeetingCount(email) : 0;
+    
     setSelectedInvitee({
-      ...person,
-      name: person.name || person,
-      email: person.email || generateEmail(person.name || person),
-      avatarColor: person.avatarColor || getColorFromName(person.name || person),
-      initials: person.initials || getInitials(person.name || person),
+      id: person.id || Date.now(),
+      name,
+      email,
+      avatarColor,
+      initials,
+      location: person.location || "Location not set",
+      joinedDate: person.joinedDate || new Date().getFullYear(),
+      meetingCount
     });
   };
 
@@ -180,23 +205,23 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
   return (
     <>
       {/* Mobile Menu Button */}
-    {!isMobileOpen && (
-      <button
-        className="sidebar-mobile-toggle"
-        onClick={() => setIsMobileOpen(true)}
-        aria-label="Open sidebar"
-      >
-        <FaBars />
-      </button>
-    )}
+      {!isMobileOpen && (
+        <button
+          className="sidebar-mobile-toggle"
+          onClick={toggleMobileSidebar}
+          aria-label="Open sidebar"
+        >
+          <FaBars />
+        </button>
+      )}
 
-    {/* Mobile Overlay */}
-    {isMobileOpen && (
-      <div
-        className="sidebar-overlay"
-        onClick={() => setIsMobileOpen(false)}
-      />
-    )}
+      {/* Mobile Overlay */}
+      {isMobileOpen && (
+        <div
+          className="sidebar-overlay"
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
 
       <aside className={`sidebar ${isMobileOpen ? 'sidebar-open' : ''}`}>
         {/* Logo */}
@@ -332,7 +357,7 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
           </div>
         )}
 
-        {/* ✅ INVITEE PROFILE CARD - POPUP */}
+        {/* ✅ INVITEE PROFILE CARD - POPUP with DYNAMIC DATA */}
         {selectedInvitee && (
           <div className="invitee-profile-overlay" onClick={closeProfileCard}>
             <div className="invitee-profile-card" onClick={(e) => e.stopPropagation()}>
@@ -351,7 +376,7 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
                   <h3>{selectedInvitee.name}</h3>
                   <span className="profile-email">
                     <FaEnvelope className="profile-icon" />
-                    {selectedInvitee.email}
+                    {selectedInvitee.email || "No email provided"}
                   </span>
                 </div>
               </div>
@@ -361,15 +386,15 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
               <div className="profile-details">
                 <div className="profile-detail-item">
                   <FaCalendarCheck className="profile-detail-icon" />
-                  <span>2 meetings with {selectedInvitee.name}</span>
+                  <span>{selectedInvitee.meetingCount || 0} meetings with {selectedInvitee.name}</span>
                 </div>
                 <div className="profile-detail-item">
                   <FaMapPin className="profile-detail-icon" />
-                  <span>New York, USA</span>
+                  <span>{selectedInvitee.location || "Location not set"}</span>
                 </div>
                 <div className="profile-detail-item">
                   <FaUserFriends className="profile-detail-icon" />
-                  <span>Joined Appointopia in 2024</span>
+                  <span>Joined {selectedInvitee.joinedDate || "recently"}</span>
                 </div>
               </div>
 

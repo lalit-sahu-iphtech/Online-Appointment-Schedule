@@ -1,0 +1,361 @@
+/* src/component/Common/Topbar.css */
+
+/* =====================================================
+   TOPBAR
+===================================================== */
+
+.topbar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.topbar h1 {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    color: #171A1F;
+}
+
+/* =====================================================
+   TOPBAR RIGHT
+===================================================== */
+
+.topbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+/* =====================================================
+   CREATE BUTTON
+===================================================== */
+
+.topbar-create-btn {
+    height: 42px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: none;
+    border-radius: 10px;
+    background-color: #8659D3;
+    color: white;
+    font-family: "Poppins", sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.topbar-create-btn span {
+    font-size: 25px;
+    font-weight: 300;
+    line-height: 1;
+}
+
+.topbar-create-btn:hover {
+    background-color: #7544c8;
+}
+
+/* =====================================================
+   TOPBAR ICONS
+===================================================== */
+
+.topbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* =====================================================
+   ICON WRAP
+===================================================== */
+
+.topbar-icon-wrap {
+    position: relative;
+}
+
+.topbar-icon-btn {
+    width: 38px;
+    height: 38px;
+    border: none;
+    border-radius: 50%;
+    background-color: #F3F4F6;
+    color: #667085;
+    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.topbar-icon-btn:hover {
+    background-color: #e7e8eb;
+}
+
+/* =====================================================
+   BADGE
+===================================================== */
+
+.topbar-icon-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #ef4444;
+    border: 2px solid #ffffff;
+    pointer-events: none;
+}
+
+/* =====================================================
+   DROPDOWN
+===================================================== */
+
+.topbar-dropdown {
+    position: absolute;
+    top: 46px;
+    right: 0;
+    width: 280px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    z-index: 50;
+    padding: 14px;
+    box-sizing: border-box;
+    animation: topbarDropdownFadeIn 0.15s ease;
+}
+
+@keyframes topbarDropdownFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.topbar-dropdown h4 {
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #20242a;
+}
+
+.topbar-dropdown-empty {
+    font-size: 12px;
+    color: #7b8494;
+    text-align: center;
+    padding: 16px 0 4px;
+}
+
+/* =====================================================
+   SEARCH
+===================================================== */
+
+.topbar-search-input-wrap input {
+    width: 100%;
+    height: 34px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0 10px;
+    font-size: 12px;
+    outline: none;
+    box-sizing: border-box;
+    font-family: "Poppins", sans-serif;
+    color: #374151;
+}
+
+.topbar-search-input-wrap input:focus {
+    box-shadow: 0 0 0 1px #8555d5;
+}
+
+.topbar-search-result-list {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.topbar-search-result-item {
+    padding: 8px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #374151;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.topbar-search-result-item:hover {
+    background: #f4effd;
+    color: #8555d5;
+}
+
+.topbar-search-result-date {
+    font-size: 10px;
+    color: #9aa1ad;
+    flex-shrink: 0;
+}
+
+/* =====================================================
+   PROFILE DROPDOWN
+===================================================== */
+
+.topbar-profile-dropdown {
+    width: 220px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.topbar-profile-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.topbar-profile-avatar {
+    width: 34px;
+    height: 34px;
+    color: #8659D3;
+    flex-shrink: 0;
+}
+
+.topbar-profile-dropdown-header h4 {
+    margin: 0 0 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #20242a;
+}
+
+.topbar-profile-dropdown-header span {
+    font-size: 10px;
+    color: #9aa1ad;
+}
+
+.topbar-profile-menu {
+    display: flex;
+    flex-direction: column;
+    padding: 6px;
+}
+
+.topbar-profile-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 36px;
+    padding: 0 10px;
+    border: none;
+    background: transparent;
+    border-radius: 8px;
+    color: #374151;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    text-align: left;
+}
+
+.topbar-profile-menu-item:hover {
+    background: #f4effd;
+    color: #8555d5;
+}
+
+.topbar-profile-menu-logout {
+    color: #ef4444;
+}
+
+.topbar-profile-menu-logout:hover {
+    background: #fef2f2;
+    color: #ef4444;
+}
+
+/* =====================================================
+   AVATAR
+===================================================== */
+
+.topbar-avatar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    margin-left: 4px;
+}
+
+.topbar-avatar-icon {
+    width: 36px;
+    height: 36px;
+    color: #8659D3;
+}
+
+.topbar-avatar-chevron {
+    font-size: 11px;
+    color: #667085;
+}
+
+/* =====================================================
+   CUSTOM ACTIONS
+===================================================== */
+
+.topbar-custom-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 768px) {
+    .topbar h1 {
+        font-size: 26px;
+    }
+
+    .topbar-dropdown {
+        width: 240px;
+        right: -10px;
+    }
+
+    .topbar-icons .topbar-icon-wrap:nth-child(3) {
+        display: none;
+    }
+}
+
+@media (max-width: 500px) {
+    .topbar {
+        align-items: flex-start;
+        gap: 10px;
+        flex-direction: column;
+    }
+
+    .topbar h1 {
+        font-size: 22px;
+    }
+
+    .topbar-create-btn {
+        height: 38px;
+        padding: 0 12px;
+        font-size: 13px;
+    }
+
+    .topbar-dropdown {
+        width: 220px;
+        right: -20px;
+    }
+}

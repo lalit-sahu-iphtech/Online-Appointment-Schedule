@@ -454,6 +454,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
+                  maxHeight={100}
                 />
 
               </div>

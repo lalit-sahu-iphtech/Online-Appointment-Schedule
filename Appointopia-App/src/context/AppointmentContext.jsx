@@ -88,11 +88,32 @@ export function AppointmentProvider({ children }) {
     });
   };
 
+  // ✅ NEW: Update appointment function
+  const updateAppointment = (updatedAppointment) => {
+    console.log("✏️ Updating appointment:", updatedAppointment);
+    
+    setAppointments(prev => {
+      const newAppointments = prev.map(month => ({
+        ...month,
+        appointments: month.appointments.map(apt => 
+          apt.id === updatedAppointment.id ? updatedAppointment : apt
+        ),
+        // Update events count
+        events: `${month.appointments.length} Event${month.appointments.length !== 1 ? 's' : ''}`
+      }));
+      
+      console.log("✅ After update:", newAppointments);
+      return newAppointments;
+    });
+  };
+
+  // ✅ Value mein updateAppointment add karein
   const value = {
     appointments,
     loading,
     addAppointment,
-    deleteAppointment
+    deleteAppointment,
+    updateAppointment  // ✅ Yahan add karein
   };
 
   return (
