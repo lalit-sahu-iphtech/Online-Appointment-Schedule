@@ -1,0 +1,138 @@
+/* src/component/Calendar/AddInviteeModal.css */
+
+.invitee-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 30, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1100;
+}
+
+.invitee-modal-box {
+    width: 380px;
+    max-width: calc(100vw - 30px);
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    font-family: "Poppins", sans-serif;
+}
+
+.invitee-modal-header {
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 18px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.invitee-modal-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a2e;
+}
+
+.invitee-modal-close {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #9aa1ad;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.invitee-modal-close:hover {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.invitee-modal-body {
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.invitee-form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #374151;
+}
+
+.invitee-form-group input {
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    box-sizing: border-box;
+    border: 1.5px solid #e5e7eb;
+    outline: none;
+    border-radius: 10px;
+    background: #fafbfc;
+    color: #1a1a2e;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+}
+
+.invitee-form-group input:focus {
+    border-color: #8555d5;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(133, 85, 213, 0.1);
+}
+
+.invitee-error-text {
+    color: #ef4444;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.invitee-modal-footer {
+    padding: 14px 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    border-top: 1px solid #f0f0f0;
+}
+
+.invitee-done-btn {
+    height: 36px;
+    padding: 0 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: transparent;
+    color: #4b5563;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+}
+
+.invitee-done-btn:hover {
+    background: #f3f4f6;
+}
+
+.invitee-add-btn {
+    height: 36px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #8555d5;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+}
+
+.invitee-add-btn:hover {
+    background: #7544c8;
+}

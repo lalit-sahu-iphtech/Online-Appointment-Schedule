@@ -11,6 +11,13 @@ import {
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 import { useNavigate } from "react-router-dom";
+import emailjs from "@emailjs/browser";
+import AddInviteeModal from "./AddInviteeModal";
+
+// TODO: replace with your EmailJS Service ID, Template ID and Public Key
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const AVATAR_COLORS = [
     '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
@@ -37,8 +44,9 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     });
 
     const [formData, setFormData] = useState(buildFormData);
-    const [inviteeName, setInviteeName] = useState("");
     const [errors, setErrors] = useState({});
+    const [showInviteeModal, setShowInviteeModal] = useState(false);
+    const [isSending, setIsSending] = useState(false);
 
     const navigate = useNavigate();
 
@@ -51,7 +59,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     useEffect(() => {
         setFormData(buildFormData());
         setErrors({});
-        setInviteeName("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData]);
 
@@ -63,32 +70,79 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    const addInvitee = () => {
-        if (!inviteeName.trim()) {
-            alert("Please enter a name");
-            return;
-        }
-        if (formData.invitees.some(item => item.name === inviteeName.trim())) {
+    // Called from AddInviteeModal when user saves a Name + Email
+    const addInvitee = ({ name, email }) => {
+        if (formData.invitees.some(item => item.email.toLowerCase() === email.toLowerCase())) {
             alert("This person is already invited");
             return;
         }
 
         const newInvitee = {
             id: Date.now(),
-            name: inviteeName.trim(),
-            email: `${inviteeName.trim().toLowerCase().replace(/\s/g, '.')}@example.com`,
+            name,
+            email,
             avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
-            initials: inviteeName.trim().split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
+            initials: name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2)
         };
 
-        setFormData({ ...formData, invitees: [...formData.invitees, newInvitee] });
-        setInviteeName("");
+        setFormData(prev => ({ ...prev, invitees: [...prev.invitees, newInvitee] }));
     };
 
     const removeInvitee = (id) => {
         setFormData({ ...formData, invitees: formData.invitees.filter(item => item.id !== id) });
     };
 
+    // Sends one email per invitee using EmailJS. Runs after the meeting is saved.
+    const sendInviteEmails = async (data) => {
+        if (!data.invitees || data.invitees.length === 0) return;
+    
+        setIsSending(true);
+        const failed = [];
+    
+        // Get current user (organizer)
+        const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
+    
+        for (const person of data.invitees) {
+            try {
+                await emailjs.send(
+                    EMAILJS_SERVICE_ID,
+                    EMAILJS_TEMPLATE_ID,
+                    {
+                        // ✅ Invitee details
+                        to_name: person.name,
+                        to_email: person.email,
+                        
+                        // ✅ Meeting details
+                        meeting_name: data.meetingName,
+                        meeting_date: data.date,
+                        start_time: data.startTime,
+                        end_time: data.endTime,
+                        meeting_location: data.location || "N/A",
+                        online_link: data.onlineLink || "N/A",
+                        
+                        // ✅ Organizer details (for From Name and Reply To)
+                        organizer_name: currentUser?.email?.split('@')[0] || "Organizer",
+                        organizer_email: currentUser?.email || "organizer@example.com",
+                        
+                        // ✅ Optional: Custom message
+                        custom_message: data.customMessage || "Looking forward to seeing you!"
+                    },
+                    EMAILJS_PUBLIC_KEY
+                );
+            } catch (err) {
+                console.error(`Failed to send invite to ${person.email}:`, err);
+                failed.push(person.name);
+            }
+        }
+    
+        setIsSending(false);
+    
+        if (failed.length > 0) {
+            alert(`Could not send invite email to: ${failed.join(", ")}`);
+        } else {
+            alert(`✅ Invitations sent to ${data.invitees.length} people!`);
+        }
+    };
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -108,14 +162,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
 
         onSave(formData);
+        sendInviteEmails(formData);
         onClose();
-    };
-
-    const handleInviteeKeyPress = (e) => {
-        if (e.key === 'Enter') {
-            e.preventDefault();
-            addInvitee();
-        }
     };
 
     const getInitials = (name) => {
@@ -136,6 +184,16 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         const [h] = time.split(':').map(Number);
         return h >= 12 ? 'PM' : 'AM';
     };
+    const getTodayDate = () =>{
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+    const getMinDate = () =>{
+        return getTodayDate();
+    }
 
     return (
         <div className="meeting-overlay" onClick={onClose}>
@@ -173,6 +231,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                         name="date"
                                         value={formData.date}
                                         onChange={handleChange}
+                                        min={getMinDate()}
                                     />
                                     <FaCalendarAlt className="calendar-icon" />
                                 </div>
@@ -260,15 +319,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                 ))}
 
                                 <div className="add-invitee">
-                                    <input
-                                        type="text"
-                                        value={inviteeName}
-                                        onChange={(e) => setInviteeName(e.target.value)}
-                                        onKeyPress={handleInviteeKeyPress}
-                                        placeholder="Add invitee"
-                                    />
-                                    <button type="button" onClick={addInvitee}>
-                                        <FaPlus /> Add
+                                    <button type="button" onClick={() => setShowInviteeModal(true)}>
+                                        <FaPlus /> Add Invitee
                                     </button>
                                 </div>
                             </div>
@@ -313,12 +365,21 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                         >
                             ⚙️ Advanced settings
                         </button>
-                        <button type="submit" className="save-meeting-btn">
-                            {isEditMode ? "✅ Update Meeting" : "✅ Save Meeting"}
+                        <button type="submit" className="save-meeting-btn" disabled={isSending}>
+                            {isSending
+                                ? "Sending invites..."
+                                : isEditMode ? "✅ Update Meeting" : "✅ Save Meeting"}
                         </button>
                     </div>
                 </form>
             </div>
+
+            {showInviteeModal && (
+                <AddInviteeModal
+                    onClose={() => setShowInviteeModal(false)}
+                    onAdd={addInvitee}
+                />
+            )}
         </div>
     );
 }

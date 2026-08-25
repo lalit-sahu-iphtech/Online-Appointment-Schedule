@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+// src/component/Calendar/Calendar.jsx
+import { useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   FaSearch,
@@ -21,7 +22,6 @@ import { getRandomEventColor } from "../../utils/colorUtils";
 
 import Reminder from "./Reminder";
 
-
 import {
   getWeekDays,
   formatDate,
@@ -29,28 +29,34 @@ import {
   getMonthYear,
 } from "../../utils/dateUtils";
 
+import Topbar from "../Comman/Topbar";
+import { useNotifications } from "../../hooks/useNotifications";
+import { getNotificationLabel } from "../../utils/notificationService";
+import { useNotificationsContext } from "../../context/NotificationContext";
+
 export default function Calendar({ onEventsChange, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [currentUser, setCurrentUser] = useState(null); // NEW: logged-in user
-  const [checkingAuth, setCheckingAuth] = useState(true); // NEW: avoid flashing calendar before redirect
+  const [currentUser, setCurrentUser] = useState(null);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [view, setView] = useState("week");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showMeetingModal, setShowMeetingModal] = useState(false);
-  const [editingEvent, setEditingEvent] = useState(null); // meeting being edited (null = create mode)
-  const [shareToast, setShareToast] = useState(false); // "Link copied" feedback
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [shareToast, setShareToast] = useState(false);
   const [meeting, setMeeting] = useState([]);
-  const [activePanel, setActivePanel] = useState(null); // 'search' | 'notifications' | 'comments' | 'profile' | null
+  const [activePanel, setActivePanel] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [now, setNow] = useState(new Date());
 
-  // ===== NEW: AUTH GUARD =====
-  // Calendar page (aur isliye "+ Create") sirf logged-in user access kar sake.
-  // Agar localStorage me currentUser nahi hai to seedha /signin pe bhej do.
+  // Get notification context
+  const { addNotifications } = useNotificationsContext();
+
+  // ===== AUTH GUARD =====
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
     if (!stored) {
@@ -67,14 +73,15 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       return;
     }
     setCheckingAuth(false);
-  }, [navigate,location.pathname]);
+  }, [navigate, location.pathname]);
 
-  // Har 30 second me "now" refresh karo taaki "starts in X min" sahi rahe
+  // Har 30 second me "now" refresh
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 
+  // ===== LOAD MEETINGS FROM LOCALSTORAGE =====
   useEffect(() => {
     const saved = localStorage.getItem('calendar_meetings');
     if (saved) {
@@ -98,6 +105,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   }, []);
 
+  // ===== SAVE MEETINGS TO LOCALSTORAGE =====
   useEffect(() => {
     if (meeting.length > 0) {
       localStorage.setItem('calendar_meetings', JSON.stringify(meeting));
@@ -115,52 +123,26 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   }, [currentDate, onDateChange]);
 
-  // Search / Notifications / Comments / Profile dropdown ko toggle karo
-  const togglePanel = (panel) => {
-    setActivePanel((prev) => (prev === panel ? null : panel));
-  };
+  // ===== NOTIFICATIONS - USING COMMON SYSTEM =====
+  const {
+    notifications: upcomingNotifications,
+    count: notificationCount,
+    getLabel,
+  } = useNotifications(meeting, 60);
 
-  // Bahar click karne par khula panel band ho jaaye
+  // ✅ Add calendar notifications to global context
   useEffect(() => {
-    if (!activePanel) return;
-    const handleClickOutside = (e) => {
-      if (!e.target.closest(".icon-wrap")) {
-        setActivePanel(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [activePanel]);
-
-  const searchResults = searchTerm.trim()
-    ? meeting.filter((item) =>
-        item.meetingName?.toLowerCase().includes(searchTerm.trim().toLowerCase())
-      )
-    : [];
-
-  // ===== UPCOMING MEETING REMINDER =====
-  const getEventStartDateTime = (item) => {
-    if (!item.date || !item.startTime) return null;
-    const [y, mo, d] = item.date.split("-").map(Number);
-    const [h, m] = item.startTime.split(":").map(Number);
-    return new Date(y, mo - 1, d, h, m, 0, 0);
-  };
-
-  const upcomingNotifications = meeting
-    .map((item) => {
-      const start = getEventStartDateTime(item);
-      if (!start) return null;
-      const diffMinutes = (start - now) / 60000;
-      return { item, diffMinutes };
-    })
-    .filter((entry) => entry && entry.diffMinutes >= -10 && entry.diffMinutes <= 60)
-    .sort((a, b) => a.diffMinutes - b.diffMinutes);
-
-  const getNotificationLabel = (diffMinutes) => {
-    if (diffMinutes > 1) return `Starts in ${Math.round(diffMinutes)} min`;
-    if (diffMinutes >= -1) return "Starting now";
-    return `Started ${Math.round(-diffMinutes)} min ago`;
-  };
+    const formattedNotifications = upcomingNotifications.map(n => ({
+      id: n.id,
+      title: n.title,
+      diffMinutes: n.diffMinutes,
+      date: n.date,
+      time: n.startTime,
+      location: n.location,
+      source: "calendar",
+    }));
+    addNotifications("calendar", formattedNotifications);
+  }, [upcomingNotifications, addNotifications]);
 
   // ===== COMMENTS =====
   const meetingsWithComments = meeting.filter(
@@ -181,6 +163,14 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     );
   };
 
+  // ===== SEARCH RESULTS =====
+  const searchResults = searchTerm.trim()
+    ? meeting.filter((item) =>
+        item.meetingName?.toLowerCase().includes(searchTerm.trim().toLowerCase())
+      )
+    : [];
+
+  // ===== NAVIGATION =====
   const goToPrevious = () => {
     const newDate = new Date(currentDate);
     if (view === 'day') newDate.setDate(newDate.getDate() - 1);
@@ -224,6 +214,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
+  // ===== CRUD OPERATIONS =====
   const deleteMeeting = (id) => {
     setMeeting(meeting.filter(item => item.id !== id));
     localStorage.removeItem(`event_color_${id}`);
@@ -276,25 +267,24 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     return colors[color.id] || colors.purple;
   };
 
-  const handleJoinMeeting = (event) =>{
-    console.log("Joining meetingn:", event);
-    if(event.onlineLink){
+  // ===== HANDLERS =====
+  const handleJoinMeeting = (event) => {
+    console.log("Joining meeting:", event);
+    if (event.onlineLink) {
       window.open(event.onlineLink, "_blank");
     }
-  }
+  };
 
-  const handleDismissReminder = (eventId) =>{
-    console.log("Reminder dismissed:",eventId);
-  }
+  const handleDismissReminder = (eventId) => {
+    console.log("Reminder dismissed:", eventId);
+  };
 
-  // ===== EDIT MEETING =====
   const handleEditMeeting = (event) => {
     setSelectedEvent(null);
     setEditingEvent(event);
     setShowMeetingModal(true);
   };
 
-  // ===== SHARE MEETING =====
   const handleShareMeeting = (event) => {
     const link = event.onlineLink || window.location.href;
 
@@ -314,202 +304,51 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     setTimeout(() => setShareToast(false), 2000);
   };
 
-  // ===== NEW: PROFILE DROPDOWN ACTIONS =====
+  // ===== PROFILE ACTIONS =====
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
-    setActivePanel(null);
     navigate("/signin");
   };
 
   const handleProfileClick = () => {
-    setActivePanel(null);
     navigate("/profile");
   };
 
   const handleSettingsClick = () => {
-    setActivePanel(null);
     navigate("/settings");
   };
 
-  // Auth check hone tak (ya redirect hote waqt) kuch mat dikhao
   if (checkingAuth) {
     return null;
   }
 
   return (
     <>
-      <div className="calendar-topbar">
-        <h1>Calendar</h1>
-        <div className="topbar-right">
-          <button className="create-btn" onClick={() => setShowMeetingModal(true)}>
-            <span>+</span> Create
-          </button>
-          <div className="topbar-icons">
+      {/* TOPBAR - No notifications props needed, reads from context */}
+      <Topbar
+        title="Calendar"
+        createButtonLabel="Create"
+        onCreateClick={() => setShowMeetingModal(true)}
+        searchPlaceholder="Search by meeting name"
+        searchResults={searchResults.map(item => ({
+          id: item.id,
+          title: item.meetingName,
+          date: item.date,
+        }))}
+        onSearchChange={(value) => setSearchTerm(value)}
+        onSearchResultClick={(item) => {
+          const event = meeting.find(m => m.id === item.id);
+          if (event) setSelectedEvent(event);
+          setSearchTerm("");
+        }}
+        commentsCount={meetingsWithComments.length}
+        currentUser={currentUser}
+        onLogout={handleLogout}
+        onProfileClick={handleProfileClick}
+        onSettingsClick={handleSettingsClick}
+      />
 
-            {/* SEARCH */}
-            <div className="icon-wrap">
-              <button
-                className="icon-btn"
-                onClick={() => togglePanel("search")}
-                aria-label="Search meetings"
-              >
-                <FaSearch />
-              </button>
-
-              {activePanel === "search" && (
-                <div className="icon-dropdown">
-                  <h4>Search meetings</h4>
-                  <div className="search-input-wrap">
-                    <input
-                      type="text"
-                      autoFocus
-                      placeholder="Search by meeting name"
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                  </div>
-
-                  {searchTerm.trim() === "" && (
-                    <div className="icon-dropdown-empty">Type to search your meetings</div>
-                  )}
-
-                  {searchTerm.trim() !== "" && searchResults.length === 0 && (
-                    <div className="icon-dropdown-empty">No meetings found</div>
-                  )}
-
-                  {searchResults.length > 0 && (
-                    <div className="search-result-list">
-                      {searchResults.map((item) => (
-                        <div
-                          key={item.id}
-                          className="search-result-item"
-                          onClick={() => {
-                            setSelectedEvent(item);
-                            setActivePanel(null);
-                            setSearchTerm("");
-                          }}
-                        >
-                          <span>{item.meetingName}</span>
-                          <span className="search-result-date">{item.date}</span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* NOTIFICATIONS */}
-            <div className="icon-wrap">
-              <button
-                className="icon-btn"
-                onClick={() => togglePanel("notifications")}
-                aria-label="Notifications"
-              >
-                <FaRegBell />
-                {upcomingNotifications.length > 0 && <span className="icon-badge"></span>}
-              </button>
-
-              {activePanel === "notifications" && (
-                <div className="icon-dropdown">
-                  <h4>Upcoming meetings</h4>
-                  {upcomingNotifications.length === 0 ? (
-                    <div className="icon-dropdown-empty">No meeting starting soon</div>
-                  ) : (
-                    <div className="search-result-list">
-                      {upcomingNotifications.map(({ item, diffMinutes }) => (
-                        <div
-                          key={item.id}
-                          className="search-result-item"
-                          onClick={() => {
-                            setSelectedEvent(item);
-                            setActivePanel(null);
-                          }}
-                        >
-                          <span>{item.meetingName}</span>
-                          <span className="search-result-date">
-                            {getNotificationLabel(diffMinutes)}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* COMMENTS */}
-            <div className="icon-wrap">
-              <button
-                className="icon-btn"
-                onClick={() => togglePanel("comments")}
-                aria-label="Comments"
-              >
-                <FaRegCommentDots />
-                {meetingsWithComments.length > 0 && <span className="icon-badge"></span>}
-              </button>
-
-              {activePanel === "comments" && (
-                <div className="icon-dropdown">
-                  <h4>Comments</h4>
-                  {meetingsWithComments.length === 0 ? (
-                    <div className="icon-dropdown-empty">No comments yet</div>
-                  ) : (
-                    <div className="search-result-list">
-                      {meetingsWithComments.map((item) => (
-                        <div
-                          key={item.id}
-                          className="search-result-item"
-                          onClick={() => {
-                            setSelectedEvent(item);
-                            setActivePanel(null);
-                          }}
-                        >
-                          <span>{item.meetingName}</span>
-                          <span className="search-result-date">
-                            {item.comments.length} comment{item.comments.length > 1 ? "s" : ""}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* PROFILE */}
-            <div className="icon-wrap avatar-wrap" onClick={() => togglePanel("profile")}>
-              <FaUserCircle className="avatar-icon" />
-              <FaChevronDown className="avatar-chevron" />
-
-              {activePanel === "profile" && (
-                <div className="icon-dropdown profile-dropdown">
-                  <div className="profile-dropdown-header">
-                    <FaUserCircle className="profile-dropdown-avatar" />
-                    <div>
-                      <h4>{currentUser?.email ? currentUser.email.split("@")[0] : "My Account"}</h4>
-                      <span>{currentUser?.email || "Manage your profile"}</span>
-                    </div>
-                  </div>
-
-                  <div className="profile-menu">
-                    <button type="button" className="profile-menu-item" onClick={handleProfileClick}>
-                      <FaUser /> Profile
-                    </button>
-                    <button type="button" className="profile-menu-item" onClick={handleSettingsClick}>
-                      <FaCog /> Settings
-                    </button>
-                    <button type="button" className="profile-menu-item profile-menu-logout" onClick={handleLogout}>
-                      <FaSignOutAlt /> Logout
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </div>
-
+      {/* CALENDAR CONTAINER */}
       <div className="calendar-container">
         <div className="calendar-header">
           <div className="calendar-date">
@@ -558,6 +397,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         )}
       </div>
 
+      {/* MODALS */}
       {showMeetingModal && (
         <AddMeetingModal
           onClose={() => {
@@ -594,7 +434,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         />
       )}
 
-      {/* "link copied" toast for Share fallback */}
+      {/* Toast */}
       {shareToast && (
         <div
           style={{
@@ -616,11 +456,10 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         </div>
       )}
 
-      <Reminder 
-      events={meeting}
-      onJoinMeeting={handleJoinMeeting}
-      onDismiss={handleDismissReminder}
-
+      <Reminder
+        events={meeting}
+        onJoinMeeting={handleJoinMeeting}
+        onDismiss={handleDismissReminder}
       />
     </>
   );
