@@ -6,15 +6,32 @@
  * @param {Number} windowMinutes - Time window in minutes (default: 60)
  * @returns {Array} - Sorted notifications with diffMinutes
  */
- export const getUpcomingNotifications = (events, windowMinutes = 60) => {
+// src/utils/notificationService.js
+
+export const getUpcomingNotifications = (events, windowMinutes = 60) => {
     const now = new Date();
     const notifications = [];
 
-    if (!events || events.length === 0) return notifications;
+    console.log("📢 getUpcomingNotifications called with", events?.length || 0, "events");
+
+    if (!events || events.length === 0) {
+        console.log("📢 No events provided");
+        return notifications;
+    }
 
     events.forEach((event) => {
+        // ✅ Debug: Log each event
+        console.log(`📢 Event:`, {
+            name: event.meetingName || event.title,
+            date: event.date,
+            startTime: event.startTime,
+        });
+
         // ✅ Check if event has date and startTime
-        if (!event.date || !event.startTime) return;
+        if (!event.date || !event.startTime) {
+            console.log(`⚠️ Event missing date or startTime — skipping`);
+            return;
+        }
 
         // ✅ Parse event date
         const [year, month, day] = event.date.split("-").map(Number);
@@ -23,13 +40,17 @@
         // ✅ Create proper event date object
         const eventDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
         
-        // ✅ If event is invalid date, skip
-        if (isNaN(eventDate.getTime())) return;
+        if (isNaN(eventDate.getTime())) {
+            console.log(`⚠️ Invalid event date — skipping`);
+            return;
+        }
 
         const diffMinutes = (eventDate - now) / 60000;
+        console.log(`⏱️ Diff minutes: ${diffMinutes.toFixed(2)}`);
 
         // ✅ Show events from 10 minutes before to windowMinutes after
         if (diffMinutes >= -10 && diffMinutes <= windowMinutes) {
+            console.log(`✅ Notification found!`);
             notifications.push({
                 id: event.id,
                 title: event.title || event.meetingName || event.name,
@@ -39,15 +60,17 @@
                 location: event.location,
                 onlineLink: event.onlineLink,
                 diffMinutes: diffMinutes,
-                // ✅ Original event data
                 event: event,
             });
+        } else {
+            console.log(`⏭️ Outside time window (${diffMinutes.toFixed(2)} mins)`);
         }
     });
 
-    // ✅ Sort by nearest first
+    console.log(`📢 Total notifications found: ${notifications.length}`);
     return notifications.sort((a, b) => a.diffMinutes - b.diffMinutes);
 };
+
 
 /**
  * Get notification label based on time difference
