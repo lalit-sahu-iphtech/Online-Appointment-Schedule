@@ -91,6 +91,19 @@ export default function Topbar({
     displayTitle: `${item.sourceLabel}: ${item.title}`,
   }));
 
+  // ✅ Get user display name
+  const getUserDisplayName = () => {
+    if (currentUser?.name) return currentUser.name;
+    if (currentUser?.displayName) return currentUser.displayName;
+    if (currentUser?.email) return currentUser.email.split("@")[0];
+    return "My Account";
+  };
+
+  const getUserEmail = () => {
+    if (currentUser?.email) return currentUser.email;
+    return "Manage your profile";
+  };
+
   return (
     <div className="topbar">
       <h1>{title}</h1>
@@ -232,9 +245,9 @@ export default function Topbar({
             {activePanel === "comments" && (
               <div className="topbar-dropdown topbar-comment-dropdown">
                 <h4>Comments</h4>
-                {/* <div className="topbar-dropdown-empty">
+                <div className="topbar-dropdown-empty">
                   {commentsCount === 0 ? "No comments yet" : `${commentsCount} comments`}
-                </div> */}
+                </div>
               </div>
             )}
           </div>
@@ -246,7 +259,7 @@ export default function Topbar({
             </div>
           )}
 
-          {/* PROFILE */}
+          {/* PROFILE - UPDATED WITH CURRENT USER INFO */}
           <div
             className="topbar-icon-wrap topbar-avatar-wrap"
             onClick={() => togglePanel("profile")}
@@ -259,12 +272,10 @@ export default function Topbar({
                 <div className="topbar-profile-dropdown-header">
                   <FaUserCircle className="topbar-profile-avatar" />
                   <div>
-                    <h4>
-                      {currentUser?.email
-                        ? currentUser.email.split("@")[0]
-                        : "My Account"}
-                    </h4>
-                    <span>{currentUser?.email || "Manage your profile"}</span>
+                    {/* ✅ Show current user name */}
+                    <h4>{getUserDisplayName()}</h4>
+                    {/* ✅ Show current user email */}
+                    <span>{getUserEmail()}</span>
                   </div>
                 </div>
 
