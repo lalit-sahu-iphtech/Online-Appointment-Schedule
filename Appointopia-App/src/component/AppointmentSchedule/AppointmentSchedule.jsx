@@ -19,9 +19,17 @@ import {
   FaTrash,
   FaClock,
 } from "react-icons/fa";
+
+// ✅ Firebase Services
+import {
+  getAppointments,
+  addAppointment as firebaseAddAppointment,
+  updateAppointment as firebaseUpdateAppointment,
+  deleteAppointment as firebaseDeleteAppointment
+} from "../../services/firestoreService";
+
 import AppointmentCard from "./AppointmentCard";
 import CreateAppointment from "../CreateAppointment/CreateAppointment";
-import { useAppointments } from "../../context/AppointmentContext";
 import "./appointmentSchedule.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -34,13 +42,30 @@ import { useNotificationsContext } from "../../context/NotificationContext";
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
+// ✅ Month name mapping
+const MONTH_NAME_MAP = {
+    "JAN": "January",
+    "FEB": "February",
+    "MARCH": "March",
+    "APRIL": "April",
+    "MAY": "May",
+    "JUNE": "June",
+    "JULY": "July",
+    "AUG": "August",
+    "SEP": "September",
+    "OCT": "October",
+    "NOV": "November",
+    "DEC": "December"
+};
+
 export default function AppointmentSchedule() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const { appointments, addAppointment, deleteAppointment, updateAppointment, loading } = useAppointments();
   
   // ===== ALL STATE HOOKS (Top par) =====
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
   const [view, setView] = useState("month");
   const [showFilter, setShowFilter] = useState(false);
@@ -57,13 +82,10 @@ export default function AppointmentSchedule() {
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
   // Initialize expanded months
-  const [expandedMonths, setExpandedMonths] = useState(() => {
-    const state = {};
-    appointments.forEach(month => {
-      state[month.month] = month.appointments.length > 0;
-    });
-    return state;
-  });
+  const [expandedMonths, setExpandedMonths] = useState({});
+
+  // Get notification context
+  const { addNotifications } = useNotificationsContext();
 
   // ===== ALL EFFECTS (Top par) =====
   
@@ -84,14 +106,6 @@ export default function AppointmentSchedule() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  useEffect(() => {
-    const state = {};
-    appointments.forEach(month => {
-      state[month.month] = month.appointments.length > 0;
-    });
-    setExpandedMonths(state);
-  }, [appointments]);
-
   // Auth check
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
@@ -111,17 +125,107 @@ export default function AppointmentSchedule() {
     setCheckingAuth(false);
   }, [navigate, location.pathname]);
 
+  // ===== ✅ LOAD APPOINTMENTS FROM FIREBASE =====
+  useEffect(() => {
+    loadAppointments();
+  }, []);
+
+  const loadAppointments = async () => {
+    try {
+      setLoading(true);
+      const data = await getAppointments();
+      
+      // ✅ Group appointments by month
+      const monthsMap = {};
+      data.forEach(apt => {
+        // ✅ Use the stored month if available, otherwise detect from date
+        let monthKey = apt.targetMonth || apt.month;
+        if (!monthKey) {
+          // Fallback: detect from date
+          const dateObj = new Date(apt.date);
+          monthKey = MONTHS[dateObj.getMonth()];
+        }
+        
+        if (!monthsMap[monthKey]) {
+          monthsMap[monthKey] = { month: monthKey, appointments: [] };
+        }
+        monthsMap[monthKey].appointments.push(apt);
+      });
+      
+      const groupedAppointments = Object.values(monthsMap);
+      setAppointments(groupedAppointments);
+      
+      // ✅ Update expanded months
+      const state = {};
+      groupedAppointments.forEach(month => {
+        state[month.month] = month.appointments.length > 0;
+      });
+      setExpandedMonths(state);
+    } catch (error) {
+      console.error("❌ Error loading appointments:", error);
+      setAppointments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ===== ✅ CRUD OPERATIONS =====
+
+  // ✅ Add appointment — FIXED: targetMonth properly handled
+  const handleAddAppointment = async (newAppointment, targetMonth) => {
+    try {
+      const userStr = localStorage.getItem("currentUser");
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      // ✅ Store targetMonth in appointment
+      const appointmentWithDate = {
+        ...newAppointment,
+        targetMonth: targetMonth, // ✅ Store the selected month
+        organizerEmail: user?.email || "unknown",
+        organizerName: user?.email?.split('@')[0] || "User",
+        date: newAppointment.date || new Date().toISOString().split('T')[0],
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await firebaseAddAppointment(appointmentWithDate);
+      await loadAppointments();
+    } catch (error) {
+      console.error("❌ Error adding appointment:", error);
+    }
+  };
+
+  // ✅ Update appointment
+  const handleUpdateAppointment = async (id, data) => {
+    try {
+      await firebaseUpdateAppointment(id, data);
+      await loadAppointments();
+    } catch (error) {
+      console.error("❌ Error updating appointment:", error);
+    }
+  };
+
+  // ✅ Delete appointment
+  const handleDeleteAppointment = async (id) => {
+    try {
+      await firebaseDeleteAppointment(id);
+      await loadAppointments();
+    } catch (error) {
+      console.error("❌ Error deleting appointment:", error);
+    }
+  };
+
   // ===== HOOKS THAT MUST BE BEFORE CONDITIONAL RETURNS =====
   // Get all appointments for notifications
   const getAllAppointments = useMemo(() => {
     const all = [];
     appointments.forEach(monthData => {
-        monthData.appointments.forEach(apt => {
-            all.push({
-                ...apt,
-                month: monthData.month
-            });
+      monthData.appointments.forEach(apt => {
+        all.push({
+          ...apt,
+          month: monthData.month
         });
+      });
     });
     return all;
   }, [appointments]);
@@ -133,9 +237,6 @@ export default function AppointmentSchedule() {
     count: notificationCount,
     getLabel,
   } = useNotifications(allAppointments, 60);
-
-  // Get notification context
-  const { addNotifications } = useNotificationsContext();
 
   // ✅ Add schedule notifications to global context
   useEffect(() => {
@@ -157,7 +258,7 @@ export default function AppointmentSchedule() {
   }
 
   if (loading) {
-    return <div className="appointment-layout">Loading...</div>;
+    return <div className="appointment-layout">Loading appointments...</div>;
   }
 
   // ===== REST OF THE FUNCTIONS =====
@@ -246,7 +347,7 @@ export default function AppointmentSchedule() {
     const day = String(date.getDate()).padStart(2, '0');
     const dateStr = `${year}-${month}-${day}`;
     
-    const allAppointments = getAllAppointments();
+    const allAppointments = getAllAppointments;
     return allAppointments.filter(apt => apt.date === dateStr);
   };
 
@@ -339,7 +440,7 @@ export default function AppointmentSchedule() {
   const getSearchResults = () => {
     if (!search.trim()) return [];
     const results = [];
-    const allAppointments = getAllAppointments();
+    const allAppointments = getAllAppointments;
     allAppointments.forEach(apt => {
       if (apt.title.toLowerCase().includes(search.trim().toLowerCase())) {
         results.push({
@@ -530,7 +631,7 @@ export default function AppointmentSchedule() {
                               onClick={(e) => {
                                 e.stopPropagation();
                                 if (window.confirm(`Delete "${appointment.title}"?`)) {
-                                  deleteAppointment(appointment.id);
+                                  handleDeleteAppointment(appointment.id);
                                 }
                               }}
                             >
@@ -583,8 +684,8 @@ export default function AppointmentSchedule() {
                           <AppointmentCard 
                             key={appointment.id} 
                             appointment={appointment}
-                            onDelete={deleteAppointment}
-                            onUpdate={updateAppointment}
+                            onDelete={handleDeleteAppointment}
+                            onUpdate={handleUpdateAppointment}
                           />
                         ))
                       ) : (
@@ -613,17 +714,7 @@ export default function AppointmentSchedule() {
         <CreateAppointment
           onClose={() => setShowCreate(false)}
           onSave={(newAppointment, targetMonth) => {
-            const today = new Date();
-            const dateStr = today.toISOString().split('T')[0];
-            
-            const appointmentWithDate = {
-              ...newAppointment,
-              date: newAppointment.date || dateStr,
-              startTime: newAppointment.startTime || `${String(today.getHours() + 1).padStart(2, '0')}:00`,
-              endTime: newAppointment.endTime || `${String(today.getHours() + 2).padStart(2, '0')}:00`,
-            };
-            
-            addAppointment(appointmentWithDate, targetMonth);
+            handleAddAppointment(newAppointment, targetMonth);
             setShowCreate(false);
             
             if (view === "week") {
