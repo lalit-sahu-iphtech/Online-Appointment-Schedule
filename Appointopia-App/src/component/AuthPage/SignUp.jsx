@@ -52,8 +52,6 @@ export default function SignUp() {
       newErrors.password = "Password must contain at least one number";
     }
 
-    // ✅ Confirm password validation REMOVED
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -61,24 +59,23 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    // ✅ Reset errors and messages
     setErrors({});
     setSuccessMessage("");
-    setLoading(true);
-
+    
     if (!validateForm()) {
-      setLoading(false);
       return;
     }
 
+    setLoading(true);
+
     try {
-      // ✅ Firebase Sign Up
       const user = await signUp(
         formData.email.trim().toLowerCase(),
         formData.password,
         formData.name.trim()
       );
 
-      // ✅ Save user to localStorage for app state
       const userData = {
         uid: user.uid,
         name: formData.name.trim(),
@@ -99,21 +96,24 @@ export default function SignUp() {
         navigate("/");
       }, 1000);
     } catch (error) {
-      // ✅ Handle Firebase errors
+      console.error("Sign up error:", error);
+      
+      // ✅ Clear previous errors and set new error
       let errorMessage = "Something went wrong. Please try again.";
-      switch (error.code) {
-        case "auth/email-already-in-use":
-          errorMessage = "This email is already registered. Please sign in.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "Invalid email address.";
-          break;
-        case "auth/weak-password":
-          errorMessage = "Password is too weak. Use at least 6 characters.";
-          break;
-        default:
-          errorMessage = error.message || "Something went wrong. Please try again.";
+      
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "❌ This email is already registered. Please sign in instead.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "❌ Invalid email address.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "❌ Password is too weak. Use at least 6 characters with uppercase, lowercase and number.";
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "❌ Too many attempts. Please try again later.";
+      } else if (error.message) {
+        errorMessage = `❌ ${error.message}`;
       }
+      
+      // ✅ Set error and ensure it shows in UI
       setErrors({ email: errorMessage });
     } finally {
       setLoading(false);
@@ -123,6 +123,7 @@ export default function SignUp() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    // ✅ Clear error for this field when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -178,7 +179,14 @@ export default function SignUp() {
                 className={errors.email ? "input-error" : ""}
                 disabled={loading}
               />
-              {errors.email && <span className="error-message">{errors.email}</span>}
+              {/* ✅ Email error message - clearly visible */}
+              {errors.email && <span className="error-message" style={{ 
+                display: "block", 
+                marginTop: "4px",
+                color: "#e53935",
+                fontSize: "12px",
+                fontWeight: "500"
+              }}>{errors.email}</span>}
             </div>
 
             {/* Password */}

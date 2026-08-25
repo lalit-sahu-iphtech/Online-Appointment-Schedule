@@ -141,7 +141,13 @@ export default function SignIn() {
                 className={errors.email ? "input-error" : ""}
                 disabled={loading}
               />
-              {errors.email && <span className="error-message">{errors.email}</span>}
+    {errors.email && <span className="error-message" style={{ 
+    display: "block", 
+    marginTop: "4px",
+    color: "#e53935",
+    fontSize: "12px",
+    fontWeight: "500"
+}}>{errors.email}</span>}
             </div>
 
             {/* Password */}

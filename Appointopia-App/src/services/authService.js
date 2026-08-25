@@ -18,18 +18,18 @@ export const setAuthPersistence = () => {
 };
 
 // ✅ Sign Up with Firebase
+// src/services/authService.js
+
+// ✅ Sign Up with Firebase
 export const signUp = async (email, password, displayName) => {
     try {
-        // 1. Create user in Firebase Auth
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // 2. Update profile with display name
         await updateProfile(user, {
             displayName: displayName
         });
 
-        // 3. Save user data to Firestore
         const userRef = doc(db, "users", user.uid);
         await setDoc(userRef, {
             uid: user.uid,
@@ -44,6 +44,7 @@ export const signUp = async (email, password, displayName) => {
         return user;
     } catch (error) {
         console.error("❌ Sign up error:", error);
+        // ✅ Throw error so component can handle it
         throw error;
     }
 };
