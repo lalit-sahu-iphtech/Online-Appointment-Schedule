@@ -100,11 +100,19 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     try {
       setLoading(true);
       const data = await getMeetings();
+      console.log("📥 Calendar meetings loaded:", data.length);
+      
+      // ✅ Ensure all meetings have date and startTime
       const formattedData = data.map(item => ({
         ...item,
         id: item.id,
-        color: item.color || getRandomEventColor(item.id)?.id || "purple"
+        color: item.color || getRandomEventColor(item.id)?.id || "purple",
+        // ✅ Default values if missing
+        date: item.date || new Date().toISOString().split('T')[0],
+        startTime: item.startTime || "09:00",
+        endTime: item.endTime || "10:00"
       }));
+      
       setMeeting(formattedData);
       if (onEventsChange) onEventsChange(formattedData);
     } catch (error) {
@@ -164,8 +172,17 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     getLabel,
   } = useNotifications(meeting, 60);
 
+  // ✅ Debug: Check notifications
+  console.log("📢 Calendar meetings count:", meeting.length);
+  console.log("📢 Calendar notifications:", upcomingNotifications);
+
   // ✅ Add calendar notifications to global context
   useEffect(() => {
+    if (upcomingNotifications.length === 0) {
+      console.log("📢 No upcoming calendar notifications");
+      return;
+    }
+    
     const formattedNotifications = upcomingNotifications.map(n => ({
       id: n.id,
       title: n.title,
@@ -175,6 +192,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       location: n.location,
       source: "calendar",
     }));
+    console.log("📢 Adding calendar notifications:", formattedNotifications);
     addNotifications("calendar", formattedNotifications);
   }, [upcomingNotifications, addNotifications]);
 
