@@ -34,6 +34,14 @@ import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
 
+// ✅ Firebase Services
+import {
+  getMeetings,
+  addMeeting as firebaseAddMeeting,
+  updateMeeting as firebaseUpdateMeeting,
+  deleteMeeting as firebaseDeleteMeeting
+} from "../../services/firestoreService";
+
 export default function Calendar({ onEventsChange, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,6 +60,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   const [activePanel, setActivePanel] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [now, setNow] = useState(new Date());
+  const [loading, setLoading] = useState(true);
 
   // Get notification context
   const { addNotifications } = useNotificationsContext();
@@ -81,49 +90,74 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     return () => clearInterval(timer);
   }, []);
 
-  // ===== LOAD MEETINGS FROM LOCALSTORAGE =====
+  // ===== ✅ LOAD MEETINGS FROM FIREBASE =====
   useEffect(() => {
-    const saved = localStorage.getItem('calendar_meetings');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const withColors = parsed.map(event => {
-          if (!event.color) {
-            const color = getRandomEventColor(event.id);
-            return { ...event, color: color.id };
-          }
-          return event;
-        });
-        setMeeting(withColors);
-        if (onEventsChange) {
-          onEventsChange(withColors);
-        }
-      } catch (error) {
-        console.error('Error loading meetings:', error);
-        setMeeting([]);
-      }
-    }
+    loadMeetings();
   }, []);
 
-  // ===== SAVE MEETINGS TO LOCALSTORAGE =====
-  useEffect(() => {
-    if (meeting.length > 0) {
-      localStorage.setItem('calendar_meetings', JSON.stringify(meeting));
-    } else {
-      localStorage.removeItem('calendar_meetings');
+  // ✅ Load meetings from Firebase
+  const loadMeetings = async () => {
+    try {
+      setLoading(true);
+      const data = await getMeetings();
+      const formattedData = data.map(item => ({
+        ...item,
+        id: item.id,
+        color: item.color || getRandomEventColor(item.id)?.id || "purple"
+      }));
+      setMeeting(formattedData);
+      if (onEventsChange) onEventsChange(formattedData);
+    } catch (error) {
+      console.error("❌ Error loading meetings:", error);
+    } finally {
+      setLoading(false);
     }
-    if (onEventsChange) {
-      onEventsChange(meeting);
-    }
-  }, [meeting, onEventsChange]);
+  };
 
-  useEffect(() => {
-    if (onDateChange) {
-      onDateChange(currentDate);
-    }
-  }, [currentDate, onDateChange]);
+  // ===== ✅ CRUD OPERATIONS WITH FIREBASE =====
 
-  // ===== NOTIFICATIONS - USING COMMON SYSTEM =====
+  // ✅ Save meeting to Firebase
+  const handleSaveMeeting = async (data) => {
+    try {
+      const userStr = localStorage.getItem("currentUser");
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      const newMeeting = {
+        ...data,
+        organizerEmail: user?.email || "unknown",
+        organizerName: user?.email?.split('@')[0] || "User"
+      };
+
+      const saved = await firebaseAddMeeting(newMeeting);
+      await loadMeetings();
+      return saved;
+    } catch (error) {
+      console.error("❌ Error saving meeting:", error);
+      throw error;
+    }
+  };
+
+  // ✅ Update meeting in Firebase
+  const handleUpdateMeeting = async (id, data) => {
+    try {
+      await firebaseUpdateMeeting(id, data);
+      await loadMeetings();
+    } catch (error) {
+      console.error("❌ Error updating meeting:", error);
+    }
+  };
+
+  // ✅ Delete meeting from Firebase
+  const handleDeleteMeeting = async (id) => {
+    try {
+      await firebaseDeleteMeeting(id);
+      await loadMeetings();
+    } catch (error) {
+      console.error("❌ Error deleting meeting:", error);
+    }
+  };
+
+  // ===== NOTIFICATIONS =====
   const {
     notifications: upcomingNotifications,
     count: notificationCount,
@@ -214,12 +248,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
-  // ===== CRUD OPERATIONS =====
-  const deleteMeeting = (id) => {
-    setMeeting(meeting.filter(item => item.id !== id));
-    localStorage.removeItem(`event_color_${id}`);
-  };
-
+  // ===== EVENT POSITION & COLOR =====
   const getEventPosition = (startTime, endTime) => {
     const [startHour, startMinute] = startTime.split(":").map(Number);
     const [endHour, endMinute] = endTime.split(":").map(Number);
@@ -322,9 +351,12 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     return null;
   }
 
+  if (loading) {
+    return <div className="calendar-loading">Loading meetings...</div>;
+  }
+
   return (
     <>
-      {/* TOPBAR - No notifications props needed, reads from context */}
       <Topbar
         title="Calendar"
         createButtonLabel="Create"
@@ -370,7 +402,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
             getEventPosition={getEventPosition}
             getEventColor={getEventColor}
             currentDate={currentDate}
-            onDelete={deleteMeeting}
+            onDelete={handleDeleteMeeting}
             onEventClick={(event) => setSelectedEvent(event)}
           />
         )}
@@ -381,7 +413,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
             getEventPosition={getEventPosition}
             getEventColor={getEventColor}
             currentDate={currentDate}
-            onDelete={deleteMeeting}
+            onDelete={handleDeleteMeeting}
             onEventClick={(event) => setSelectedEvent(event)}
           />
         )}
@@ -391,7 +423,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
             meeting={meeting}
             getEventColor={getEventColor}
             currentDate={currentDate}
-            onDelete={deleteMeeting}
+            onDelete={handleDeleteMeeting}
             onEventClick={(event) => setSelectedEvent(event)}
           />
         )}
@@ -409,14 +441,11 @@ export default function Calendar({ onEventsChange, onDateChange }) {
           isEditMode={!!editingEvent}
           onSave={(data) => {
             if (editingEvent) {
-              setMeeting((prev) =>
-                prev.map((m) =>
-                  m.id === editingEvent.id ? { ...m, ...data, id: editingEvent.id } : m
-                )
-              );
+              // ✅ Update existing meeting
+              handleUpdateMeeting(editingEvent.id, data);
             } else {
-              const newEvent = { ...data, id: Date.now() };
-              setMeeting((prev) => [...prev, newEvent]);
+              // ✅ Create new meeting
+              handleSaveMeeting(data);
             }
             setShowMeetingModal(false);
             setEditingEvent(null);
