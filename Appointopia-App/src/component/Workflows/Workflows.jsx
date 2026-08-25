@@ -23,6 +23,14 @@ import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
 
+// ✅ Firebase Services
+import {
+  getWorkflows as firebaseGetWorkflows,
+  addWorkflow as firebaseAddWorkflow,
+  updateWorkflow as firebaseUpdateWorkflow,
+  deleteWorkflow as firebaseDeleteWorkflow
+} from "../../services/firestoreService";
+
 // DEFAULT WORKFLOWS (Templates)
 const DEFAULT_WORKFLOWS = [
   {
@@ -97,6 +105,9 @@ export default function Workflows({ onWorkflowsChange }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [activePanel, setActivePanel] = useState(null);
 
+  // Get notification context
+  const { addNotifications } = useNotificationsContext();
+
   // ===== ALL EFFECTS (Top par) =====
 
   // Toggle panels
@@ -115,38 +126,86 @@ export default function Workflows({ onWorkflowsChange }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // Load workflows from localStorage
+  // ✅ LOAD WORKFLOWS FROM FIREBASE
   useEffect(() => {
-    const saved = localStorage.getItem('workflows');
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const merged = DEFAULT_WORKFLOWS.map(template => {
-          const existing = parsed.find(w => w.id === template.id && w.isTemplate);
-          return existing || template;
-        });
-        const userWorkflows = parsed.filter(w => !w.isTemplate);
-        setWorkflows([...merged, ...userWorkflows]);
-      } catch (error) {
-        console.error('Error loading workflows:', error);
-        setWorkflows(DEFAULT_WORKFLOWS);
-      }
-    } else {
-      localStorage.setItem('workflows', JSON.stringify(DEFAULT_WORKFLOWS));
-      setWorkflows(DEFAULT_WORKFLOWS);
-    }
-    setLoading(false);
+    loadWorkflows();
   }, []);
 
-  // Save to localStorage
-  useEffect(() => {
-    if (!loading) {
-      localStorage.setItem('workflows', JSON.stringify(workflows));
+  const loadWorkflows = async () => {
+    try {
+      setLoading(true);
+      const data = await firebaseGetWorkflows();
+      
+      // ✅ Separate templates and user workflows
+      const templates = data.filter(w => w.isTemplate === true);
+      const userWorkflows = data.filter(w => w.isTemplate === false);
+      
+      // ✅ Merge with default templates (if any missing)
+      const mergedTemplates = DEFAULT_WORKFLOWS.map(template => {
+        const existing = templates.find(w => w.id === template.id);
+        return existing || template;
+      });
+      
+      setWorkflows([...mergedTemplates, ...userWorkflows]);
+      
       if (onWorkflowsChange) {
-        onWorkflowsChange(workflows);
+        onWorkflowsChange([...mergedTemplates, ...userWorkflows]);
       }
+    } catch (error) {
+      console.error("❌ Error loading workflows:", error);
+      // ✅ Fallback to default templates
+      setWorkflows(DEFAULT_WORKFLOWS);
+    } finally {
+      setLoading(false);
     }
-  }, [workflows, loading, onWorkflowsChange]);
+  };
+
+  // ===== ✅ CRUD OPERATIONS =====
+
+  // ✅ Add workflow
+  const handleAddWorkflow = async (newWorkflow) => {
+    try {
+      const userStr = localStorage.getItem("currentUser");
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      const workflowWithUser = {
+        ...newWorkflow,
+        isTemplate: false,
+        createdBy: user?.email || "unknown",
+        createdByName: user?.email?.split('@')[0] || "User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      await firebaseAddWorkflow(workflowWithUser);
+      await loadWorkflows();
+    } catch (error) {
+      console.error("❌ Error adding workflow:", error);
+    }
+  };
+
+  // ✅ Update workflow
+  const handleUpdateWorkflow = async (id, data) => {
+    try {
+      await firebaseUpdateWorkflow(id, {
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
+      await loadWorkflows();
+    } catch (error) {
+      console.error("❌ Error updating workflow:", error);
+    }
+  };
+
+  // ✅ Delete workflow
+  const handleDeleteWorkflow = async (id) => {
+    try {
+      await firebaseDeleteWorkflow(id);
+      await loadWorkflows();
+    } catch (error) {
+      console.error("❌ Error deleting workflow:", error);
+    }
+  };
 
   // Auth check
   useEffect(() => {
@@ -187,9 +246,6 @@ export default function Workflows({ onWorkflowsChange }) {
     count: workflowNotifCount,
     getLabel: getWorkflowLabel,
   } = useNotifications(workflowEvents, 60);
-
-  // Get notification context
-  const { addNotifications } = useNotificationsContext();
 
   // ✅ Add workflow notifications to global context
   useEffect(() => {
@@ -299,11 +355,11 @@ export default function Workflows({ onWorkflowsChange }) {
   };
 
   // Delete workflow
-  const handleDeleteWorkflow = (id) => {
+  const handleDeleteWorkflowClick = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
       if (window.confirm(`Delete "${workflow.title}"?`)) {
-        setWorkflows(prev => prev.filter(w => w.id !== id));
+        handleDeleteWorkflow(id);
       }
     }
   };
@@ -311,28 +367,12 @@ export default function Workflows({ onWorkflowsChange }) {
   // Add/Edit workflow
   const addWorkflow = (newWorkflow) => {
     if (editingWorkflow) {
-      setWorkflows(prev =>
-        prev.map(w =>
-          w.id === editingWorkflow.id
-            ? { 
-                ...newWorkflow, 
-                id: editingWorkflow.id, 
-                isTemplate: editingWorkflow.isTemplate || false 
-              }
-            : w
-        )
-      );
+      // ✅ Edit mode
+      handleUpdateWorkflow(editingWorkflow.id, newWorkflow);
       setEditingWorkflow(null);
     } else {
-      setWorkflows([
-        ...workflows,
-        {
-          ...newWorkflow,
-          id: Date.now(),
-          isTemplate: false,
-          createdAt: new Date().toISOString(),
-        },
-      ]);
+      // ✅ Create mode
+      handleAddWorkflow(newWorkflow);
     }
     setShowCreateModal(false);
   };
@@ -354,7 +394,7 @@ export default function Workflows({ onWorkflowsChange }) {
   const searchResults = getSearchResults();
 
   // Comments count
-  const commentsCount = workflows.length > 0 ? workflows.length : 0;
+  const commentsCount = 0;
 
   return (
     <>
@@ -373,7 +413,7 @@ export default function Workflows({ onWorkflowsChange }) {
           setActivePanel(null);
           setSearch("");
         }}
-        commentsCount={0}
+        commentsCount={commentsCount}
         currentUser={currentUser}
         onLogout={handleLogout}
         onProfileClick={handleProfileClick}
@@ -486,7 +526,7 @@ export default function Workflows({ onWorkflowsChange }) {
                     workflow={workflow}
                     onUse={handleUseWorkflow}
                     onEdit={handleEditWorkflow}
-                    onDelete={handleDeleteWorkflow}
+                    onDelete={handleDeleteWorkflowClick}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}
@@ -515,7 +555,7 @@ export default function Workflows({ onWorkflowsChange }) {
                     workflow={workflow}
                     onUse={handleUseWorkflow}
                     onEdit={handleEditWorkflow}
-                    onDelete={handleDeleteWorkflow}
+                    onDelete={handleDeleteWorkflowClick}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}
