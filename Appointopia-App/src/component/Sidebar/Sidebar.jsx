@@ -81,6 +81,35 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     return count;
   };
 
+  // ✅ Get color based on event category or type
+  const getEventCardColor = (event) => {
+    if (event.color) {
+      const colorMap = {
+        purple: '#8755D5',
+        teal: '#16A6AD',
+        orange: '#FF7800',
+        blue: '#2F80D7',
+        pink: '#E84C8A',
+        green: '#27AE60',
+        red: '#E74C3C',
+        yellow: '#F2C94C',
+        indigo: '#4A56E2',
+        brown: '#8B5E3C'
+      };
+      return colorMap[event.color] || '#8755D5';
+    }
+    return '#8755D5';
+  };
+
+  // ✅ Get event type label
+  const getEventTypeLabel = (event) => {
+    if (event.category) return event.category;
+    if (event.type) return event.type;
+    if (event.meetingName) return 'Meeting';
+    if (event.title) return 'Event';
+    return 'Event';
+  };
+
   // Calculate next event
   useEffect(() => {
     if (memoizedEvents && memoizedEvents.length > 0 && memoizedDate) {
@@ -202,6 +231,43 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     );
   };
 
+  // ✅ Format event time for display
+  const formatEventTime = (startTime, endTime) => {
+    if (!startTime) return 'Time TBD';
+    if (!endTime) return formatTimeDisplay(startTime);
+    return `${formatTimeDisplay(startTime)} - ${formatTimeDisplay(endTime)}`;
+  };
+
+  // ✅ Get event title with fallback
+  const getEventTitle = (event) => {
+    return event.meetingName || event.title || event.name || 'Untitled Event';
+  };
+
+  // ✅ Get event location with fallback
+  const getEventLocation = (event) => {
+    return event.location || event.venue || 'Location not specified';
+  };
+
+  // ✅ Get event link with fallback
+  const getEventLink = (event) => {
+    return event.onlineLink || event.link || null;
+  };
+
+  // ✅ Get event date
+  const getEventDate = (event) => {
+    if (event.date) {
+      const d = new Date(event.date);
+      if (!isNaN(d.getTime())) {
+        return d.toLocaleDateString('en-US', { 
+          weekday: 'short', 
+          month: 'short', 
+          day: 'numeric' 
+        });
+      }
+    }
+    return null;
+  };
+
   return (
     <>
       {/* Mobile Menu Button */}
@@ -256,34 +322,48 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
           })}
         </nav>
 
-        {/* Next Event Card */}
+        {/* ✅ Next Event Card - DYNAMIC */}
         {nextEvent ? (
           <div className="next-event-card">
             <div className="next-event-header">
-              <span className="next-event-label">Next Event</span>
+              <span className="next-event-label">
+                {getEventTypeLabel(nextEvent)}
+              </span>
+              {/* {getEventDate(nextEvent) && (
+                <span className="next-event-date">
+                  {getEventDate(nextEvent)}
+                </span>
+              )} */}
             </div>
             
             <div className="next-event-content">
-              <h4 className="event-title">{nextEvent.meetingName || nextEvent.title}</h4>
+              <h4 className="event-title">
+                {getEventTitle(nextEvent)}
+              </h4>
               
               <div className="event-time">
                 <FaClock className="event-icon" />
                 <span className="time-badge">
-                  {formatTimeDisplay(nextEvent.startTime)} - {formatTimeDisplay(nextEvent.endTime)}
+                  {formatEventTime(nextEvent.startTime, nextEvent.endTime)}
                 </span>
               </div>
               
               {nextEvent.location && (
                 <div className="event-location">
                   <FaMapMarkerAlt className="event-icon" />
-                  <span>{nextEvent.location}</span>
+                  <span>{getEventLocation(nextEvent)}</span>
                 </div>
               )}
               
-              {nextEvent.onlineLink && (
-                <a href={nextEvent.onlineLink} className="event-link">
+              {getEventLink(nextEvent) && (
+                <a 
+                  href={getEventLink(nextEvent)} 
+                  className="event-link"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   <FaLink className="event-icon" />
-                  <span>{nextEvent.onlineLink}</span>
+                  <span>{getEventLink(nextEvent)}</span>
                 </a>
               )}
 
