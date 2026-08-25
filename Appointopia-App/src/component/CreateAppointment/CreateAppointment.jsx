@@ -1,3 +1,4 @@
+// src/component/CreateAppointment/CreateAppointment.jsx
 import { useState } from "react";
 
 import {
@@ -61,14 +62,11 @@ export default function CreateAppointment({ onClose, onSave }) {
   ];
 
   const handleChange = (e) => {
-
     const { name, value } = e.target;
-
     setFormData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
   };
 
   // ✅ Copy link handler with toast
@@ -106,19 +104,15 @@ export default function CreateAppointment({ onClose, onSave }) {
   });
 
   const handleScheduleChange = (e) => {
-
     const { name, value } = e.target;
-
     setScheduleData((prev) => ({
       ...prev,
       [name]: value,
     }));
-
   };
 
   // Add a new time slot to a day (also enables the day if it was off)
   const addSlot = (day) => {
-
     setAvailability((prev) => ({
       ...prev,
       [day]: {
@@ -129,18 +123,14 @@ export default function CreateAppointment({ onClose, onSave }) {
         ],
       },
     }));
-
   };
 
   // Remove a time slot; if it was the last one, mark the day unavailable
   const removeSlot = (day, index) => {
-
     setAvailability((prev) => {
-
       const nextSlots = prev[day].slots.filter(
         (_, i) => i !== index
       );
-
       return {
         ...prev,
         [day]: {
@@ -148,14 +138,11 @@ export default function CreateAppointment({ onClose, onSave }) {
           slots: nextSlots,
         },
       };
-
     });
-
   };
 
   // Update start/end value of a specific slot
   const updateSlot = (day, index, field, value) => {
-
     setAvailability((prev) => ({
       ...prev,
       [day]: {
@@ -165,7 +152,6 @@ export default function CreateAppointment({ onClose, onSave }) {
         ),
       },
     }));
-
   };
 
   /* =========================================
@@ -173,14 +159,11 @@ export default function CreateAppointment({ onClose, onSave }) {
   ========================================= */
 
   const handleNext = () => {
-
     console.log("Appointment Data:", {
       ...formData,
       color: selectedColor,
     });
-
     setStep(2);
-
   };
 
   const handleBack = () => {
@@ -202,53 +185,64 @@ export default function CreateAppointment({ onClose, onSave }) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-      const handleShare = () => {
-        // ✅ Get current time for start time
-        const now = new Date();
-        const startHour = now.getHours() + 1;
-        const startMin = now.getMinutes();
-        const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-        
-        // ✅ Parse duration
-        const durationMatch = scheduleData.duration?.match(/(\d+)/);
-        const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
-        
-        // ✅ Calculate end time
-        const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
-        const endHour = Math.floor(endTotalMinutes / 60);
-        const endMin = endTotalMinutes % 60;
-        const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-      
-        // ✅ Get LOCAL date (not UTC)
-        const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        const localDateStr = `${year}-${month}-${day}`;
-      
-        // Build the appointment object
-        const newAppointment = {
-          id: Date.now(),
-          title: formData.eventName,
-          location: formData.location,
-          onlineLink: formData.onlineLink,
-          duration: scheduleData.duration,
-          bookings: "0 bookings",
-          bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
-          color: selectedColor,
-          startTime: startTime,
-          endTime: endTime,
-          date: localDateStr // ✅ Use LOCAL date
-        };
-      
-        // Call onSave with the new appointment and target month
-        if (onSave) {
-          onSave(newAppointment, scheduleData.targetMonth);
-        }
-      
-        // Close the modal
-        onClose();
-      };
+  // =========================================
+  // ✅ FIXED: handleShare with Firebase support
+  // =========================================
+  const handleShare = () => {
+    // ✅ Get current time for start time
+    const now = new Date();
+    const startHour = now.getHours() + 1;
+    const startMin = now.getMinutes();
+    const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+    
+    // ✅ Parse duration
+    const durationMatch = scheduleData.duration?.match(/(\d+)/);
+    const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+    
+    // ✅ Calculate end time
+    const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
+    const endHour = Math.floor(endTotalMinutes / 60);
+    const endMin = endTotalMinutes % 60;
+    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+    
+    // ✅ Get LOCAL date (not UTC)
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const localDateStr = `${year}-${month}-${day}`;
+    
+    // ✅ Get current user
+    const userStr = localStorage.getItem("currentUser");
+    const user = userStr ? JSON.parse(userStr) : null;
+    
+    // ✅ Build the appointment object (without id — Firebase will generate)
+    const newAppointment = {
+      title: formData.eventName,
+      location: formData.location,
+      onlineLink: formData.onlineLink,
+      duration: scheduleData.duration,
+      bookings: "0 bookings",
+      bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
+      color: selectedColor,
+      startTime: startTime,
+      endTime: endTime,
+      date: localDateStr,
+      // ✅ Firebase fields
+      organizerEmail: user?.email || "unknown",
+      organizerName: user?.email?.split('@')[0] || "User",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    
+    // ✅ Call onSave with the new appointment and target month
+    if (onSave) {
+      onSave(newAppointment, scheduleData.targetMonth);
+    }
+    
+    // ✅ Close the modal
+    onClose();
+  };
 
   const selectedColorHex = colors.find(
     (c) => c.id === selectedColor
@@ -374,7 +368,7 @@ export default function CreateAppointment({ onClose, onSave }) {
 
                     <FaRegCopy
                       className="copy-link-icon"
-                      onClick={() => handleCopyLink(formData.onlineLink)} // ✅ Updated
+                      onClick={() => handleCopyLink(formData.onlineLink)}
                     />
 
                   </div>
@@ -809,14 +803,13 @@ export default function CreateAppointment({ onClose, onSave }) {
               </div>
 
 
-              {/* ✅ ADD WORKFLOW - CLICKABLE */}
+              {/* ADD WORKFLOW */}
 
               <button
                 type="button"
                 className="add-workflow-box"
                 onClick={() => {
                   console.log("Add Workflow clicked!");
-                  // TODO: Open workflow modal or navigate
                   alert("Add Workflow feature coming soon!");
                 }}
               >
@@ -841,7 +834,7 @@ export default function CreateAppointment({ onClose, onSave }) {
           ) : (
 
             /* =========================================
-               STEP 3 — REVIEW INFORMATION (Updated Design)
+               STEP 3 — REVIEW INFORMATION
             ========================================= */
 
             <div className="review-step">
@@ -1104,7 +1097,7 @@ export default function CreateAppointment({ onClose, onSave }) {
 
       </aside>
 
-      {/* ✅ COPY TOAST */}
+      {/* COPY TOAST */}
       {copyToast && (
         <div className="copy-toast">
           Link copied to clipboard! ✓
