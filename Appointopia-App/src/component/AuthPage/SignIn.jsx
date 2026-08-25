@@ -1,8 +1,8 @@
+// src/component/AuthPage/SignIn.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signIn } from "../../services/authService";
 
-import google from "../../assets/images/google.png";
-import facebook from "../../assets/images/facebook.png";
 import logo from "../../assets/images/logo.png";
 
 import "./auth.css";
@@ -10,232 +10,198 @@ import "./auth.css";
 export default function SignIn() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
 
-  const [error, setError] = useState("");
-
+  const [errors, setErrors] = useState({});
   const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email.trim())) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError("");
+    setErrors({});
     setSuccessMessage("");
+    setLoading(true);
 
-    const trimmedEmail = email.trim().toLowerCase();
-
-    // Email validation
-    if (!trimmedEmail) {
-      setError("Email is required");
+    if (!validateForm()) {
+      setLoading(false);
       return;
     }
 
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(trimmedEmail)) {
-      setError("Enter a valid email address");
-      return;
+    try {
+      // ✅ Firebase Sign In
+      const user = await signIn(
+        formData.email.trim().toLowerCase(),
+        formData.password
+      );
+
+      // ✅ Save user to localStorage for app state
+      const userData = {
+        uid: user.uid,
+        email: user.email,
+        name: user.displayName || user.email?.split('@')[0] || "User",
+      };
+      localStorage.setItem("currentUser", JSON.stringify(userData));
+
+      setSuccessMessage("Login successful!");
+      setFormData({ email: "", password: "" });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 800);
+    } catch (error) {
+      // ✅ Handle Firebase errors
+      let errorMessage = "Something went wrong. Please try again.";
+      switch (error.code) {
+        case "auth/user-not-found":
+          errorMessage = "No account found with this email. Please sign up first.";
+          break;
+        case "auth/wrong-password":
+          errorMessage = "Incorrect password. Please try again.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        case "auth/too-many-requests":
+          errorMessage = "Too many failed attempts. Please try again later.";
+          break;
+        default:
+          errorMessage = error.message || "Something went wrong. Please try again.";
+      }
+      setErrors({ email: errorMessage });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    // Get users
-    const users =
-      JSON.parse(localStorage.getItem("users")) || [];
-
-    // Find user
-    const user = users.find(
-      (user) => user.email === trimmedEmail
-    );
-
-    // User doesn't exist
-    if (!user) {
-      setError("Account not found. Please sign up first.");
-      return;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-
-    // Save current user
-    localStorage.setItem(
-      "currentUser",
-      JSON.stringify(user)
-    );
-
-    setSuccessMessage("Login successful!");
-
-    setEmail("");
-
-    // Go to home
-    setTimeout(() => {
-      navigate("/");
-    }, 800);
   };
 
   return (
     <div className="auth-page">
-
       {/* Logo */}
       <div className="auth-logo">
-        
-        <Link to="/"className="logo-link">
-        <div className="auth-logo-icon">
-          <img
-            src={logo}
-            alt="Appointopia"
-          />
-        </div>
-
-        <h2>Appointopia</h2>
+        <Link to="/" className="logo-link">
+          <div className="auth-logo-icon">
+            <img src={logo} alt="Appointopia" />
+          </div>
+          <h2>Appointopia</h2>
         </Link>
-
-       
-
       </div>
 
-
-      {/* Shapes */}
       <div className="auth-top-right-shape"></div>
       <div className="auth-bottom-left-shape"></div>
 
-
-      {/* Left Section */}
       <div className="auth-left">
-
         <div className="auth-card">
-
           <h1>Welcome Back</h1>
-
           <p className="auth-description">
             Sign in to your Appointopia account
           </p>
 
-
-          <form
-            className="auth-form"
-            onSubmit={handleSubmit}
-          >
-
+          <form className="auth-form" onSubmit={handleSubmit}>
             {/* Email */}
-            <label>
-              Enter your email
-            </label>
-
-            <input
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-                setSuccessMessage("");
-              }}
-              className={error ? "input-error" : ""}
-            />
-
-            {error && (
-              <span className="error-message">
-                {error}
-              </span>
-            )}
-
-            {successMessage && (
-              <p className="success-message">
-                {successMessage}
-              </p>
-            )}
-
-
-            {/* Sign In */}
-            <button
-              type="submit"
-              className="auth-main-btn"
-            >
-              Sign In
-            </button>
-
-
-            {/* OR */}
-            <div className="auth-or-divider">
-              <span>OR</span>
+            <div className="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                className={errors.email ? "input-error" : ""}
+                disabled={loading}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
+            {/* Password */}
+            <div className="form-group">
+              <label>Password</label>
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={errors.password ? "input-error" : ""}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.password && <span className="error-message">{errors.password}</span>}
+            </div>
 
-            {/* Google */}
-            <button
-              type="button"
-              className="auth-social-btn auth-google-btn"
-            >
-              <img
-                src={google}
-                alt="Google"
-              />
+            {/* Forgot Password */}
+            <div className="forgot-password">
+              <span>Forgot password?</span>
+            </div>
 
-              <span>
-                Sign in with Google
-              </span>
+            {successMessage && <p className="success-message">{successMessage}</p>}
 
+            <button type="submit" className="auth-main-btn" disabled={loading}>
+              {loading ? "Signing In..." : "Sign In"}
             </button>
-
-
-            {/* Facebook */}
-            <button
-              type="button"
-              className="auth-social-btn auth-facebook-btn"
-            >
-              <img
-                src={facebook}
-                alt="Facebook"
-              />
-
-              <span>
-                Sign in with Facebook
-              </span>
-
-            </button>
-
           </form>
 
-
-          {/* Sign Up */}
           <p className="auth-bottom-text">
-
             Don't have an account?{" "}
-
-            <Link
-              to="/signup"
-              className="auth-link"
-            >
+            <Link to="/signup" className="auth-link">
               Sign up
             </Link>
-
           </p>
-
         </div>
-
       </div>
 
-
-      {/* Right Section */}
       <div className="auth-right">
-
         <div className="auth-quote">
-
-          <span className="auth-quote-mark">
-            “
-          </span>
-
+          <span className="auth-quote-mark">“</span>
           <p>
             Welcome back to{" "}
-            <span className="auth-highlight">
-              effortlessly
-            </span>{" "}
+            <span className="auth-highlight">effortlessly</span>{" "}
             organize your schedule, manage events,
             and stay on top of your busy life.
           </p>
-
-          <span className="auth-quote-mark">
-            ”
-          </span>
-
+          <span className="auth-quote-mark">”</span>
         </div>
-
       </div>
-
     </div>
   );
 }

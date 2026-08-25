@@ -1,8 +1,8 @@
+// src/component/AuthPage/SignUp.jsx
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signUp } from "../../services/authService";
 
-import google from "../../assets/images/google.png";
-import facebook from "../../assets/images/facebook.png";
 import logo from "../../assets/images/logo.png";
 
 import "./auth.css";
@@ -10,53 +10,122 @@ import "./auth.css";
 export default function SignUp() {
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
 
-  const handleSubmit = (e) => {
+  const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = "Full name is required";
+    } else if (formData.name.trim().length < 2) {
+      newErrors.name = "Name must be at least 2 characters";
+    }
+
+    // Email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!emailRegex.test(formData.email.trim())) {
+      newErrors.email = "Enter a valid email address";
+    }
+
+    // Password validation
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Password must be at least 6 characters";
+    } else if (!/[A-Z]/.test(formData.password)) {
+      newErrors.password = "Password must contain at least one uppercase letter";
+    } else if (!/[a-z]/.test(formData.password)) {
+      newErrors.password = "Password must contain at least one lowercase letter";
+    } else if (!/[0-9]/.test(formData.password)) {
+      newErrors.password = "Password must contain at least one number";
+    }
+
+    // ✅ Confirm password validation REMOVED
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setError("");
+    setErrors({});
     setSuccessMessage("");
+    setLoading(true);
 
-    const trimmedEmail = email.trim().toLowerCase();
-
-    if (!trimmedEmail) {
-      setError("Email is required");
+    if (!validateForm()) {
+      setLoading(false);
       return;
     }
 
-    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/.test(trimmedEmail)) {
-      setError("Enter a valid email address");
-      return;
+    try {
+      // ✅ Firebase Sign Up
+      const user = await signUp(
+        formData.email.trim().toLowerCase(),
+        formData.password,
+        formData.name.trim()
+      );
+
+      // ✅ Save user to localStorage for app state
+      const userData = {
+        uid: user.uid,
+        name: formData.name.trim(),
+        email: formData.email.trim().toLowerCase(),
+      };
+      localStorage.setItem("currentUser", JSON.stringify(userData));
+
+      window.dispatchEvent(new Event("userLoggedIn"));
+
+      setSuccessMessage("Account created successfully!");
+      setFormData({
+        name: "",
+        email: "",
+        password: "",
+      });
+
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error) {
+      // ✅ Handle Firebase errors
+      let errorMessage = "Something went wrong. Please try again.";
+      switch (error.code) {
+        case "auth/email-already-in-use":
+          errorMessage = "This email is already registered. Please sign in.";
+          break;
+        case "auth/invalid-email":
+          errorMessage = "Invalid email address.";
+          break;
+        case "auth/weak-password":
+          errorMessage = "Password is too weak. Use at least 6 characters.";
+          break;
+        default:
+          errorMessage = error.message || "Something went wrong. Please try again.";
+      }
+      setErrors({ email: errorMessage });
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const userExists = users.some((user) => user.email === trimmedEmail);
-
-    if (userExists) {
-      setError("Account already exists with this email");
-      return;
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
-
-    const newUser = {
-      id: Date.now().toString(),
-      email: trimmedEmail,
-    };
-
-    localStorage.setItem("users", JSON.stringify([...users, newUser]));
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-
-    // ✅ Dispatch event so GetStarted updates
-    window.dispatchEvent(new Event("userLoggedIn"));
-
-    setSuccessMessage("Account created successfully!");
-    setEmail("");
-
-    setTimeout(() => {
-      navigate("/");
-    }, 800);
   };
 
   return (
@@ -76,44 +145,71 @@ export default function SignUp() {
 
       <div className="auth-left">
         <div className="auth-card">
-          <h1>Welcome</h1>
+          <h1>Create Account</h1>
           <p className="auth-description">
-            Create an account on Appointopia for free
+            Join Appointopia to manage your schedule effortlessly
           </p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
-            <label>Enter your email to get started</label>
-            <input
-              type="email"
-              placeholder="Enter email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError("");
-                setSuccessMessage("");
-              }}
-              className={error ? "input-error" : ""}
-            />
-
-            {error && <span className="error-message">{error}</span>}
-            {successMessage && <p className="success-message">{successMessage}</p>}
-
-            <button type="submit" className="auth-main-btn">
-              Sign Up
-            </button>
-
-            <div className="auth-or-divider">
-              <span>OR</span>
+            {/* Name */}
+            <div className="form-group">
+              <label>Full Name</label>
+              <input
+                type="text"
+                name="name"
+                placeholder="Enter your full name"
+                value={formData.name}
+                onChange={handleChange}
+                className={errors.name ? "input-error" : ""}
+                disabled={loading}
+              />
+              {errors.name && <span className="error-message">{errors.name}</span>}
             </div>
 
-            <button type="button" className="auth-social-btn auth-google-btn">
-              <img src={google} alt="Google" />
-              <span>Sign up with Google</span>
-            </button>
+            {/* Email */}
+            <div className="form-group">
+              <label>Email Address</label>
+              <input
+                type="email"
+                name="email"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                className={errors.email ? "input-error" : ""}
+                disabled={loading}
+              />
+              {errors.email && <span className="error-message">{errors.email}</span>}
+            </div>
 
-            <button type="button" className="auth-social-btn auth-facebook-btn">
-              <img src={facebook} alt="Facebook" />
-              <span>Sign up with Facebook</span>
+            {/* Password */}
+            <div className="form-group">
+              <label>Password</label>
+              <div className="password-wrapper">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="Create a password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  className={errors.password ? "input-error" : ""}
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  className="password-toggle"
+                  onClick={() => setShowPassword(!showPassword)}
+                  disabled={loading}
+                >
+                  {showPassword ? "Hide" : "Show"}
+                </button>
+              </div>
+              {errors.password && <span className="error-message">{errors.password}</span>}
+            </div>
+
+            {successMessage && <p className="success-message">{successMessage}</p>}
+
+            <button type="submit" className="auth-main-btn" disabled={loading}>
+              {loading ? "Creating Account..." : "Sign Up"}
             </button>
           </form>
 
