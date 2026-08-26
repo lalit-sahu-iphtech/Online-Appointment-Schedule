@@ -18,6 +18,9 @@ import {
   FaSignOutAlt,
   FaTrash,
   FaClock,
+  FaEdit,
+  FaSave,
+  FaTimes,
 } from "react-icons/fa";
 
 // ✅ Firebase Services
@@ -42,28 +45,12 @@ import { useNotificationsContext } from "../../context/NotificationContext";
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-// ✅ Month name mapping
-const MONTH_NAME_MAP = {
-    "JAN": "January",
-    "FEB": "February",
-    "MARCH": "March",
-    "APRIL": "April",
-    "MAY": "May",
-    "JUNE": "June",
-    "JULY": "July",
-    "AUG": "August",
-    "SEP": "September",
-    "OCT": "October",
-    "NOV": "November",
-    "DEC": "December"
-};
-
 export default function AppointmentSchedule() {
 
   const navigate = useNavigate();
   const location = useLocation();
   
-  // ===== ALL STATE HOOKS (Top par) =====
+  // ===== ALL STATE HOOKS =====
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
@@ -77,9 +64,23 @@ export default function AppointmentSchedule() {
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [activePanel, setActivePanel] = useState(null);
-  
-  // Week view state
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
+
+  // ✅ Week view expanded events state
+  const [expandedWeekEvents, setExpandedWeekEvents] = useState({});
+
+  // ✅ Edit mode state
+  const [editingEvent, setEditingEvent] = useState(null);
+  const [editFormData, setEditFormData] = useState({
+    title: "",
+    location: "",
+    startTime: "",
+    endTime: "",
+    duration: "",
+    color: "purple",
+    bookings: 0,
+    bookingPage: ""
+  });
 
   // Initialize expanded months
   const [expandedMonths, setExpandedMonths] = useState({});
@@ -87,7 +88,7 @@ export default function AppointmentSchedule() {
   // Get notification context
   const { addNotifications } = useNotificationsContext();
 
-  // ===== ALL EFFECTS (Top par) =====
+  // ===== ALL EFFECTS =====
   
   // Toggle panels
   const togglePanel = (panel) => {
@@ -134,18 +135,35 @@ export default function AppointmentSchedule() {
     try {
       setLoading(true);
       const data = await getAppointments();
+      console.log("📥 Appointments loaded from Firebase:", data.length);
       
-      // ✅ Group appointments by month
+      if (data.length === 0) {
+        console.log("📭 No appointments found");
+        setAppointments([]);
+        setLoading(false);
+        return;
+      }
+
+      const formattedData = data.map(item => ({
+        ...item,
+        id: item.id,
+        date: item.date || new Date().toISOString().split('T')[0],
+        startTime: item.startTime || "09:00",
+        endTime: item.endTime || "10:00",
+        title: item.title || item.meetingName || "Untitled",
+        duration: item.duration || "30 min",
+        location: item.location || "",
+        bookings: item.bookings || 0,
+        color: item.color || "purple",
+        bookingPage: item.bookingPage || "",
+        month: item.targetMonth || new Date(item.date).toLocaleString('default', { month: 'long' }).toUpperCase()
+      }));
+      
+      console.log("📊 Formatted appointments:", formattedData.length);
+      
       const monthsMap = {};
-      data.forEach(apt => {
-        // ✅ Use the stored month if available, otherwise detect from date
-        let monthKey = apt.targetMonth || apt.month;
-        if (!monthKey) {
-          // Fallback: detect from date
-          const dateObj = new Date(apt.date);
-          monthKey = MONTHS[dateObj.getMonth()];
-        }
-        
+      formattedData.forEach(apt => {
+        const monthKey = apt.month || new Date(apt.date).toLocaleString('default', { month: 'long' }).toUpperCase();
         if (!monthsMap[monthKey]) {
           monthsMap[monthKey] = { month: monthKey, appointments: [] };
         }
@@ -153,12 +171,12 @@ export default function AppointmentSchedule() {
       });
       
       const groupedAppointments = Object.values(monthsMap);
+      console.log("📊 Grouped months:", groupedAppointments.map(m => m.month));
       setAppointments(groupedAppointments);
       
-      // ✅ Update expanded months
       const state = {};
       groupedAppointments.forEach(month => {
-        state[month.month] = month.appointments.length > 0;
+        state[month.month] = true;
       });
       setExpandedMonths(state);
     } catch (error) {
@@ -169,18 +187,79 @@ export default function AppointmentSchedule() {
     }
   };
 
-  // ===== ✅ CRUD OPERATIONS =====
+  // ===== ✅ TOGGLE WEEK EVENTS =====
+  const toggleWeekEvents = (dateStr) => {
+    setExpandedWeekEvents(prev => ({
+      ...prev,
+      [dateStr]: !prev[dateStr]
+    }));
+  };
 
-  // ✅ Add appointment — FIXED: targetMonth properly handled
+  // ===== ✅ EDIT FUNCTIONS =====
+  const startEditing = (appointment) => {
+    setEditingEvent(appointment.id);
+    setEditFormData({
+      title: appointment.title || "",
+      location: appointment.location || "",
+      startTime: appointment.startTime || "09:00",
+      endTime: appointment.endTime || "10:00",
+      duration: appointment.duration || "30 min",
+      color: appointment.color || "purple",
+      bookings: appointment.bookings || 0,
+      bookingPage: appointment.bookingPage || ""
+    });
+  };
+
+  const cancelEditing = () => {
+    setEditingEvent(null);
+    setEditFormData({
+      title: "",
+      location: "",
+      startTime: "",
+      endTime: "",
+      duration: "",
+      color: "purple",
+      bookings: 0,
+      bookingPage: ""
+    });
+  };
+
+  const saveEdit = async (appointmentId) => {
+    try {
+      const updatedData = {
+        title: editFormData.title,
+        location: editFormData.location,
+        startTime: editFormData.startTime,
+        endTime: editFormData.endTime,
+        duration: editFormData.duration,
+        color: editFormData.color,
+        bookings: editFormData.bookings,
+        bookingPage: editFormData.bookingPage,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await firebaseUpdateAppointment(appointmentId, updatedData);
+      await loadAppointments();
+      cancelEditing();
+      console.log("✅ Appointment updated successfully!");
+    } catch (error) {
+      console.error("❌ Error updating appointment:", error);
+      alert("Failed to update appointment. Please try again.");
+    }
+  };
+
+  // ===== ✅ CRUD OPERATIONS =====
   const handleAddAppointment = async (newAppointment, targetMonth) => {
     try {
+      console.log("📝 Adding appointment:", newAppointment, "to month:", targetMonth);
+      
       const userStr = localStorage.getItem("currentUser");
       const user = userStr ? JSON.parse(userStr) : null;
 
-      // ✅ Store targetMonth in appointment
       const appointmentWithDate = {
         ...newAppointment,
-        targetMonth: targetMonth, // ✅ Store the selected month
+        targetMonth: targetMonth,
+        month: targetMonth,
         organizerEmail: user?.email || "unknown",
         organizerName: user?.email?.split('@')[0] || "User",
         date: newAppointment.date || new Date().toISOString().split('T')[0],
@@ -189,23 +268,26 @@ export default function AppointmentSchedule() {
       };
 
       await firebaseAddAppointment(appointmentWithDate);
+      console.log("✅ Appointment saved to Firebase, reloading...");
       await loadAppointments();
     } catch (error) {
       console.error("❌ Error adding appointment:", error);
     }
   };
 
-  // ✅ Update appointment
   const handleUpdateAppointment = async (id, data) => {
     try {
-      await firebaseUpdateAppointment(id, data);
+      console.log("✏️ Updating appointment:", id, data);
+      await firebaseUpdateAppointment(id, {
+        ...data,
+        updatedAt: new Date().toISOString()
+      });
       await loadAppointments();
     } catch (error) {
       console.error("❌ Error updating appointment:", error);
     }
   };
 
-  // ✅ Delete appointment
   const handleDeleteAppointment = async (id) => {
     try {
       await firebaseDeleteAppointment(id);
@@ -215,8 +297,7 @@ export default function AppointmentSchedule() {
     }
   };
 
-  // ===== HOOKS THAT MUST BE BEFORE CONDITIONAL RETURNS =====
-  // Get all appointments for notifications
+  // ===== HOOKS =====
   const getAllAppointments = useMemo(() => {
     const all = [];
     appointments.forEach(monthData => {
@@ -230,7 +311,6 @@ export default function AppointmentSchedule() {
     return all;
   }, [appointments]);
 
-  // ✅ useNotifications hook - stable reference
   const allAppointments = getAllAppointments;
   const {
     notifications: upcomingNotifications,
@@ -238,7 +318,6 @@ export default function AppointmentSchedule() {
     getLabel,
   } = useNotifications(allAppointments, 60);
 
-  // ✅ Add schedule notifications to global context
   useEffect(() => {
     const formattedNotifications = upcomingNotifications.map(n => ({
       id: n.id,
@@ -252,7 +331,7 @@ export default function AppointmentSchedule() {
     addNotifications("schedule", formattedNotifications);
   }, [upcomingNotifications, addNotifications]);
 
-  // ===== CONDITIONAL RETURNS (hooks ke BAAD) =====
+  // ===== CONDITIONAL RETURNS =====
   if (checkingAuth) {
     return null;
   }
@@ -261,9 +340,7 @@ export default function AppointmentSchedule() {
     return <div className="appointment-layout">Loading appointments...</div>;
   }
 
-  // ===== REST OF THE FUNCTIONS =====
-
-  // Profile actions
+  // ===== FUNCTIONS =====
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
@@ -285,12 +362,10 @@ export default function AppointmentSchedule() {
     }));
   };
 
-  // Month view navigation
   const previousYear = () => setCurrentYear(y => y - 1);
   const nextYear = () => setCurrentYear(y => y + 1);
   const goToThisMonth = () => setCurrentYear(new Date().getFullYear());
 
-  // Week view navigation
   const goToPreviousWeek = () => {
     const newDate = new Date(currentWeekStart);
     newDate.setDate(newDate.getDate() - 7);
@@ -307,7 +382,6 @@ export default function AppointmentSchedule() {
     setCurrentWeekStart(new Date());
   };
 
-  // Get week range text
   const getWeekRangeText = () => {
     const weekDays = getWeekDates(currentWeekStart);
     const start = weekDays[0];
@@ -322,7 +396,6 @@ export default function AppointmentSchedule() {
     return `${startMonth} ${start.getDate()} - ${endMonth} ${end.getDate()}, ${year}`;
   };
 
-  // Get week dates
   const getWeekDates = (startDate) => {
     const today = new Date(startDate);
     const currentDay = today.getDay();
@@ -340,7 +413,6 @@ export default function AppointmentSchedule() {
     return week;
   };
 
-  // Get appointments for a specific date
   const getAppointmentsForDate = (date) => {
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -351,11 +423,10 @@ export default function AppointmentSchedule() {
     return allAppointments.filter(apt => apt.date === dateStr);
   };
 
-  // Get event position
   const getEventPosition = (startTime, endTime) => {
     const [startHour, startMinute] = startTime ? startTime.split(":").map(Number) : [9, 0];
     const [endHour, endMinute] = endTime ? endTime.split(":").map(Number) : [10, 0];
-    const calendarStartHour = 7;
+    const calendarStartHour = 0;
     const startMinutes = (startHour - calendarStartHour) * 60 + startMinute;
     const endMinutes = (endHour - calendarStartHour) * 60 + endMinute;
     
@@ -363,11 +434,13 @@ export default function AppointmentSchedule() {
     const HEADER_HEIGHT = 40;
     
     const top = HEADER_HEIGHT + (startMinutes / 60) * SLOT_HEIGHT;
-    const height = ((endMinutes - startMinutes) / 60) * SLOT_HEIGHT;
+    const durationMinutes = endMinutes - startMinutes;
+    const height = (durationMinutes / 60) * SLOT_HEIGHT;
     
     return { 
       top, 
-      height: Math.max(height, 28)
+      height: Math.max(height, 32),
+      duration: durationMinutes
     };
   };
 
@@ -377,13 +450,13 @@ export default function AppointmentSchedule() {
   const today = new Date();
 
   const timeSlots = [];
-  for (let i = 7; i <= 23; i++) {
-    const hour = i > 12 ? i - 12 : i;
+  for (let i = 0; i < 24; i++) {
     const ampm = i >= 12 ? 'PM' : 'AM';
-    timeSlots.push(`${hour}:00 ${ampm}`);
+    const displayHour = i === 0 ? 12 : (i > 12 ? i - 12 : i);
+    timeSlots.push(`${displayHour}:00 ${ampm}`);
   }
 
-  // Month view - Ensure all months exist
+  // Month view
   const allMonths = MONTHS.map(month => {
     const existing = appointments.find(a => a.month === month);
     if (existing) return existing;
@@ -394,7 +467,6 @@ export default function AppointmentSchedule() {
     };
   });
 
-  // Filter appointments
   const filteredMonths = allMonths.map(month => {
     let filtered = month.appointments;
     
@@ -425,7 +497,6 @@ export default function AppointmentSchedule() {
     month.appointments.length > 0 || month.month === MONTHS[new Date().getMonth()]
   );
 
-  // ===== COMMENTS COUNT =====
   const getCommentsCount = () => {
     let count = 0;
     appointments.forEach(monthData => {
@@ -436,7 +507,6 @@ export default function AppointmentSchedule() {
     return count;
   };
 
-  // ===== SEARCH RESULTS =====
   const getSearchResults = () => {
     if (!search.trim()) return [];
     const results = [];
@@ -455,11 +525,236 @@ export default function AppointmentSchedule() {
 
   const searchResults = getSearchResults();
 
+  const colors = [
+    { name: 'purple', bg: '#8755d5', text: '#ffffff' },
+    { name: 'teal', bg: '#13a6ad', text: '#ffffff' },
+    { name: 'orange', bg: '#ff8100', text: '#ffffff' },
+    { name: 'blue', bg: '#2F80D7', text: '#ffffff' },
+    { name: 'pink', bg: '#E84C8A', text: '#ffffff' },
+    { name: 'green', bg: '#27AE60', text: '#ffffff' },
+    { name: 'red', bg: '#E74C3C', text: '#ffffff' },
+    { name: 'yellow', bg: '#F2C94C', text: '#1a1a1a' },
+    { name: 'indigo', bg: '#4A56E2', text: '#ffffff' },
+    { name: 'brown', bg: '#8B5E3C', text: '#ffffff' }
+  ];
+
+  // ✅ Render month edit form
+  const renderMonthEditForm = (appointment) => {
+    return (
+      <div className="month-edit-form" style={{
+        padding: '16px',
+        background: 'white',
+        borderRadius: '12px',
+        border: '2px solid #8555d5',
+        boxShadow: '0 4px 20px rgba(133, 85, 213, 0.15)',
+        width: '100%',
+        minHeight: '260px',
+        boxSizing: 'border-box'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+          <strong style={{ fontSize: '14px', color: '#1a1a1a' }}>Edit Appointment</strong>
+          <button 
+            onClick={cancelEditing} 
+            style={{ border: 'none', background: 'none', cursor: 'pointer', color: '#ef4444' }}
+          >
+            <FaTimes size={16} />
+          </button>
+        </div>
+        
+        <input
+          type="text"
+          value={editFormData.title}
+          onChange={(e) => setEditFormData({...editFormData, title: e.target.value})}
+          placeholder="Title"
+          style={{ 
+            width: '100%', 
+            padding: '8px 12px', 
+            marginBottom: '8px', 
+            border: '2px solid #3b82f6', 
+            borderRadius: '8px', 
+            fontSize: '13px',
+            boxSizing: 'border-box',
+            outline: 'none'
+          }}
+        />
+        
+        <input
+          type="text"
+          value={editFormData.location}
+          onChange={(e) => setEditFormData({...editFormData, location: e.target.value})}
+          placeholder="Location"
+          style={{ 
+            width: '100%', 
+            padding: '8px 12px', 
+            marginBottom: '8px', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '8px', 
+            fontSize: '13px',
+            boxSizing: 'border-box',
+            outline: 'none'
+          }}
+        />
+        
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+          <input
+            type="time"
+            value={editFormData.startTime}
+            onChange={(e) => setEditFormData({...editFormData, startTime: e.target.value})}
+            style={{ 
+              flex: 1, 
+              padding: '8px 12px', 
+              border: '1px solid #e5e7eb', 
+              borderRadius: '8px', 
+              fontSize: '13px',
+              outline: 'none'
+            }}
+          />
+          <input
+            type="time"
+            value={editFormData.endTime}
+            onChange={(e) => setEditFormData({...editFormData, endTime: e.target.value})}
+            style={{ 
+              flex: 1, 
+              padding: '8px 12px', 
+              border: '1px solid #e5e7eb', 
+              borderRadius: '8px', 
+              fontSize: '13px',
+              outline: 'none'
+            }}
+          />
+        </div>
+        
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '8px' }}>
+          <input
+            type="text"
+            value={editFormData.duration}
+            onChange={(e) => setEditFormData({...editFormData, duration: e.target.value})}
+            placeholder="Duration"
+            style={{ 
+              flex: 1, 
+              padding: '8px 12px', 
+              border: '1px solid #e5e7eb', 
+              borderRadius: '8px', 
+              fontSize: '13px',
+              outline: 'none'
+            }}
+          />
+          <input
+            type="number"
+            value={editFormData.bookings}
+            onChange={(e) => setEditFormData({...editFormData, bookings: parseInt(e.target.value) || 0})}
+            placeholder="Bookings"
+            style={{ 
+              width: '80px', 
+              padding: '8px 12px', 
+              border: '1px solid #e5e7eb', 
+              borderRadius: '8px', 
+              fontSize: '13px',
+              outline: 'none'
+            }}
+          />
+        </div>
+
+        <input
+          type="text"
+          value={editFormData.bookingPage}
+          onChange={(e) => setEditFormData({...editFormData, bookingPage: e.target.value})}
+          placeholder="Booking page URL"
+          style={{ 
+            width: '100%', 
+            padding: '8px 12px', 
+            marginBottom: '8px', 
+            border: '1px solid #e5e7eb', 
+            borderRadius: '8px', 
+            fontSize: '13px',
+            boxSizing: 'border-box',
+            outline: 'none'
+          }}
+        />
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginBottom: '12px' }}>
+          <span style={{ fontSize: '11px', color: '#6b7280', fontWeight: '500' }}>Color:</span>
+          {colors.map(color => (
+            <button
+              key={color.name}
+              onClick={() => setEditFormData({...editFormData, color: color.name})}
+              style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '50%',
+                border: editFormData.color === color.name ? '3px solid #1a1a1a' : '2px solid #e5e7eb',
+                background: color.bg,
+                cursor: 'pointer',
+                transition: 'all 0.2s ease',
+                boxShadow: editFormData.color === color.name ? '0 0 0 2px #8555d5' : 'none'
+              }}
+              title={color.name}
+            />
+          ))}
+        </div>
+        
+        <button
+          onClick={() => saveEdit(appointment.id)}
+          style={{
+            width: '100%',
+            padding: '10px',
+            background: '#8555d5',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontSize: '14px',
+            fontWeight: '600',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => e.target.style.background = '#7544c8'}
+          onMouseLeave={(e) => e.target.style.background = '#8555d5'}
+        >
+          <FaSave style={{ marginRight: '8px' }} /> Save Changes
+        </button>
+      </div>
+    );
+  };
+
+  // ✅ Get events with +X more
+  const getEventsWithMoreButton = (dayAppointments, dateStr, isExpanded) => {
+    const MAX_VISIBLE = 3;
+    const hasMore = dayAppointments.length > MAX_VISIBLE;
+    const visibleEvents = isExpanded ? dayAppointments : dayAppointments.slice(0, MAX_VISIBLE);
+    
+    // Sort events by start time
+    const sortedEvents = [...visibleEvents].sort((a, b) => {
+      return (a.startTime || "09:00").localeCompare(b.startTime || "09:00");
+    });
+    
+    // Group overlapping events
+    const groups = [];
+    sortedEvents.forEach(event => {
+      const eventStart = event.startTime || "09:00";
+      const eventEnd = event.endTime || "10:00";
+      
+      let placed = false;
+      for (let group of groups) {
+        const lastEvent = group[group.length - 1];
+        const lastEnd = lastEvent.endTime || "10:00";
+        if (eventStart >= lastEnd) {
+          group.push(event);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        groups.push([event]);
+      }
+    });
+    
+    return { groups, hasMore };
+  };
+
   return (
     <div className="appointment-layout">
       <section className="appointment-main">
         
-        {/* TOPBAR - No notifications props needed, reads from context */}
         <Topbar
           title="Appointment Schedule"
           createButtonLabel="Create"
@@ -478,7 +773,6 @@ export default function AppointmentSchedule() {
           onSettingsClick={handleSettingsClick}
         />
 
-        {/* SCHEDULE CONTAINER */}
         <div className="schedule-container">
           
           {/* Toolbar */}
@@ -565,7 +859,7 @@ export default function AppointmentSchedule() {
             </div>
           )}
 
-          {/* WEEK VIEW */}
+          {/* ✅ WEEK VIEW - PROPER +X MORE */}
           {view === "week" ? (
             <div className="week-view-container">
               <div className="week-header">
@@ -601,6 +895,14 @@ export default function AppointmentSchedule() {
                   const dayAppointments = getAppointmentsForDate(day);
                   const isToday = today.toDateString() === day.toDateString();
                   
+                  const year = day.getFullYear();
+                  const month = String(day.getMonth() + 1).padStart(2, '0');
+                  const dayNum = String(day.getDate()).padStart(2, '0');
+                  const dateStr = `${year}-${month}-${dayNum}`;
+                  
+                  const isExpanded = expandedWeekEvents[dateStr] || false;
+                  const { groups, hasMore } = getEventsWithMoreButton(dayAppointments, dateStr, isExpanded);
+                  
                   return (
                     <div key={dayIndex} className={`week-day-column ${isToday ? 'today-column' : ''}`}>
                       <div className="week-grid-lines">
@@ -609,39 +911,150 @@ export default function AppointmentSchedule() {
                         ))}
                       </div>
 
-                      {dayAppointments.map((appointment) => {
-                        const startTime = appointment.startTime || "09:00";
-                        const endTime = appointment.endTime || "10:00";
-                        const { top, height } = getEventPosition(startTime, endTime);
-                        const color = getEventColor(appointment.color || "purple");
+                      {/* ✅ Render events with proper positioning */}
+                      {groups.map((group, groupIndex) => {
+                        const groupSize = group.length;
+                        const widthPerEvent = groupSize > 1 ? 100 / groupSize : 100;
                         
-                        return (
-                          <div
-                            key={appointment.id}
-                            className="week-event-item"
-                            style={{
-                              top: `${top}px`,
-                              height: `${height}px`,
-                              background: color.bg,
-                              color: color.text,
-                            }}
-                          >
-                            <button
-                              className="week-event-delete"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                if (window.confirm(`Delete "${appointment.title}"?`)) {
-                                  handleDeleteAppointment(appointment.id);
-                                }
+                        return group.map((appointment, eventIndex) => {
+                          const startTime = appointment.startTime || "09:00";
+                          const endTime = appointment.endTime || "10:00";
+                          const { top, height } = getEventPosition(startTime, endTime);
+                          const color = getEventColor(appointment.color || "purple");
+                          
+                          const offset = groupSize > 1 ? (eventIndex * widthPerEvent) : 0;
+                          const width = groupSize > 1 ? widthPerEvent - 4 : 100;
+                          
+                          return (
+                            <div
+                              key={appointment.id}
+                              className="week-event-item"
+                              style={{
+                                top: `${top}px`,
+                                height: `${height}px`,
+                                left: `${4 + (offset * 0.96)}%`,
+                                width: `${width}%`,
+                                background: color.bg,
+                                color: color.text,
+                                zIndex: 10 + eventIndex,
+                                position: 'absolute',
+                                borderRadius: '6px',
+                                padding: '6px 8px',
+                                fontSize: '11px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                gap: '2px',
+                                overflow: 'hidden',
+                                cursor: 'default',
+                                minHeight: '30px',
+                                border: '1px solid rgba(255,255,255,0.2)',
                               }}
                             >
-                              <FaTrash />
-                            </button>
-                            <strong>{appointment.title}</strong>
-                            <span>{startTime} - {endTime}</span>
-                          </div>
-                        );
+                              <button
+                                className="week-event-delete"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (window.confirm(`Delete "${appointment.title}"?`)) {
+                                    handleDeleteAppointment(appointment.id);
+                                  }
+                                }}
+                              >
+                                <FaTrash />
+                              </button>
+                              <strong>{appointment.title}</strong>
+                              <span>
+                                <FaClock style={{ fontSize: '8px', marginRight: '2px' }} />
+                                {startTime} - {endTime}
+                              </span>
+                              {appointment.location && (
+                                <span style={{ fontSize: '8px', opacity: 0.8 }}>
+                                  📍 {appointment.location}
+                                </span>
+                              )}
+                            </div>
+                          );
+                        });
                       })}
+
+                      {/* ✅ +X More button - Proper position */}
+                      {hasMore && !isExpanded && (
+                        <div 
+                          className="week-show-more-btn"
+                          onClick={() => toggleWeekEvents(dateStr)}
+                          style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            padding: '4px 12px',
+                            background: 'rgba(133, 85, 213, 0.9)',
+                            color: 'white',
+                            borderRadius: '12px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            zIndex: 50,
+                            border: 'none',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            backdropFilter: 'blur(4px)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.transform = 'translateX(-50%) scale(1.05)';
+                            e.target.style.background = 'rgba(133, 85, 213, 1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.transform = 'translateX(-50%) scale(1)';
+                            e.target.style.background = 'rgba(133, 85, 213, 0.9)';
+                          }}
+                        >
+                          <FaChevronDown size={8} />
+                          <span>+{dayAppointments.length - 3} more</span>
+                        </div>
+                      )}
+
+                      {/* ✅ Show Less button */}
+                      {hasMore && isExpanded && (
+                        <div 
+                          className="week-show-more-btn show-less"
+                          onClick={() => toggleWeekEvents(dateStr)}
+                          style={{
+                            position: 'absolute',
+                            bottom: '8px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            padding: '4px 12px',
+                            background: 'rgba(239, 68, 68, 0.9)',
+                            color: 'white',
+                            borderRadius: '12px',
+                            fontSize: '10px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            zIndex: 50,
+                            border: 'none',
+                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                            transition: 'all 0.3s ease',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '4px',
+                            backdropFilter: 'blur(4px)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.target.style.transform = 'translateX(-50%) scale(1.05)';
+                            e.target.style.background = 'rgba(239, 68, 68, 1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.target.style.transform = 'translateX(-50%) scale(1)';
+                            e.target.style.background = 'rgba(239, 68, 68, 0.9)';
+                          }}
+                        >
+                          <FaChevronUp size={8} />
+                          <span>Show less</span>
+                        </div>
+                      )}
 
                       {dayAppointments.length === 0 && (
                         <div className="week-day-empty">
@@ -663,7 +1076,7 @@ export default function AppointmentSchedule() {
               </div>
             </div>
           ) : (
-            /* MONTH VIEW */
+            /* ✅ MONTH VIEW */
             <div className="months-container">
               {visibleMonths.map((month) => (
                 <div className="month-section" key={month.month}>
@@ -680,14 +1093,31 @@ export default function AppointmentSchedule() {
                   {expandedMonths[month.month] && (
                     <div className="appointment-grid">
                       {month.appointments.length > 0 ? (
-                        month.appointments.map((appointment) => (
-                          <AppointmentCard 
-                            key={appointment.id} 
-                            appointment={appointment}
-                            onDelete={handleDeleteAppointment}
-                            onUpdate={handleUpdateAppointment}
-                          />
-                        ))
+                        month.appointments.map((appointment) => {
+                          const isEditing = editingEvent === appointment.id;
+                          
+                          if (isEditing) {
+                            return (
+                              <div key={appointment.id} className="appointment-card edit-mode">
+                                <div className="appointment-card-content">
+                                  {renderMonthEditForm(appointment)}
+                                </div>
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <AppointmentCard 
+                              key={appointment.id} 
+                              appointment={appointment}
+                              onDelete={handleDeleteAppointment}
+                              onUpdate={(updatedData) => {
+                                handleUpdateAppointment(appointment.id, updatedData);
+                              }}
+                              onEdit={() => startEditing(appointment)}
+                            />
+                          );
+                        })
                       ) : (
                         <div className="no-events">
                           <p>No appointments for {month.month}</p>
@@ -714,6 +1144,7 @@ export default function AppointmentSchedule() {
         <CreateAppointment
           onClose={() => setShowCreate(false)}
           onSave={(newAppointment, targetMonth) => {
+            console.log("📝 CreateAppointment onSave called:", newAppointment, targetMonth);
             handleAddAppointment(newAppointment, targetMonth);
             setShowCreate(false);
             

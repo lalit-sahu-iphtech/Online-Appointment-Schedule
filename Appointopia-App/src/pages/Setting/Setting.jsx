@@ -9,6 +9,15 @@ import {
   FaTrashAlt,
   FaSignOutAlt,
 } from "react-icons/fa";
+import { auth, db } from "../../firebase/firebase";
+import {
+  signOut,
+  deleteUser,
+  reauthenticateWithCredential,
+  EmailAuthProvider,
+} from "firebase/auth";
+import { doc, deleteDoc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { onAuthStateChange } from "../../services/authService";
 import "./setting.css";
 
 const DEFAULT_SETTINGS = {
@@ -23,40 +32,51 @@ export default function Settings() {
 
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
   const [savedMessage, setSavedMessage] = useState("");
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  // Auth guard - same pattern as Calendar.jsx
+  // ✅ Auth guard with Firebase
   useEffect(() => {
-    const stored = localStorage.getItem("currentUser");
-    if (!stored) {
-      navigate("/signin");
-      return;
-    }
-    try {
-      setCurrentUser(JSON.parse(stored));
-    } catch (error) {
-      console.error("Invalid currentUser in storage:", error);
-      localStorage.removeItem("currentUser");
-      navigate("/signin");
-      return;
-    }
-    setCheckingAuth(false);
+    const unsubscribe = onAuthStateChange(async (user) => {
+      if (!user) {
+        navigate("/signin");
+        return;
+      }
+      setCurrentUser(user);
+      setCheckingAuth(false);
+      setLoading(false);
+    });
+    return () => unsubscribe();
   }, [navigate]);
 
-  // Saved preferences load karo
+  // ✅ Load settings from Firestore
   useEffect(() => {
-    const saved = localStorage.getItem("app_settings");
-    if (saved) {
+    const loadSettings = async () => {
+      if (!currentUser?.uid) return;
+      
       try {
-        setSettings({ ...DEFAULT_SETTINGS, ...JSON.parse(saved) });
+        const userRef = doc(db, "users", currentUser.uid);
+        const userSnap = await getDoc(userRef);
+        
+        if (userSnap.exists()) {
+          const userData = userSnap.data();
+          if (userData.settings) {
+            setSettings({ ...DEFAULT_SETTINGS, ...userData.settings });
+          }
+        }
       } catch (error) {
-        console.error("Invalid app_settings in storage:", error);
+        console.error("Error loading settings:", error);
       }
+    };
+
+    if (currentUser?.uid) {
+      loadSettings();
     }
-  }, []);
+  }, [currentUser]);
 
   const toggleSetting = (key) => {
     setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -66,32 +86,91 @@ export default function Settings() {
     setSettings((prev) => ({ ...prev, defaultView: view }));
   };
 
-  const handleSave = () => {
-    localStorage.setItem("app_settings", JSON.stringify(settings));
-    setSavedMessage("Settings saved!");
-    setTimeout(() => setSavedMessage(""), 2200);
+  // ✅ Save settings to Firestore
+  const handleSave = async () => {
+    if (!currentUser?.uid) return;
+
+    try {
+      const userRef = doc(db, "users", currentUser.uid);
+      await setDoc(userRef, {
+        settings: settings,
+        updatedAt: serverTimestamp(),
+      }, { merge: true });
+
+      // Also save to localStorage for quick access
+      localStorage.setItem("app_settings", JSON.stringify(settings));
+      
+      setSavedMessage("Settings saved successfully!");
+      setTimeout(() => setSavedMessage(""), 2200);
+    } catch (error) {
+      console.error("Error saving settings:", error);
+      setSavedMessage("Failed to save settings. Please try again.");
+      setTimeout(() => setSavedMessage(""), 2200);
+    }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem("currentUser");
-    navigate("/signin");
+  // ✅ Logout with Firebase
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("app_settings");
+      navigate("/signin");
+    } catch (error) {
+      console.error("Logout error:", error);
+      alert("Failed to logout. Please try again.");
+    }
   };
 
-  const handleDeleteAccount = () => {
+  // ✅ Delete account with Firebase
+  const handleDeleteAccount = async () => {
     if (!confirmDelete) {
       setConfirmDelete(true);
       return;
     }
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    const updatedUsers = users.filter((u) => u.id !== currentUser.id);
-    localStorage.setItem("users", JSON.stringify(updatedUsers));
-    localStorage.removeItem("currentUser");
-    localStorage.removeItem("calendar_meetings");
-    localStorage.removeItem("app_settings");
-    navigate("/signup");
+
+    if (!currentUser?.uid) {
+      alert("No user found");
+      return;
+    }
+
+    setIsDeleting(true);
+
+    try {
+      // ✅ Delete user data from Firestore
+      const userRef = doc(db, "users", currentUser.uid);
+      await deleteDoc(userRef);
+
+      // ✅ Delete user from Firebase Auth
+      const user = auth.currentUser;
+      if (user) {
+        await deleteUser(user);
+      }
+
+      // ✅ Clear localStorage
+      localStorage.removeItem("currentUser");
+      localStorage.removeItem("app_settings");
+      localStorage.removeItem("calendar_meetings");
+
+      navigate("/signup");
+    } catch (error) {
+      console.error("Delete account error:", error);
+      
+      // ✅ If user needs reauthentication
+      if (error.code === "auth/requires-recent-login") {
+        alert("For security, please sign out and sign in again before deleting your account.");
+      } else {
+        alert(`Failed to delete account: ${error.message || "Please try again."}`);
+      }
+    } finally {
+      setIsDeleting(false);
+      setConfirmDelete(false);
+    }
   };
 
-  if (checkingAuth) return null;
+  if (checkingAuth || loading) {
+    return <div className="settings-loading">Loading...</div>;
+  }
 
   return (
     <div className="settings-page">
@@ -220,16 +299,17 @@ export default function Settings() {
               <strong>Delete account</strong>
               <span>
                 {confirmDelete
-                  ? "Click again to permanently delete your account and meetings"
-                  : "This will permanently remove your account and all meetings"}
+                  ? "Click again to permanently delete your account and all data"
+                  : "This will permanently remove your account and all associated data"}
               </span>
             </div>
             <button
               type="button"
               className="settings-delete-btn"
               onClick={handleDeleteAccount}
+              disabled={isDeleting}
             >
-              {confirmDelete ? "Confirm Delete" : "Delete Account"}
+              {isDeleting ? "Deleting..." : confirmDelete ? "Confirm Delete" : "Delete Account"}
             </button>
           </div>
         </div>
