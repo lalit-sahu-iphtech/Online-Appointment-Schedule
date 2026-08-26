@@ -19,6 +19,22 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
+/* ✅ Edit mode - Card expands */
+.appointment-card.edit-mode {
+  height: auto;
+  min-height: 320px;
+  max-height: 480px;
+  border: 2px solid #8555d5;
+  box-shadow: 0 4px 20px rgba(133, 85, 213, 0.15);
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.appointment-card.edit-mode:hover {
+  transform: none;
+  box-shadow: 0 4px 20px rgba(133, 85, 213, 0.15);
+}
+
 /* Color Border Left */
 .appointment-card::before {
   content: "";
@@ -77,6 +93,14 @@
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
+}
+
+/* ✅ Edit mode content */
+.appointment-card.edit-mode .appointment-card-content {
+  height: auto;
+  min-height: 300px;
+  overflow-y: auto;
+  padding-bottom: 16px;
 }
 
 /* Title Row */
@@ -408,12 +432,99 @@
 }
 
 /* =========================================
+   ✅ COLOR PICKER STYLES
+========================================= */
+
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding: 4px 0;
+}
+
+.color-picker-label {
+  font-size: 11px;
+  color: #6b7280;
+  margin-right: 4px;
+  font-weight: 500;
+}
+
+.color-picker-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-picker-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.color-picker-btn.active {
+  border: 3px solid #1a1a1a;
+  box-shadow: 0 0 0 2px #8555d5, 0 2px 8px rgba(133, 85, 213, 0.3);
+  transform: scale(1.1);
+}
+
+/* =========================================
+   ✅ GRID STACKING FIX - Card hover effect
+========================================= */
+
+.appointment-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 23px;
+  margin-top: 7px;
+}
+
+/* ✅ Card stacking fix - All cards visible on hover */
+.appointment-grid .appointment-card {
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* ✅ Hover effect - Cards spread out */
+.appointment-grid:hover .appointment-card {
+  transform: translateX(0) !important;
+}
+
+/* ✅ Individual card hover - Slight lift */
+.appointment-grid .appointment-card:hover {
+  transform: translateY(-6px) scale(1.02);
+  z-index: 5;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+/* ✅ Edit mode card - Override hover */
+.appointment-grid .appointment-card.edit-mode:hover {
+  transform: none;
+  z-index: 10;
+}
+
+/* =========================================
    RESPONSIVE
 ========================================= */
+
+@media (max-width: 1100px) {
+  .appointment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
 
 @media (max-width: 768px) {
   .appointment-card {
     height: 175px;
+  }
+  
+  .appointment-card.edit-mode {
+    min-height: 340px;
+    max-height: 460px;
   }
   
   .appointment-card-content {
@@ -446,11 +557,38 @@
     height: 28px;
     padding: 2px 8px;
   }
+  
+  .color-picker-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .appointment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (max-width: 650px) {
+  .appointment-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  
+  .appointment-card.edit-mode {
+    min-height: 360px;
+    max-height: 500px;
+  }
 }
 
 @media (max-width: 500px) {
   .appointment-card {
     height: 165px;
+  }
+  
+  .appointment-card.edit-mode {
+    min-height: 380px;
+    max-height: 520px;
   }
   
   .appointment-card-content {
@@ -509,4 +647,40 @@
     height: 26px;
     padding: 2px 6px;
   }
+  
+  .color-picker-btn {
+    width: 22px;
+    height: 22px;
+  }
+  
+  .color-picker-container {
+    gap: 4px;
+  }
+}
+
+/* =========================================
+   SCROLLBAR STYLING
+========================================= */
+
+.appointment-card.edit-mode::-webkit-scrollbar {
+  width: 4px;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-thumb:hover {
+  background: #b8bbc1;
+}
+
+/* Firefox scrollbar */
+.appointment-card.edit-mode {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
 }

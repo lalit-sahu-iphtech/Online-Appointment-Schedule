@@ -410,6 +410,7 @@
 /* =========================================
  SCHEDULE CONTAINER
 ========================================= */
+
 .schedule-container {
   width: 100%;
   background: white;
@@ -422,12 +423,10 @@
   box-sizing: border-box;
   overflow-y: auto; 
   flex: 1; 
-  scrollbar-width : none;
-  -ms-overflow-style : none;
-
-  
- 
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
 .schedule-container::-webkit-scrollbar {
   width: 6px;
   display: none;
@@ -609,6 +608,7 @@
   margin-top: 10px;
   padding-bottom: 10px;
 }
+
 .month-section {
   background: #f7f8f9;
   border-radius: 11px;
@@ -664,6 +664,152 @@
   margin-top: 7px;
 }
 
+/* ✅ Card container with perspective for 3D effect */
+.appointment-grid .appointment-card {
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ✅ V-Shape pattern - Different cards move in different directions */
+.appointment-grid .appointment-card:nth-child(1) {
+  transform-origin: center bottom;
+}
+
+.appointment-grid .appointment-card:nth-child(2) {
+  transform-origin: center bottom;
+}
+
+.appointment-grid .appointment-card:nth-child(3) {
+  transform-origin: center bottom;
+}
+
+.appointment-grid .appointment-card:nth-child(4) {
+  transform-origin: center bottom;
+}
+
+.appointment-grid .appointment-card:nth-child(5) {
+  transform-origin: center bottom;
+}
+
+.appointment-grid .appointment-card:nth-child(6) {
+  transform-origin: center bottom;
+}
+
+/* ✅ Hover effect - Cards spread in V shape */
+.appointment-grid:hover .appointment-card {
+  transform: translateY(-4px);
+}
+
+/* ✅ Individual card hover - V shape movement */
+.appointment-grid .appointment-card:hover {
+  transform: translateY(-12px) scale(1.03);
+  z-index: 10;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ✅ Different positions for V shape */
+.appointment-grid .appointment-card:nth-child(1):hover {
+  transform: translate(-8px, -10px) scale(1.03) rotate(-1deg);
+}
+
+.appointment-grid .appointment-card:nth-child(2):hover {
+  transform: translate(0px, -12px) scale(1.03);
+}
+
+.appointment-grid .appointment-card:nth-child(3):hover {
+  transform: translate(8px, -10px) scale(1.03) rotate(1deg);
+}
+
+.appointment-grid .appointment-card:nth-child(4):hover {
+  transform: translate(-6px, -10px) scale(1.03) rotate(-0.5deg);
+}
+
+.appointment-grid .appointment-card:nth-child(5):hover {
+  transform: translate(0px, -12px) scale(1.03);
+}
+
+.appointment-grid .appointment-card:nth-child(6):hover {
+  transform: translate(6px, -10px) scale(1.03) rotate(0.5deg);
+}
+
+/* ✅ Continue pattern for more cards */
+.appointment-grid .appointment-card:nth-child(7):hover {
+  transform: translate(-4px, -10px) scale(1.03) rotate(-0.5deg);
+}
+
+.appointment-grid .appointment-card:nth-child(8):hover {
+  transform: translate(0px, -12px) scale(1.03);
+}
+
+.appointment-grid .appointment-card:nth-child(9):hover {
+  transform: translate(4px, -10px) scale(1.03) rotate(0.5deg);
+}
+
+/* ✅ Edit mode card - No V shape effect */
+.appointment-grid .appointment-card.edit-mode:hover {
+  transform: none !important;
+  z-index: 10;
+  box-shadow: 0 4px 20px rgba(133, 85, 213, 0.15);
+}
+
+/* ✅ Card hover - Smooth transition for all cards in grid */
+.appointment-grid:hover .appointment-card:not(:hover) {
+  transform: translateY(0px) scale(0.98);
+  opacity: 0.85;
+  filter: blur(0.5px);
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ✅ Reset for edit mode cards on grid hover */
+.appointment-grid:hover .appointment-card.edit-mode {
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+/* ✅ Responsive V shape */
+@media (max-width: 1100px) {
+  .appointment-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  
+  /* Adjust V shape for 2 columns */
+  .appointment-grid .appointment-card:nth-child(1):hover {
+    transform: translate(-6px, -10px) scale(1.03) rotate(-0.5deg);
+  }
+  
+  .appointment-grid .appointment-card:nth-child(2):hover {
+    transform: translate(6px, -10px) scale(1.03) rotate(0.5deg);
+  }
+  
+  .appointment-grid .appointment-card:nth-child(3):hover {
+    transform: translate(-6px, -10px) scale(1.03) rotate(-0.5deg);
+  }
+  
+  .appointment-grid .appointment-card:nth-child(4):hover {
+    transform: translate(6px, -10px) scale(1.03) rotate(0.5deg);
+  }
+}
+
+@media (max-width: 650px) {
+  .appointment-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  /* Disable V shape for single column */
+  .appointment-grid .appointment-card:hover {
+    transform: translateY(-6px) scale(1.02) !important;
+  }
+  
+  .appointment-grid:hover .appointment-card:not(:hover) {
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}
+
 /* =========================================
  NO EVENTS
 ========================================= */
@@ -692,43 +838,6 @@
 
 .no-events button:hover {
   background: #7544c8;
-}
-
-/* =========================================
- WEEK VIEW
-========================================= */
-
-.week-view {
-  min-height: 500px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.week-empty {
-  text-align: center;
-}
-
-.week-empty h2 {
-  margin: 0 0 8px;
-  font-size: 22px;
-}
-
-.week-empty p {
-  color: #888e99;
-  font-size: 13px;
-}
-
-.week-empty button {
-  border: none;
-  background: #8755d5;
-  color: white;
-  padding: 11px 18px;
-  border-radius: 8px;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
 }
 
 /* =========================================
@@ -883,11 +992,12 @@
   box-sizing: border-box;
 }
 
-/* Week Events */
+/* =========================================
+   WEEK EVENTS
+========================================= */
+
 .week-event-item {
   position: absolute;
-  left: 4px;
-  right: 4px;
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 11px;
@@ -895,13 +1005,16 @@
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
-  cursor: pointer;
-  z-index: 2;
+  cursor: default;
   min-height: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
 }
 
 .week-event-item:hover {
-  opacity: 0.9;
+  z-index: 20 !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .week-event-item strong {
@@ -917,6 +1030,7 @@
   opacity: 0.9;
 }
 
+/* ✅ Week Event Delete Button */
 .week-event-delete {
   position: absolute;
   top: 2px;
@@ -937,11 +1051,58 @@
 }
 
 .week-event-item:hover .week-event-delete {
-  opacity: 1;
+  opacity: 0.8;
 }
 
 .week-event-delete:hover {
   background: rgba(255, 255, 255, 0.45);
+  opacity: 1;
+}
+
+/* =========================================
+   WEEK +X MORE BUTTON - PROPER POSITION
+========================================= */
+
+.week-show-more-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 4px 12px;
+  background: rgba(133, 85, 213, 0.9);
+  color: white;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 50;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.week-show-more-btn:hover {
+  transform: translateX(-50%) scale(1.05);
+  background: rgba(133, 85, 213, 1);
+  box-shadow: 0 4px 15px rgba(133, 85, 213, 0.3);
+}
+
+.week-show-more-btn.show-less {
+  background: rgba(239, 68, 68, 0.9);
+}
+
+.week-show-more-btn.show-less:hover {
+  background: rgba(239, 68, 68, 1);
+  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+}
+
+.week-show-more-btn svg {
+  font-size: 8px;
 }
 
 /* Week Day Empty */
@@ -959,7 +1120,6 @@
 .week-create-btn-wrap {
   display: flex;
   justify-content: center;
- 
   padding-top: 16px;
   border-top: 1px solid #e5e7eb;
   flex-shrink: 0;
@@ -986,7 +1146,10 @@
   border-color: #b892ff;
 }
 
-/* Week View Responsive */
+/* =========================================
+   WEEK VIEW RESPONSIVE
+========================================= */
+
 @media (max-width: 768px) {
   .week-header {
       min-width: 500px;
@@ -1012,6 +1175,15 @@
   
   .week-time-slot {
       font-size: 9px;
+  }
+  
+  .week-show-more-btn {
+      font-size: 9px;
+      padding: 3px 10px;
+  }
+  
+  .week-show-more-btn svg {
+      font-size: 7px;
   }
 }
 
@@ -1062,6 +1234,15 @@
       font-size: 12px;
       padding: 8px 16px;
   }
+  
+  .week-show-more-btn {
+      font-size: 8px;
+      padding: 2px 8px;
+  }
+  
+  .week-show-more-btn svg {
+      font-size: 6px;
+  }
 }
 
 /* =========================================
@@ -1071,9 +1252,6 @@
 @media (max-width: 1100px) {
   .appointment-left {
       width: 180px;
-  }
-  .appointment-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
   }
   .floating-create {
       right: 180px;
@@ -1166,11 +1344,6 @@
       flex-wrap: wrap;
   }
 
-  .appointment-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-  }
-
   .month-section {
       padding: 10px 16px 16px;
   }
@@ -1182,43 +1355,50 @@
       align-items: flex-start;
       gap: 10px;
   }
+  
   .appointment-topbar h1 {
       font-size: 22px;
   }
+  
   .appointment-topbar-right {
       gap: 8px;
   }
+  
   .schedule-container {
       padding: 12px;
   }
+  
   .schedule-toolbar {
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
   }
+  
   .toolbar-left,
   .toolbar-right {
       justify-content: space-between;
       flex-wrap: wrap;
   }
+  
   .view-switch {
       margin-right: 0;
       padding-right: 0;
       border-right: none;
   }
-  .appointment-grid {
-      grid-template-columns: 1fr;
-  }
+  
   .month-section {
       padding: 10px 12px 15px;
   }
+  
   .filter-panel {
       flex-direction: column;
       align-items: stretch;
   }
+  
   .filter-panel select {
       width: 100%;
   }
+  
   .appointment-icon-dropdown {
       right: -30px;
       width: 200px;
@@ -1302,49 +1482,61 @@
   .appointment-main {
       padding: 10px;
   }
+  
   .appointment-topbar h1 {
       font-size: 18px;
   }
+  
   .appointment-topbar-right {
       gap: 6px;
   }
+  
   .appointment-create-btn {
       height: 30px;
       padding: 0 8px;
       font-size: 11px;
   }
+  
   .appointment-create-btn span {
       font-size: 16px;
   }
+  
   .appointment-icon-btn {
       width: 28px;
       height: 28px;
       font-size: 11px;
   }
+  
   .appointment-avatar-icon {
       width: 24px;
       height: 24px;
   }
+  
   .appointment-avatar-chevron {
       font-size: 8px;
   }
+  
   .appointment-icon-badge {
       width: 6px;
       height: 6px;
       top: 0;
       right: 0;
   }
+  
   .appointment-icon-dropdown {
       width: 180px;
       right: -40px;
       padding: 8px;
   }
+  
   .appointment-icon-dropdown h4 {
       font-size: 11px;
   }
+  
   .schedule-container {
       padding: 8px;
   }
+  
   .floating-create {
       height: 32px;
       padding: 0 10px;
@@ -1371,4 +1563,81 @@
 
 .appointment-main::-webkit-scrollbar-thumb:hover {
   background: #b8bbc1;
+}
+
+/* =========================================
+   ADDITIONAL FIXES
+========================================= */
+
+/* ✅ Fix for card actions in edit mode */
+.appointment-card .card-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ✅ Ensure edit mode card doesn't overflow */
+.appointment-card.edit-mode {
+  overflow-y: auto;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar {
+  width: 4px;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.appointment-card.edit-mode::-webkit-scrollbar-thumb:hover {
+  background: #b8bbc1;
+}
+
+/* Firefox scrollbar for edit mode */
+.appointment-card.edit-mode {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db transparent;
+}
+
+/* ✅ Fix for color picker in appointment card */
+.color-picker-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  padding: 4px 0;
+}
+
+.color-picker-label {
+  font-size: 11px;
+  color: #6b7280;
+  margin-right: 4px;
+  font-weight: 500;
+}
+
+.color-picker-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid #e5e7eb;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.color-picker-btn:hover {
+  transform: scale(1.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.color-picker-btn.active {
+  border: 3px solid #1a1a1a;
+  box-shadow: 0 0 0 2px #8555d5, 0 2px 8px rgba(133, 85, 213, 0.3);
+  transform: scale(1.1);
 }
