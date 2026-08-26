@@ -390,6 +390,39 @@
 /* =====================================================
    DAY WEEK MONTH
 ===================================================== */
+/* =====================================================
+   MORE EVENTS BUTTON
+===================================================== */
+
+.more-events-btn {
+    transition: all 0.2s ease !important;
+  }
+  
+  .more-events-btn:hover {
+    background: rgba(0, 0, 0, 0.85) !important;
+    transform: scale(1.02);
+  }
+  
+  .show-less-btn {
+    transition: all 0.2s ease !important;
+  }
+  
+  .show-less-btn:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    transform: scale(1.05);
+  }
+  
+  /* ✅ Day event group */
+  .day-event-group {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* ✅ Expanded events animation */
+  .calendar-event {
+    transition: all 0.3s ease !important;
+  }
 
 .calendar-view {
     display: flex;
@@ -889,6 +922,236 @@
     font-size: 9px;
     font-weight: 400;
     margin-right: 6px;
+}
+
+/* =====================================================
+   MONTH "+X MORE" TRIGGER
+===================================================== */
+.month-show-more-btn {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 3px;
+    padding: 3px 6px;
+    min-height: auto;
+    font-size: 9px;
+    font-weight: 600;
+    color: #8555d5;
+    background: #f6f3fc;
+    border: 1px solid #c9b6ef; /* ✅ Proper border */
+    border-radius: 6px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+    box-sizing: border-box; /* ✅ Ensure border is included in sizing */
+}
+
+.month-show-more-btn:hover {
+    background: #ede6f8;
+    border-color: #8555d5;
+    transform: scale(1.02);
+}
+
+.month-show-more-btn .show-more-icon {
+    font-size: 8px;
+    transition: transform 0.2s ease;
+}
+
+.month-show-more-btn:hover .show-more-icon {
+    transform: rotate(180deg);
+}
+
+/* =====================================================
+   MONTH POPOVER (portal — floats above everything, never clipped)
+===================================================== */
+
+.month-popover-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(20, 20, 30, 0.12);
+    z-index: 2000;
+    backdrop-filter: blur(2px);
+    -webkit-backdrop-filter: blur(2px);
+}
+
+
+.month-popover {
+    position: fixed;
+    width: 280px;
+    max-height: 420px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 20px 55px rgba(0, 0, 0, 0.25);
+    z-index: 2001;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    font-family: "Poppins", sans-serif;
+    animation: monthPopoverIn 0.16s ease;
+    border: 1px solid #e5e7eb; /* ✅ Added border for proper visibility */
+}
+
+@keyframes monthPopoverIn {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.month-popover-header {
+    flex-shrink: 0;
+    height: 42px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #eef0f3;
+    font-size: 12px;
+    font-weight: 600;
+    color: #20242a;
+    position: sticky;
+    top: 0;
+    background: #ffffff;
+    z-index: 5;
+    border-radius: 16px 16px 0 0;
+}
+
+.month-popover-close {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 50%;
+    background: #f3f4f6;
+    color: #667085;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.month-popover-close:hover {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* =====================================================
+   MONTH POPOVER — STACK THAT EXPANDS ON HOVER
+   Collapsed: cards peek out from behind each other, back
+   cards blurred/faded/scaled down (stack look).
+   Hover: cards animate out into a clean, evenly spaced,
+   fully sharp list.
+===================================================== */
+
+.month-popover-stack {
+    position: relative;
+    margin: 14px;
+    height: var(--collapsed-h);
+    transition: height 0.32s ease;
+    overflow: hidden; /* ✅ Prevent overflow issues */
+    border-radius: 12px;
+}
+
+.month-popover-stack:hover {
+    height: var(--expanded-h);
+}
+
+.month-popover-card {
+    position: absolute;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #ffffff;
+    border: 1px solid #eef0f3;
+    border-radius: 12px;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    box-shadow: 0 10px 22px rgba(20, 20, 30, 0.12);
+    cursor: pointer;
+    transition: top 0.32s ease, filter 0.32s ease, opacity 0.32s ease,
+        transform 0.32s ease, box-shadow 0.2s ease;
+}
+
+
+.month-popover-stack:hover .month-popover-card {
+    top: var(--top-expanded);
+    filter: blur(0px);
+    opacity: 1;
+    transform: scale(1);
+}
+
+.month-popover-card:hover {
+    box-shadow: 0 16px 30px rgba(20, 20, 30, 0.18);
+}
+
+.month-popover-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.month-popover-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.month-popover-info strong {
+    font-size: 12px;
+    font-weight: 700;
+    color: #20242a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.month-popover-info span {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 10px;
+    color: #9aa1ad;
+}
+
+.month-popover-clock {
+    font-size: 8px;
+}
+
+.month-popover-delete {
+    width: 22px;
+    height: 22px;
+    flex-shrink: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: #c6cad2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 9px;
+    transition: all 0.15s ease;
+}
+
+.month-popover-delete:hover {
+    background: #fef2f2;
+    color: #ef4444;
 }
 
 /* =====================================================

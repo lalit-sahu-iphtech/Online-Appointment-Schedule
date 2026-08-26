@@ -95,19 +95,19 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     loadMeetings();
   }, []);
 
-  // ✅ Load meetings from Firebase
+  //  Load meetings from Firebase
   const loadMeetings = async () => {
     try {
       setLoading(true);
       const data = await getMeetings();
       console.log("📥 Calendar meetings loaded:", data.length);
       
-      // ✅ Ensure all meetings have date and startTime
+      //  Ensure all meetings have date and startTime
       const formattedData = data.map(item => ({
         ...item,
         id: item.id,
         color: item.color || getRandomEventColor(item.id)?.id || "purple",
-        // ✅ Default values if missing
+        //  Default values if missing
         date: item.date || new Date().toISOString().split('T')[0],
         startTime: item.startTime || "09:00",
         endTime: item.endTime || "10:00"
@@ -122,9 +122,9 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
-  // ===== ✅ CRUD OPERATIONS WITH FIREBASE =====
+  // =====  CRUD OPERATIONS WITH FIREBASE =====
 
-  // ✅ Save meeting to Firebase
+  //  Save meeting to Firebase
   const handleSaveMeeting = async (data) => {
     try {
       const userStr = localStorage.getItem("currentUser");
@@ -145,7 +145,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
-  // ✅ Update meeting in Firebase
+  //  Update meeting in Firebase
   const handleUpdateMeeting = async (id, data) => {
     try {
       await firebaseUpdateMeeting(id, data);
@@ -267,16 +267,31 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   };
 
   // ===== EVENT POSITION & COLOR =====
-  const getEventPosition = (startTime, endTime) => {
-    const [startHour, startMinute] = startTime.split(":").map(Number);
-    const [endHour, endMinute] = endTime.split(":").map(Number);
-    const calendarStartHour = 7;
-    const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
-    const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
-    const top = (startMinutes / 60) * 58;
-    const height = ((endMinutes - startMinutes) / 60) * 58;
-    return { top, height };
+// src/component/Calendar/Calendar.jsx
+
+// ===== EVENT POSITION & COLOR =====
+const getEventPosition = (startTime, endTime) => {
+  //  Parse time properly
+  const [startHour, startMinute] = startTime.split(":").map(Number);
+  const [endHour, endMinute] = endTime.split(":").map(Number);
+  
+  //  Calendar starts from 00:00 (midnight)
+  const calendarStartHour = 0;
+  
+  //  Calculate minutes from midnight
+  const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
+  const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
+  
+  //  Each hour = 58px, so 1 minute = 58/60 px
+  const top = (startMinutes / 60) * 58;
+  const height = ((endMinutes - startMinutes) / 60) * 58;
+  
+  //  Minimum height for events
+  return { 
+    top, 
+    height: Math.max(height, 28) 
   };
+};
 
   const getEventColor = (event) => {
     if (event.color) {
