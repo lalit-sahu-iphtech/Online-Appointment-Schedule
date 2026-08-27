@@ -2,8 +2,10 @@
 import { useState, useEffect } from "react";
 import { FaBell, FaVideo, FaTimes, FaClock } from "react-icons/fa";
 import "./Reminder.css";
+import { useToast } from "../Toast";
 
 export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
+  const toast = useToast();
   const [upcomingEvents, setUpcomingEvents] = useState([]);
   const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -22,19 +24,16 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
       .map((event) => {
         if (!event.date || !event.startTime) return null;
         
-        // Event ka start time calculate karo
         const [year, month, day] = event.date.split("-").map(Number);
         const [hours, minutes] = event.startTime.split(":").map(Number);
         const eventStart = new Date(year, month - 1, day, hours, minutes, 0);
         
-        // Difference in minutes
         const diffMinutes = (eventStart - now) / 60000;
         
         return {
           ...event,
           eventStart,
           diffMinutes,
-          // 5 minutes pehle se lekar 10 minutes baad tak show karo
           isActive: diffMinutes >= -10 && diffMinutes <= 5,
           isSoon: diffMinutes > 0 && diffMinutes <= 60,
         };
@@ -45,26 +44,26 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
     setUpcomingEvents(upcoming);
   }, [events, currentTime]);
 
-  // Reminder dismiss karo
   const handleDismiss = (eventId) => {
     setUpcomingEvents((prev) => prev.filter((e) => e.id !== eventId));
     if (onDismiss) {
       onDismiss(eventId);
     }
+    toast.info('🔕 Reminder Dismissed', 'You have dismissed this reminder.');
   };
 
-  // Meeting join karo
   const handleJoin = (event) => {
     if (onJoinMeeting) {
       onJoinMeeting(event);
     }
-    // Agar online link hai toh open karo
     if (event.onlineLink) {
       window.open(event.onlineLink, "_blank");
+      toast.info('🔗 Joining Meeting', `Opening ${event.meetingName}...`);
+    } else {
+      toast.warning('⚠️ No Link', 'This meeting does not have an online link.');
     }
   };
 
-  // Time difference ko readable format mein convert karo
   const getTimeLabel = (diffMinutes) => {
     if (diffMinutes <= 0) {
       const mins = Math.round(Math.abs(diffMinutes));
@@ -81,7 +80,6 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
       : `In ${hours}h ${remainingMins}m`;
   };
 
-  // Agar koi upcoming event nahi hai toh kuch mat dikhao
   if (upcomingEvents.length === 0) {
     return null;
   }

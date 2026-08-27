@@ -1,4 +1,3 @@
-
 import {
   FaTimes,
   FaExpandAlt,
@@ -12,8 +11,11 @@ import {
   FaPen,
 } from "react-icons/fa";
 import "./eventDetailsModal.css";
+import { useToast } from "../Toast";
 
 export default function EventDetailsModal({ event, onClose, onExpand, onEdit, onShare }) {
+  const toast = useToast();
+  
   if (!event) return null;
 
   const meetingLink = event.onlineLink || window.location.href;
@@ -24,10 +26,14 @@ export default function EventDetailsModal({ event, onClose, onExpand, onEdit, on
       return;
     }
     navigator.clipboard.writeText(meetingLink);
+    toast.success('📋 Copied!', 'Meeting link copied to clipboard.');
   };
 
   const handleEdit = () => {
-    if (onEdit) onEdit(event);
+    if (onEdit) {
+      onEdit(event);
+      toast.info('✏️ Editing', `Editing "${event.meetingName}"`);
+    }
   };
 
   const formatTimeDisplay = (time) => {
