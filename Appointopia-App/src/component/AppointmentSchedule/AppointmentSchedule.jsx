@@ -41,6 +41,7 @@ import Topbar from "../Comman/Topbar";
 import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
+import { useToast } from "../Toast";
 
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -49,6 +50,7 @@ export default function AppointmentSchedule() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
   
   // ===== ALL STATE HOOKS =====
   const [appointments, setAppointments] = useState([]);
@@ -182,6 +184,7 @@ export default function AppointmentSchedule() {
     } catch (error) {
       console.error("❌ Error loading appointments:", error);
       setAppointments([]);
+      toast.error('❌ Load Failed', 'Failed to load appointments. Please refresh.');
     } finally {
       setLoading(false);
     }
@@ -208,6 +211,7 @@ export default function AppointmentSchedule() {
       bookings: appointment.bookings || 0,
       bookingPage: appointment.bookingPage || ""
     });
+    toast.info('✏️ Editing', `Editing "${appointment.title}"`);
   };
 
   const cancelEditing = () => {
@@ -222,10 +226,21 @@ export default function AppointmentSchedule() {
       bookings: 0,
       bookingPage: ""
     });
+    toast.info('✏️ Edit Cancelled', 'Changes have been discarded.');
   };
 
   const saveEdit = async (appointmentId) => {
+    // ✅ Show loading toast
+    const loadingToast = toast.loading('💾 Saving Changes...', 'Please wait');
+    
     try {
+      // ✅ Validate
+      if (!editFormData.title.trim()) {
+        loadingToast.dismiss();
+        toast.warning('⚠️ Missing Title', 'Please enter an appointment title.');
+        return;
+      }
+      
       const updatedData = {
         title: editFormData.title,
         location: editFormData.location,
@@ -241,15 +256,26 @@ export default function AppointmentSchedule() {
       await firebaseUpdateAppointment(appointmentId, updatedData);
       await loadAppointments();
       cancelEditing();
+      
+      // ✅ Success toast
+      loadingToast.success(
+        '✅ Appointment Updated!',
+        `"${editFormData.title}" has been updated successfully.`
+      );
       console.log("✅ Appointment updated successfully!");
     } catch (error) {
       console.error("❌ Error updating appointment:", error);
-      alert("Failed to update appointment. Please try again.");
+      // ✅ Error toast
+      loadingToast.error(
+        '❌ Update Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
   // ===== ✅ CRUD OPERATIONS =====
   const handleAddAppointment = async (newAppointment, targetMonth) => {
+    const loadingToast = toast.loading('Creating Appointment...', 'Please wait');
     try {
       console.log("📝 Adding appointment:", newAppointment, "to month:", targetMonth);
       
@@ -270,12 +296,21 @@ export default function AppointmentSchedule() {
       await firebaseAddAppointment(appointmentWithDate);
       console.log("✅ Appointment saved to Firebase, reloading...");
       await loadAppointments();
+      loadingToast.success(
+        '🎉 Appointment Created!',
+        `"${newAppointment.title}" has been scheduled successfully.`
+      );
     } catch (error) {
       console.error("❌ Error adding appointment:", error);
+      loadingToast.error(
+        '❌ Creation Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
   const handleUpdateAppointment = async (id, data) => {
+    const loadingToast = toast.loading('Updating Appointment...', 'Please wait');
     try {
       console.log("✏️ Updating appointment:", id, data);
       await firebaseUpdateAppointment(id, {
@@ -283,17 +318,40 @@ export default function AppointmentSchedule() {
         updatedAt: new Date().toISOString()
       });
       await loadAppointments();
+      loadingToast.success(
+        '✅ Appointment Updated!',
+        'Your appointment has been updated successfully.'
+      );
     } catch (error) {
       console.error("❌ Error updating appointment:", error);
+      loadingToast.error(
+        '❌ Update Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
   const handleDeleteAppointment = async (id) => {
+    // ✅ Confirmation
+    // if (!window.confirm('Are you sure you want to delete this appointment?')) {
+    //   return;
+    // }
+    
+    const loadingToast = toast.loading('🗑️ Deleting Appointment...', 'Please wait');
+
     try {
       await firebaseDeleteAppointment(id);
       await loadAppointments();
+      loadingToast.success(
+        '✅ Appointment Deleted!',
+        'The appointment has been removed successfully.'
+      );
     } catch (error) {
       console.error("❌ Error deleting appointment:", error);
+      loadingToast.error(
+        '❌ Delete Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
@@ -345,11 +403,14 @@ export default function AppointmentSchedule() {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
     navigate("/signin");
+    toast.success('👋 Logged Out', 'You have been logged out successfully.');
   };
+  
   const handleProfileClick = () => {
     setActivePanel(null);
     navigate("/profile");
   };
+  
   const handleSettingsClick = () => {
     setActivePanel(null);
     navigate("/settings");
@@ -362,9 +423,20 @@ export default function AppointmentSchedule() {
     }));
   };
 
-  const previousYear = () => setCurrentYear(y => y - 1);
-  const nextYear = () => setCurrentYear(y => y + 1);
-  const goToThisMonth = () => setCurrentYear(new Date().getFullYear());
+  const previousYear = () => {
+    setCurrentYear(y => y - 1);
+    toast.info('📅 Year Changed', `Showing ${currentYear - 1}`);
+  };
+  
+  const nextYear = () => {
+    setCurrentYear(y => y + 1);
+    toast.info('📅 Year Changed', `Showing ${currentYear + 1}`);
+  };
+  
+  const goToThisMonth = () => {
+    setCurrentYear(new Date().getFullYear());
+    toast.info('📅 This Month', 'Showing current month.');
+  };
 
   const goToPreviousWeek = () => {
     const newDate = new Date(currentWeekStart);
@@ -380,6 +452,7 @@ export default function AppointmentSchedule() {
 
   const goToThisWeek = () => {
     setCurrentWeekStart(new Date());
+    toast.info('📅 This Week', 'Showing current week.');
   };
 
   const getWeekRangeText = () => {
@@ -722,12 +795,10 @@ export default function AppointmentSchedule() {
     const hasMore = dayAppointments.length > MAX_VISIBLE;
     const visibleEvents = isExpanded ? dayAppointments : dayAppointments.slice(0, MAX_VISIBLE);
     
-    // Sort events by start time
     const sortedEvents = [...visibleEvents].sort((a, b) => {
       return (a.startTime || "09:00").localeCompare(b.startTime || "09:00");
     });
     
-    // Group overlapping events
     const groups = [];
     sortedEvents.forEach(event => {
       const eventStart = event.startTime || "09:00";
@@ -811,10 +882,22 @@ export default function AppointmentSchedule() {
 
             <div className="toolbar-right">
               <div className="view-switch">
-                <button className={view === "week" ? "active" : ""} onClick={() => setView("week")}>
+                <button 
+                  className={view === "week" ? "active" : ""} 
+                  onClick={() => {
+                    setView("week");
+                    toast.info('📋 Week View', 'Switched to week view.');
+                  }}
+                >
                   Week
                 </button>
-                <button className={view === "month" ? "active" : ""} onClick={() => setView("month")}>
+                <button 
+                  className={view === "month" ? "active" : ""} 
+                  onClick={() => {
+                    setView("month");
+                    toast.info('📋 Month View', 'Switched to month view.');
+                  }}
+                >
                   Month
                 </button>
               </div>
@@ -851,6 +934,7 @@ export default function AppointmentSchedule() {
                   setFilterType("all");
                   setFilterDuration("all");
                   setShowFilter(false);
+                  toast.info('🧹 Filters Cleared', 'All filters have been reset.');
                 }}
                 className="clear-filter"
               >
@@ -859,7 +943,7 @@ export default function AppointmentSchedule() {
             </div>
           )}
 
-          {/* ✅ WEEK VIEW - PROPER +X MORE */}
+          {/* ✅ WEEK VIEW */}
           {view === "week" ? (
             <div className="week-view-container">
               <div className="week-header">
@@ -911,7 +995,6 @@ export default function AppointmentSchedule() {
                         ))}
                       </div>
 
-                      {/* ✅ Render events with proper positioning */}
                       {groups.map((group, groupIndex) => {
                         const groupSize = group.length;
                         const widthPerEvent = groupSize > 1 ? 100 / groupSize : 100;
@@ -954,9 +1037,7 @@ export default function AppointmentSchedule() {
                                 className="week-event-delete"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (window.confirm(`Delete "${appointment.title}"?`)) {
-                                    handleDeleteAppointment(appointment.id);
-                                  }
+                                  handleDeleteAppointment(appointment.id);
                                 }}
                               >
                                 <FaTrash />
@@ -976,7 +1057,6 @@ export default function AppointmentSchedule() {
                         });
                       })}
 
-                      {/* ✅ +X More button - Proper position */}
                       {hasMore && !isExpanded && (
                         <div 
                           className="week-show-more-btn"
@@ -1016,7 +1096,6 @@ export default function AppointmentSchedule() {
                         </div>
                       )}
 
-                      {/* ✅ Show Less button */}
                       {hasMore && isExpanded && (
                         <div 
                           className="week-show-more-btn show-less"

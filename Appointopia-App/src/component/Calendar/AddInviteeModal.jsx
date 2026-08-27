@@ -1,10 +1,11 @@
-
 // src/component/Calendar/AddInviteeModal.jsx
 import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import "./AddInviteeModal.css";
+import { useToast } from "../Toast";
 
 export default function AddInviteeModal({ onClose, onAdd }) {
+    const toast = useToast();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [error, setError] = useState("");
@@ -14,16 +15,18 @@ export default function AddInviteeModal({ onClose, onAdd }) {
     const handleAdd = () => {
         if (!name.trim()) {
             setError("Name is required");
+            toast.warning('⚠️ Missing Name', 'Please enter a name.');
             return;
         }
         if (!isValidEmail(email.trim())) {
             setError("Enter a valid email address");
+            toast.warning('⚠️ Invalid Email', 'Please enter a valid email address.');
             return;
         }
 
         onAdd({ name: name.trim(), email: email.trim() });
-
-        // reset fields so user can add another invitee right away
+        toast.success('👤 Invitee Added', `${name.trim()} has been added.`);
+        
         setName("");
         setEmail("");
         setError("");
@@ -34,6 +37,11 @@ export default function AddInviteeModal({ onClose, onAdd }) {
             e.preventDefault();
             handleAdd();
         }
+    };
+
+    const handleDone = () => {
+        onClose();
+        toast.info('✅ Done', 'Invitee modal closed.');
     };
 
     return (
@@ -73,7 +81,7 @@ export default function AddInviteeModal({ onClose, onAdd }) {
                 </div>
 
                 <div className="invitee-modal-footer">
-                    <button type="button" className="invitee-done-btn" onClick={onClose}>
+                    <button type="button" className="invitee-done-btn" onClick={handleDone}>
                         Done
                     </button>
                     <button type="button" className="invitee-add-btn" onClick={handleAdd}>

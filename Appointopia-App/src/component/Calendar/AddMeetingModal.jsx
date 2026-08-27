@@ -13,8 +13,8 @@ import "./AddMeetingModal.css";
 import { useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
 import AddInviteeModal from "./AddInviteeModal";
+import { useToast } from "../Toast";
 
-// TODO: replace with your EmailJS Service ID, Template ID and Public Key
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -25,6 +25,7 @@ const AVATAR_COLORS = [
 ];
 
 export default function AddMeetingModal({ onClose, onSave, defaultDate, initialData, isEditMode }) {
+    const toast = useToast();
 
     const getDefaultDate = () => {
         if (initialData?.date) return initialData.date;
@@ -59,7 +60,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     useEffect(() => {
         setFormData(buildFormData());
         setErrors({});
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [initialData]);
 
     const handleChange = (e) => {
@@ -70,10 +70,9 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    // Called from AddInviteeModal when user saves a Name + Email
     const addInvitee = ({ name, email }) => {
         if (formData.invitees.some(item => item.email.toLowerCase() === email.toLowerCase())) {
-            alert("This person is already invited");
+            toast.warning('⚠️ Already Invited', `${name} is already invited to this meeting.`);
             return;
         }
 
@@ -86,20 +85,22 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         };
 
         setFormData(prev => ({ ...prev, invitees: [...prev.invitees, newInvitee] }));
+        toast.success('👤 Invitee Added', `${name} has been added to the meeting.`);
     };
 
     const removeInvitee = (id) => {
+        const invitee = formData.invitees.find(item => item.id === id);
         setFormData({ ...formData, invitees: formData.invitees.filter(item => item.id !== id) });
+        if (invitee) {
+            toast.info('🗑️ Removed', `${invitee.name} has been removed from the meeting.`);
+        }
     };
 
-    // Sends one email per invitee using EmailJS. Runs after the meeting is saved.
     const sendInviteEmails = async (data) => {
         if (!data.invitees || data.invitees.length === 0) return;
     
         setIsSending(true);
         const failed = [];
-    
-        // Get current user (organizer)
         const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
     
         for (const person of data.invitees) {
@@ -108,23 +109,16 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                     EMAILJS_SERVICE_ID,
                     EMAILJS_TEMPLATE_ID,
                     {
-                        // ✅ Invitee details
                         to_name: person.name,
                         to_email: person.email,
-                        
-                        // ✅ Meeting details
                         meeting_name: data.meetingName,
                         meeting_date: data.date,
                         start_time: data.startTime,
                         end_time: data.endTime,
                         meeting_location: data.location || "N/A",
                         online_link: data.onlineLink || "N/A",
-                        
-                        // ✅ Organizer details (for From Name and Reply To)
                         organizer_name: currentUser?.email?.split('@')[0] || "Organizer",
                         organizer_email: currentUser?.email || "organizer@example.com",
-                        
-                        // ✅ Optional: Custom message
                         custom_message: data.customMessage || "Looking forward to seeing you!"
                     },
                     EMAILJS_PUBLIC_KEY
@@ -138,11 +132,12 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         setIsSending(false);
     
         if (failed.length > 0) {
-            alert(`Could not send invite email to: ${failed.join(", ")}`);
-        } else {
-            alert(`✅ Invitations sent to ${data.invitees.length} people!`);
+            toast.error('❌ Email Failed', `Could not send invite to: ${failed.join(", ")}`);
+        } else if (data.invitees.length > 0) {
+            toast.success('📧 Invitations Sent!', `Invitations sent to ${data.invitees.length} people!`);
         }
     };
+
     const handleSubmit = (e) => {
         e.preventDefault();
 
@@ -153,17 +148,24 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
+            toast.warning('⚠️ Validation Error', 'Please fill in all required fields.');
             return;
         }
 
         if (formData.startTime >= formData.endTime) {
-            alert("End time must be after start time");
+            toast.error('⏰ Invalid Time', 'End time must be after start time.');
             return;
         }
 
         onSave(formData);
         sendInviteEmails(formData);
         onClose();
+        
+        if (isEditMode) {
+            toast.success('✅ Meeting Updated!', `"${formData.meetingName}" has been updated.`);
+        } else {
+            toast.success('🎉 Meeting Created!', `"${formData.meetingName}" has been scheduled.`);
+        }
     };
 
     const getInitials = (name) => {
@@ -178,12 +180,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
     };
 
-    // ✅ Format time for display - only used for AM/PM label
-    const getTimeAmPm = (time) => {
-        if (!time) return "AM";
-        const [h] = time.split(':').map(Number);
-        return h >= 12 ? 'PM' : 'AM';
-    };
     const getTodayDate = () =>{
         const today = new Date();
         const year = today.getFullYear();
@@ -191,9 +187,16 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         const day = String(today.getDate()).padStart(2, '0');
         return `${year}-${month}-${day}`;
     }
+
     const getMinDate = () =>{
         return getTodayDate();
     }
+
+    const handleAdvancedSettings = () => {
+        onClose();
+        navigate("/settings");
+        toast.info('⚙️ Settings', 'Opening advanced settings...');
+    };
 
     return (
         <div className="meeting-overlay" onClick={onClose}>
@@ -221,7 +224,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             {errors.meetingName && <span className="error-text">{errors.meetingName}</span>}
                         </div>
 
-                        {/* DATE + TIME - FIXED */}
+                        {/* DATE + TIME */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Date <span className="required-star">*</span></label>
@@ -247,7 +250,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                             value={formData.startTime}
                                             onChange={handleChange}
                                         />
-                                        {/* <span className="time-ampm">{getTimeAmPm(formData.startTime)}</span> */}
                                     </div>
                                     <span className="time-separator">-</span>
                                     <div className="time-input-group">
@@ -257,7 +259,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                             value={formData.endTime}
                                             onChange={handleChange}
                                         />
-                                        {/* <span className="time-ampm">{getTimeAmPm(formData.endTime)}</span> */}
                                     </div>
                                 </div>
                                 {errors.time && <span className="error-text">{errors.time}</span>}
@@ -348,6 +349,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                         }
                                         const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
                                         setFormData({ ...formData, endTime });
+                                        toast.info('⏱️ Quick Time Set', `Meeting duration set to ${duration}.`);
                                     }}
                                 >
                                     {duration}
@@ -357,11 +359,10 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                     </div>
 
                     <div className="meeting-modal-footer">
-                        <button type="button" className="advanced-btn"
-                        onClick={()=>{
-                            onClose();
-                            navigate("/settings");
-                        }}
+                        <button 
+                            type="button" 
+                            className="advanced-btn"
+                            onClick={handleAdvancedSettings}
                         >
                             ⚙️ Advanced settings
                         </button>

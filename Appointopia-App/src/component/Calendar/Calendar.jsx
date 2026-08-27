@@ -33,6 +33,7 @@ import Topbar from "../Comman/Topbar";
 import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
+import { useToast } from "../Toast";
 
 // ✅ Firebase Services
 import {
@@ -45,6 +46,7 @@ import {
 export default function Calendar({ onEventsChange, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
 
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
@@ -95,19 +97,17 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     loadMeetings();
   }, []);
 
-  //  Load meetings from Firebase
+  // Load meetings from Firebase
   const loadMeetings = async () => {
     try {
       setLoading(true);
       const data = await getMeetings();
       console.log("📥 Calendar meetings loaded:", data.length);
       
-      //  Ensure all meetings have date and startTime
       const formattedData = data.map(item => ({
         ...item,
         id: item.id,
         color: item.color || getRandomEventColor(item.id)?.id || "purple",
-        //  Default values if missing
         date: item.date || new Date().toISOString().split('T')[0],
         startTime: item.startTime || "09:00",
         endTime: item.endTime || "10:00"
@@ -117,15 +117,18 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       if (onEventsChange) onEventsChange(formattedData);
     } catch (error) {
       console.error("❌ Error loading meetings:", error);
+      toast.error('❌ Load Failed', 'Failed to load meetings. Please refresh the page.');
     } finally {
       setLoading(false);
     }
   };
 
-  // =====  CRUD OPERATIONS WITH FIREBASE =====
+  // ===== CRUD OPERATIONS WITH FIREBASE =====
 
-  //  Save meeting to Firebase
+  // Save meeting to Firebase
   const handleSaveMeeting = async (data) => {
+    const loadingToast = toast.loading('⏳ Creating Meeting...', 'Please wait');
+    
     try {
       const userStr = localStorage.getItem("currentUser");
       const user = userStr ? JSON.parse(userStr) : null;
@@ -136,32 +139,67 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         organizerName: user?.email?.split('@')[0] || "User"
       };
 
-      const saved = await firebaseAddMeeting(newMeeting);
+      await firebaseAddMeeting(newMeeting);
       await loadMeetings();
-      return saved;
+      
+      loadingToast.success(
+        '🎉 Meeting Created!',
+        `"${data.meetingName}" has been scheduled successfully.`
+      );
     } catch (error) {
       console.error("❌ Error saving meeting:", error);
+      loadingToast.error(
+        '❌ Creation Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
       throw error;
     }
   };
 
-  //  Update meeting in Firebase
+  // Update meeting in Firebase
   const handleUpdateMeeting = async (id, data) => {
+    const loadingToast = toast.loading('⏳ Updating Meeting...', 'Please wait');
+    
     try {
       await firebaseUpdateMeeting(id, data);
       await loadMeetings();
+      
+      loadingToast.success(
+        '✅ Meeting Updated!',
+        `"${data.meetingName}" has been updated successfully.`
+      );
     } catch (error) {
       console.error("❌ Error updating meeting:", error);
+      loadingToast.error(
+        '❌ Update Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
-  // ✅ Delete meeting from Firebase
+  // Delete meeting from Firebase
   const handleDeleteMeeting = async (id) => {
+    // ✅ Confirmation
+    if (!window.confirm('Are you sure you want to delete this meeting?')) {
+      return;
+    }
+    
+    const loadingToast = toast.loading('🗑️ Deleting Meeting...', 'Please wait');
+    
     try {
       await firebaseDeleteMeeting(id);
       await loadMeetings();
+      
+      loadingToast.success(
+        '✅ Meeting Deleted!',
+        'The meeting has been removed successfully.'
+      );
     } catch (error) {
       console.error("❌ Error deleting meeting:", error);
+      loadingToast.error(
+        '❌ Delete Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
@@ -171,10 +209,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     count: notificationCount,
     getLabel,
   } = useNotifications(meeting, 60);
-
-  // ✅ Debug: Check notifications
-  console.log("📢 Calendar meetings count:", meeting.length);
-  console.log("📢 Calendar notifications:", upcomingNotifications);
 
   // ✅ Add calendar notifications to global context
   useEffect(() => {
@@ -213,6 +247,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         ? { ...prev, comments: [...(prev.comments || []), newComment] }
         : prev
     );
+    toast.success('💬 Comment Added', 'Your comment has been added successfully.');
   };
 
   // ===== SEARCH RESULTS =====
@@ -243,6 +278,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     const today = new Date();
     setCurrentDate(today);
     setSelectedDate(today);
+    toast.info('📅 Today', 'Showing today\'s schedule.');
   };
 
   const getHeaderText = () => {
@@ -267,31 +303,16 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   };
 
   // ===== EVENT POSITION & COLOR =====
-// src/component/Calendar/Calendar.jsx
-
-// ===== EVENT POSITION & COLOR =====
-const getEventPosition = (startTime, endTime) => {
-  //  Parse time properly
-  const [startHour, startMinute] = startTime.split(":").map(Number);
-  const [endHour, endMinute] = endTime.split(":").map(Number);
-  
-  //  Calendar starts from 00:00 (midnight)
-  const calendarStartHour = 0;
-  
-  //  Calculate minutes from midnight
-  const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
-  const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
-  
-  //  Each hour = 58px, so 1 minute = 58/60 px
-  const top = (startMinutes / 60) * 58;
-  const height = ((endMinutes - startMinutes) / 60) * 58;
-  
-  //  Minimum height for events
-  return { 
-    top, 
-    height: Math.max(height, 28) 
+  const getEventPosition = (startTime, endTime) => {
+    const [startHour, startMinute] = startTime.split(":").map(Number);
+    const [endHour, endMinute] = endTime.split(":").map(Number);
+    const calendarStartHour = 0;
+    const startMinutes = startHour * 60 + startMinute - calendarStartHour * 60;
+    const endMinutes = endHour * 60 + endMinute - calendarStartHour * 60;
+    const top = (startMinutes / 60) * 58;
+    const height = ((endMinutes - startMinutes) / 60) * 58;
+    return { top, height: Math.max(height, 28) };
   };
-};
 
   const getEventColor = (event) => {
     if (event.color) {
@@ -334,17 +355,22 @@ const getEventPosition = (startTime, endTime) => {
     console.log("Joining meeting:", event);
     if (event.onlineLink) {
       window.open(event.onlineLink, "_blank");
+      toast.info('🔗 Joining Meeting', `Opening ${event.meetingName}...`);
+    } else {
+      toast.warning('⚠️ No Link', 'This meeting does not have an online link.');
     }
   };
 
   const handleDismissReminder = (eventId) => {
     console.log("Reminder dismissed:", eventId);
+    toast.info('🔕 Reminder Dismissed', 'You have dismissed this reminder.');
   };
 
   const handleEditMeeting = (event) => {
     setSelectedEvent(null);
     setEditingEvent(event);
     setShowMeetingModal(true);
+    toast.info('✏️ Editing Meeting', `Editing "${event.meetingName}"`);
   };
 
   const handleShareMeeting = (event) => {
@@ -357,12 +383,16 @@ const getEventPosition = (startTime, endTime) => {
           text: `Join "${event.meetingName || "this meeting"}"`,
           url: link,
         })
+        .then(() => {
+          toast.success('📤 Shared!', `"${event.meetingName}" shared successfully.`);
+        })
         .catch(() => {});
       return;
     }
 
     navigator.clipboard.writeText(link);
     setShareToast(true);
+    toast.success('📋 Copied!', 'Meeting link copied to clipboard.');
     setTimeout(() => setShareToast(false), 2000);
   };
 
@@ -370,6 +400,7 @@ const getEventPosition = (startTime, endTime) => {
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     navigate("/signin");
+    toast.success('👋 Logged Out', 'You have been logged out successfully.');
   };
 
   const handleProfileClick = () => {
@@ -378,6 +409,12 @@ const getEventPosition = (startTime, endTime) => {
 
   const handleSettingsClick = () => {
     navigate("/settings");
+  };
+
+  // ===== VIEW CHANGE =====
+  const handleViewChange = (newView) => {
+    setView(newView);
+    toast.info(`📋 ${newView.charAt(0).toUpperCase() + newView.slice(1)} View`, `Switched to ${newView} view.`);
   };
 
   if (checkingAuth) {
@@ -403,7 +440,10 @@ const getEventPosition = (startTime, endTime) => {
         onSearchChange={(value) => setSearchTerm(value)}
         onSearchResultClick={(item) => {
           const event = meeting.find(m => m.id === item.id);
-          if (event) setSelectedEvent(event);
+          if (event) {
+            setSelectedEvent(event);
+            toast.info('🔍 Found', `Showing "${event.meetingName}" details.`);
+          }
           setSearchTerm("");
         }}
         commentsCount={meetingsWithComments.length}
@@ -423,9 +463,24 @@ const getEventPosition = (startTime, endTime) => {
             <button className="today-btn" onClick={goToToday}>Today</button>
           </div>
           <div className="calendar-view">
-            <button className={view === "day" ? "view-active" : ""} onClick={() => setView("day")}>Day</button>
-            <button className={view === "week" ? "view-active" : ""} onClick={() => setView("week")}>Week</button>
-            <button className={view === "month" ? "view-active" : ""} onClick={() => setView("month")}>Month</button>
+            <button 
+              className={view === "day" ? "view-active" : ""} 
+              onClick={() => handleViewChange("day")}
+            >
+              Day
+            </button>
+            <button 
+              className={view === "week" ? "view-active" : ""} 
+              onClick={() => handleViewChange("week")}
+            >
+              Week
+            </button>
+            <button 
+              className={view === "month" ? "view-active" : ""} 
+              onClick={() => handleViewChange("month")}
+            >
+              Month
+            </button>
           </div>
         </div>
 
@@ -474,10 +529,8 @@ const getEventPosition = (startTime, endTime) => {
           isEditMode={!!editingEvent}
           onSave={(data) => {
             if (editingEvent) {
-              // ✅ Update existing meeting
               handleUpdateMeeting(editingEvent.id, data);
             } else {
-              // ✅ Create new meeting
               handleSaveMeeting(data);
             }
             setShowMeetingModal(false);
@@ -494,28 +547,6 @@ const getEventPosition = (startTime, endTime) => {
           onEdit={handleEditMeeting}
           onShare={handleShareMeeting}
         />
-      )}
-
-      {/* Toast */}
-      {shareToast && (
-        <div
-          style={{
-            position: "fixed",
-            bottom: 24,
-            left: "50%",
-            transform: "translateX(-50%)",
-            background: "#20242a",
-            color: "#fff",
-            padding: "10px 18px",
-            borderRadius: 8,
-            fontSize: 13,
-            fontFamily: '"Poppins", sans-serif',
-            zIndex: 2000,
-            boxShadow: "0 8px 20px rgba(0,0,0,0.2)",
-          }}
-        >
-          Link copied to clipboard!
-        </div>
       )}
 
       <Reminder

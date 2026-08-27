@@ -10,9 +10,12 @@ import {
     FaEdit
 } from "react-icons/fa";
 
-import "./AppointmentCard.css"
+import "./AppointmentCard.css";
+import { useToast } from "../Toast";
 
 export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdit, isEditing: externalEditing }) {
+    
+    const toast = useToast();
     
     // ✅ Edit mode state
     const [isEditing, setIsEditing] = useState(externalEditing || false);
@@ -41,6 +44,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         { name: 'brown', bg: '#8B5E3C', text: '#ffffff' }
     ];
 
+    // ✅ Share handler with toast
     const handleShare = async () => {
         const shareData = {
             title: appointment.title,
@@ -51,47 +55,97 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
+                toast.success('📤 Shared!', `"${appointment.title}" shared successfully.`);
             } catch (err) {
-                // User cancelled
+                if (err.name !== 'AbortError') {
+                    toast.error('❌ Share Failed', 'Unable to share. Please try again.');
+                }
             }
         } else {
             try {
                 await navigator.clipboard.writeText(`https://${appointment.bookingPage || 'appointopia.com'}`);
-                alert('Link copied to clipboard!');
+                toast.success('📋 Copied!', 'Booking link copied to clipboard.');
             } catch (err) {
                 console.error('Failed to copy:', err);
+                toast.error('❌ Copy Failed', 'Unable to copy link. Please try again.');
             }
         }
     };
 
-    const handleDelete = () => {
-        if (window.confirm(`Delete "${appointment.title}"?`)) {
-            onDelete(appointment.id);
+    // ✅ Delete handler with toast - FIXED with async/await
+    const handleDelete = async () => {
+        // ✅ Confirmation first
+        // if (!window.confirm(`Are you sure you want to delete "${appointment.title}"?`)) {
+        //     return;
+        // }
+        
+        const loadingToast = toast.loading('🗑️ Deleting...', 'Please wait');
+        
+        try {
+            // ✅ Wait for onDelete to complete
+            await onDelete(appointment.id);
+            loadingToast.success(
+                '✅ Deleted!',
+                `"${appointment.title}" has been removed successfully.`
+            );
+        } catch (error) {
+            console.error('Delete error:', error);
+            loadingToast.error(
+                '❌ Delete Failed',
+                error.message || 'Something went wrong. Please try again.'
+            );
         }
     };
 
-    // ✅ Edit toggle function
-    const handleEditToggle = () => {
+    // ✅ Edit toggle function - FIXED with async/await
+    const handleEditToggle = async () => {
         if (isEditing) {
-            // Save changes
-            const updatedData = {
-                ...appointment,
-                title: editedTitle,
-                location: editedLocation,
-                duration: editedDuration,
-                startTime: editedStartTime,
-                endTime: editedEndTime,
-                bookings: editedBookings,
-                color: editedColor,
-                bookingPage: editedBookingPage || appointment.bookingPage,
-                updatedAt: new Date().toISOString()
-            };
+            // ✅ Validate before saving
+            if (!editedTitle.trim()) {
+                toast.warning('⚠️ Missing Title', 'Please enter an appointment title.');
+                return;
+            }
             
-            onUpdate(updatedData);
+            // Save changes
+            const loadingToast = toast.loading('💾 Saving...', 'Please wait');
+            
+            try {
+                const updatedData = {
+                    ...appointment,
+                    title: editedTitle,
+                    location: editedLocation,
+                    duration: editedDuration,
+                    startTime: editedStartTime,
+                    endTime: editedEndTime,
+                    bookings: editedBookings,
+                    color: editedColor,
+                    bookingPage: editedBookingPage || appointment.bookingPage,
+                    updatedAt: new Date().toISOString()
+                };
+                
+                // ✅ Wait for onUpdate to complete
+                await onUpdate(updatedData);
+                loadingToast.success(
+                    '✅ Updated!',
+                    `"${editedTitle}" has been updated successfully.`
+                );
+                
+                // ✅ Exit edit mode after successful save
+                setIsEditing(false);
+                return;
+            } catch (error) {
+                console.error('Update error:', error);
+                loadingToast.error(
+                    '❌ Update Failed',
+                    error.message || 'Something went wrong. Please try again.'
+                );
+                return;
+            }
         }
-        setIsEditing(!isEditing);
         
-        if (onEdit && !isEditing) {
+        // ✅ Toggle edit mode
+        setIsEditing(true);
+        if (onEdit) {
             onEdit();
         }
     };
@@ -107,6 +161,13 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         setEditedColor(appointment.color || "purple");
         setEditedBookingPage(appointment.bookingPage || "");
         setIsEditing(false);
+        toast.info('✏️ Edit Cancelled', 'Changes have been discarded.');
+    };
+
+    // ✅ Color change handler
+    const handleColorChange = (colorName) => {
+        setEditedColor(colorName);
+        toast.info('🎨 Color Changed', `Event color set to ${colorName}`);
     };
 
     return (
@@ -224,13 +285,13 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                                 />
                             </div>
 
-                            {/* ✅ Color Picker */}
+                            {/* ✅ Color Picker with toast on change */}
                             <div className="color-picker-container">
                                 <span className="color-picker-label">Color:</span>
                                 {colors.map(color => (
                                     <button
                                         key={color.name}
-                                        onClick={() => setEditedColor(color.name)}
+                                        onClick={() => handleColorChange(color.name)}
                                         className={`color-picker-btn ${editedColor === color.name ? 'active' : ''}`}
                                         style={{ background: color.bg }}
                                         title={color.name}
@@ -277,7 +338,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                         <FaLink />
                         {appointment.bookingPage?.split("/")[0] || "booking"}
                     </a>
-                    <button className="share-button" onClick={handleShare}>
+                    <button className="share-button" onClick={handleShare} title="Share appointment">
                         <FaShareAlt />
                     </button>
                 </div>

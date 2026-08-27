@@ -1,6 +1,7 @@
 // src/component/Workflows/WorkflowCard.jsx
 import { FaEdit, FaTrash } from "react-icons/fa";
 import "./WorkflowCard.css";
+import { useToast } from "../Toast";
 
 import emailIconBefore from "../../assets/images/before-icon.png";
 import emailIconAfter from "../../assets/images/after-icon.png";
@@ -12,9 +13,29 @@ export default function WorkflowCard({
   onDelete, 
   isTemplate = true 
 }) {
+  const toast = useToast();
   const { id, title, description, category } = workflow;
 
   const isBefore = category === "Before Event/Meeting";
+
+  const handleUse = () => {
+    onUse(id);
+    toast.success('⚡ Workflow Activated!', `"${title}" has been activated.`);
+  };
+
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(id);
+    }
+  };
+
+  const handleDelete = () => {
+    if (onDelete) {
+      if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
+        onDelete(id);
+      }
+    }
+  };
 
   return (
     <div className={`workflow-card ${isBefore ? "card-before" : "card-after"}`}>
@@ -26,12 +47,12 @@ export default function WorkflowCard({
             <div className="workflow-card-title-row">
               <h3 className="workflow-card-title">{title}</h3>
               
-              {/* ✅ Edit aur Delete button - Sabko dikhega */}
+              {/* ✅ Edit aur Delete button */}
               <div className="workflow-card-actions">
                 {onEdit && (
                   <button 
                     className="workflow-card-edit-btn" 
-                    onClick={() => onEdit(id)}
+                    onClick={handleEdit}
                     title="Edit workflow"
                   >
                     <FaEdit />
@@ -40,7 +61,7 @@ export default function WorkflowCard({
                 {onDelete && (
                   <button 
                     className="workflow-card-delete-btn" 
-                    onClick={() => onDelete(id)}
+                    onClick={handleDelete}
                     title="Delete workflow"
                   >
                     <FaTrash />
@@ -50,7 +71,7 @@ export default function WorkflowCard({
             </div>
             <p className="workflow-card-description">{description}</p>
             
-            {/* ✅ Sirf badge - Template hai toh "Template" nahi toh "My Workflow" */}
+            {/* ✅ Sirf badge */}
             <span className="workflow-card-badge">
               {isTemplate ? "Template" : "My Workflow"}
             </span>
@@ -64,7 +85,7 @@ export default function WorkflowCard({
           </div>
         </div>
 
-        <button className="workflow-card-use-btn" onClick={() => onUse(id)}>
+        <button className="workflow-card-use-btn" onClick={handleUse}>
           Use workflow
         </button>
       </div>

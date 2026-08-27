@@ -24,16 +24,17 @@ import {
 } from "react-icons/fa";
 
 import "./createAppointment.css";
+import { useToast } from "../Toast";
 
 const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"];
 
-// Matches the exact labels used in appointmentData.js (Jan -> Dec)
 const MONTH_LABELS = [
   "JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE",
   "JULY", "AUG", "SEP", "OCT", "NOV", "DEC",
 ];
 
 export default function CreateAppointment({ onClose, onSave }) {
+  const toast = useToast();
 
   const [step, setStep] = useState(1);
   const [copyToast, setCopyToast] = useState(false); 
@@ -73,13 +74,12 @@ export default function CreateAppointment({ onClose, onSave }) {
   const handleCopyLink = async (link) => {
     try {
       await navigator.clipboard.writeText(link);
-      setCopyToast(true);
-      setTimeout(() => setCopyToast(false), 2000);
+      toast.success('📋 Copied!', 'Link copied to clipboard successfully.');
     } catch (err) {
       console.error("Failed to copy:", err);
+      toast.error('❌ Copy Failed', 'Unable to copy link. Please try again.');
     }
   };
-
 
   /* =========================================
      STEP 2 — SCHEDULE
@@ -123,6 +123,7 @@ export default function CreateAppointment({ onClose, onSave }) {
         ],
       },
     }));
+    toast.info('➕ Slot Added', `New time slot added for ${day}`);
   };
 
   // Remove a time slot; if it was the last one, mark the day unavailable
@@ -131,14 +132,16 @@ export default function CreateAppointment({ onClose, onSave }) {
       const nextSlots = prev[day].slots.filter(
         (_, i) => i !== index
       );
+      const isEnabled = nextSlots.length > 0;
       return {
         ...prev,
         [day]: {
-          enabled: nextSlots.length > 0,
+          enabled: isEnabled,
           slots: nextSlots,
         },
       };
     });
+    toast.info('🗑️ Slot Removed', `Time slot removed for ${day}`);
   };
 
   // Update start/end value of a specific slot
@@ -159,11 +162,23 @@ export default function CreateAppointment({ onClose, onSave }) {
   ========================================= */
 
   const handleNext = () => {
+    // ✅ Validate before going to next step
+    if (!formData.eventName.trim()) {
+      toast.warning('⚠️ Missing Event Name', 'Please enter an event name.');
+      return;
+    }
+    
+    if (!formData.location.trim()) {
+      toast.warning('⚠️ Missing Location', 'Please enter a location.');
+      return;
+    }
+    
     console.log("Appointment Data:", {
       ...formData,
       color: selectedColor,
     });
     setStep(2);
+    toast.info('📝 Step 2', 'Now configure your schedule settings.');
   };
 
   const handleBack = () => {
@@ -171,7 +186,16 @@ export default function CreateAppointment({ onClose, onSave }) {
   };
 
   const handleReview = () => {
+    // ✅ Validate schedule before review
+    const hasAvailability = Object.values(availability).some(day => day.enabled && day.slots.length > 0);
+    
+    if (!hasAvailability) {
+      toast.error('⏰ No Availability', 'Please add at least one available time slot.');
+      return;
+    }
+    
     setStep(3);
+    toast.info('📋 Review', 'Please review your appointment details before sharing.');
   };
 
   const handleEdit = () => {
@@ -186,62 +210,104 @@ export default function CreateAppointment({ onClose, onSave }) {
       .replace(/(^-|-$)/g, "");
 
   // =========================================
-  // ✅ FIXED: handleShare with Firebase support
+  // ✅ handleShare with toast messages
   // =========================================
   const handleShare = () => {
-    // ✅ Get current time for start time
-    const now = new Date();
-    const startHour = now.getHours() + 1;
-    const startMin = now.getMinutes();
-    const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-    
-    // ✅ Parse duration
-    const durationMatch = scheduleData.duration?.match(/(\d+)/);
-    const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
-    
-    // ✅ Calculate end time
-    const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
-    const endHour = Math.floor(endTotalMinutes / 60);
-    const endMin = endTotalMinutes % 60;
-    const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-    
-    // ✅ Get LOCAL date (not UTC)
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(today.getDate()).padStart(2, '0');
-    const localDateStr = `${year}-${month}-${day}`;
-    
-    // ✅ Get current user
-    const userStr = localStorage.getItem("currentUser");
-    const user = userStr ? JSON.parse(userStr) : null;
-    
-    // ✅ Build the appointment object (without id — Firebase will generate)
-    const newAppointment = {
-      title: formData.eventName,
-      location: formData.location,
-      onlineLink: formData.onlineLink,
-      duration: scheduleData.duration,
-      bookings: "0 bookings",
-      bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
-      color: selectedColor,
-      startTime: startTime,
-      endTime: endTime,
-      date: localDateStr,
-      // ✅ Firebase fields
-      organizerEmail: user?.email || "unknown",
-      organizerName: user?.email?.split('@')[0] || "User",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-    
-    // ✅ Call onSave with the new appointment and target month
-    if (onSave) {
-      onSave(newAppointment, scheduleData.targetMonth);
+    // ✅ Validate all fields before sharing
+    if (!formData.eventName.trim()) {
+      toast.warning('⚠️ Missing Event Name', 'Please enter an event name.');
+      return;
     }
     
-    // ✅ Close the modal
-    onClose();
+    if (!formData.location.trim()) {
+      toast.warning('⚠️ Missing Location', 'Please enter a location.');
+      return;
+    }
+    
+    const hasAvailability = Object.values(availability).some(day => day.enabled && day.slots.length > 0);
+    if (!hasAvailability) {
+      toast.error('⏰ No Availability', 'Please add at least one available time slot.');
+      return;
+    }
+
+    // ✅ Show loading toast while saving
+    const loadingToast = toast.loading('⏳ Creating Appointment...', 'Please wait');
+
+    try {
+      // ✅ Get current time for start time
+      const now = new Date();
+      const startHour = now.getHours() + 1;
+      const startMin = now.getMinutes();
+      const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
+      
+      // ✅ Parse duration
+      const durationMatch = scheduleData.duration?.match(/(\d+)/);
+      const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
+      
+      // ✅ Calculate end time
+      const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
+      const endHour = Math.floor(endTotalMinutes / 60);
+      const endMin = endTotalMinutes % 60;
+      const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
+      
+      // ✅ Get LOCAL date
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0');
+      const day = String(today.getDate()).padStart(2, '0');
+      const localDateStr = `${year}-${month}-${day}`;
+      
+      // ✅ Get current user
+      const userStr = localStorage.getItem("currentUser");
+      const user = userStr ? JSON.parse(userStr) : null;
+
+      if (!user) {
+        loadingToast.error('❌ Not Logged In', 'Please sign in to create appointments.');
+        return;
+      }
+      
+      // ✅ Build the appointment object
+      const newAppointment = {
+        title: formData.eventName,
+        location: formData.location,
+        onlineLink: formData.onlineLink,
+        duration: scheduleData.duration,
+        bookings: 0,
+        bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
+        color: selectedColor,
+        startTime: startTime,
+        endTime: endTime,
+        date: localDateStr,
+        organizerEmail: user?.email || "unknown",
+        organizerName: user?.email?.split('@')[0] || "User",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      
+      // ✅ Call onSave with the new appointment and target month
+      if (onSave) {
+        onSave(newAppointment, scheduleData.targetMonth);
+        loadingToast.success(
+          '🎉 Appointment Created!',
+          `"${formData.eventName}" has been scheduled successfully for ${scheduleData.targetMonth}.`
+        );
+      } else {
+        loadingToast.error('❌ Save Failed', 'Unable to save appointment. Please try again.');
+        return;
+      }
+      
+      // ✅ Close the modal after a short delay
+      setTimeout(() => {
+        onClose();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Error creating appointment:', error);
+      loadingToast.error(
+        '❌ Creation Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
+    }
   };
 
   const selectedColorHex = colors.find(
@@ -273,7 +339,17 @@ export default function CreateAppointment({ onClose, onSave }) {
 
           <button
             className="create-close-btn"
-            onClick={onClose}
+            onClick={() => {
+              // ✅ Confirm before closing if not on step 3
+              if (step !== 3 && (formData.eventName !== "One-on-one" || formData.location !== "Room 01")) {
+                if (window.confirm('Are you sure you want to close? Your changes will not be saved.')) {
+                  onClose();
+                  toast.info('❌ Cancelled', 'Appointment creation cancelled.');
+                }
+              } else {
+                onClose();
+              }
+            }}
             aria-label="Close"
           >
             <FaTimes />
@@ -310,7 +386,7 @@ export default function CreateAppointment({ onClose, onSave }) {
               <div className="gi-field gi-full-field">
 
                 <label htmlFor="eventName">
-                  Event Name
+                  Event Name <span className="required-star">*</span>
                 </label>
 
                 <input
@@ -319,6 +395,8 @@ export default function CreateAppointment({ onClose, onSave }) {
                   name="eventName"
                   value={formData.eventName}
                   onChange={handleChange}
+                  placeholder="Enter event name"
+                  required
                 />
 
               </div>
@@ -331,7 +409,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                 <div className="gi-field">
 
                   <label htmlFor="location">
-                    Location
+                    Location <span className="required-star">*</span>
                   </label>
 
                   <div className="input-with-icon">
@@ -342,6 +420,8 @@ export default function CreateAppointment({ onClose, onSave }) {
                       name="location"
                       value={formData.location}
                       onChange={handleChange}
+                      placeholder="Enter location"
+                      required
                     />
 
                     <FaMapMarkerAlt />
@@ -364,11 +444,14 @@ export default function CreateAppointment({ onClose, onSave }) {
                       name="onlineLink"
                       value={formData.onlineLink}
                       onChange={handleChange}
+                      placeholder="Enter online link"
                     />
 
                     <FaRegCopy
                       className="copy-link-icon"
                       onClick={() => handleCopyLink(formData.onlineLink)}
+                      style={{ cursor: 'pointer' }}
+                      title="Copy link"
                     />
 
                   </div>
@@ -420,9 +503,10 @@ export default function CreateAppointment({ onClose, onSave }) {
                         style={{
                           backgroundColor: item.color,
                         }}
-                        onClick={() =>
-                          setSelectedColor(item.id)
-                        }
+                        onClick={() => {
+                          setSelectedColor(item.id);
+                          toast.info('🎨 Color Changed', `Event color set to ${item.id}`);
+                        }}
                         aria-label={`${item.id} color`}
                       />
 
@@ -449,6 +533,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                   value={formData.description}
                   onChange={handleChange}
                   maxHeight={100}
+                  placeholder="Enter event description"
                 />
 
               </div>
@@ -589,7 +674,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                 <div className="schedule-field">
 
                   <label>
-                    Duration
+                    Duration <span className="required-star">*</span>
                   </label>
 
                   <div className="select-with-icon">
@@ -599,9 +684,9 @@ export default function CreateAppointment({ onClose, onSave }) {
                       value={scheduleData.duration}
                       onChange={handleScheduleChange}
                     >
-                      <option>30 mins</option>
-                      <option>60 mins</option>
-                      <option>90 mins</option>
+                      <option value="30 mins">30 mins</option>
+                      <option value="60 mins">60 mins</option>
+                      <option value="90 mins">90 mins</option>
                     </select>
 
                     <FaChevronDown />
@@ -648,7 +733,7 @@ export default function CreateAppointment({ onClose, onSave }) {
               <div className="schedule-field target-month-field">
 
                 <label>
-                  Add to Month
+                  Add to Month <span className="required-star">*</span>
                 </label>
 
                 <div className="select-with-icon">
@@ -677,7 +762,7 @@ export default function CreateAppointment({ onClose, onSave }) {
               <div className="availability-field">
 
                 <label className="section-label">
-                  General availability
+                  General availability <span className="required-star">*</span>
                 </label>
 
                 {DAYS.map((day) => {
@@ -746,9 +831,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                               <button
                                 type="button"
                                 className="remove-slot-btn"
-                                onClick={() =>
-                                  removeSlot(day, index)
-                                }
+                                onClick={() => removeSlot(day, index)}
                                 aria-label={`Remove slot for ${day}`}
                               >
                                 <FaTimes />
@@ -809,8 +892,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                 type="button"
                 className="add-workflow-box"
                 onClick={() => {
-                  console.log("Add Workflow clicked!");
-                  alert("Add Workflow feature coming soon!");
+                  toast.info('🔧 Workflow', 'Add Workflow feature coming soon!');
                 }}
               >
 
@@ -1096,13 +1178,6 @@ export default function CreateAppointment({ onClose, onSave }) {
         </div>
 
       </aside>
-
-      {/* COPY TOAST */}
-      {copyToast && (
-        <div className="copy-toast">
-          Link copied to clipboard! ✓
-        </div>
-      )}
 
     </div>
   );

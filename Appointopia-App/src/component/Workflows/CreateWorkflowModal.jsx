@@ -3,8 +3,11 @@ import { useState, useEffect } from "react";
 import { FaTimes, FaPlus, FaTrash, FaChevronDown, FaCheck } from "react-icons/fa";
 import "./createWorkflowModal.css";
 import emailActionIcon from "../../assets/images/before-icon.png";
+import { useToast } from "../Toast";
 
 export default function CreateWorkflowModal({ onClose, onSave, initialData, isEditMode }) {
+  const toast = useToast();
+  
   const [formData, setFormData] = useState({
     title: "",
     category: "Before Event/Meeting",
@@ -47,6 +50,7 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
   const confirmAddAction = () => {
     if (!newAction.trim()) {
       setAddingAction(false);
+      toast.warning('⚠️ Empty Action', 'Please describe the action.');
       return;
     }
     setFormData({
@@ -55,23 +59,26 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
     });
     setNewAction("");
     setAddingAction(false);
+    toast.success('➕ Action Added', `"${newAction.trim()}" has been added.`);
   };
 
   const removeAction = (index) => {
+    const actionText = formData.actions[index];
     setFormData({
       ...formData,
       actions: formData.actions.filter((_, i) => i !== index),
     });
+    toast.info('🗑️ Action Removed', `"${actionText}" has been removed.`);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!formData.title.trim()) {
-      alert("Please enter workflow name");
+      toast.warning('⚠️ Missing Title', 'Please enter workflow name.');
       return;
     }
     if (formData.actions.length === 0) {
-      alert("Please add at least one action");
+      toast.warning('⚠️ No Actions', 'Please add at least one action.');
       return;
     }
     
@@ -84,6 +91,12 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
     };
     
     onSave(newWorkflow);
+    
+    if (isEditMode) {
+      toast.success('✅ Workflow Updated!', `"${formData.title}" has been updated.`);
+    } else {
+      toast.success('✅ Workflow Created!', `"${formData.title}" has been created.`);
+    }
     onClose();
   };
   
@@ -93,7 +106,13 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
         {/* Header */}
         <div className="workflows-drawer-header">
           <h2>{isEditMode ? "Edit Workflow" : "Create Workflow"}</h2>
-          <button className="workflows-drawer-close" onClick={onClose}>
+          <button 
+            className="workflows-drawer-close" 
+            onClick={() => {
+              toast.info('❌ Cancelled', 'Workflow creation cancelled.');
+              onClose();
+            }}
+          >
             <FaTimes />
           </button>
         </div>
@@ -102,7 +121,7 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
         <form onSubmit={handleSubmit} className="workflows-drawer-body" id="create-workflow-form">
           {/* Workflow Name */}
           <div className="workflows-form-group">
-            <label>Workflow Name</label>
+            <label>Workflow Name <span className="required-star">*</span></label>
             <input
               type="text"
               name="title"
@@ -114,7 +133,7 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
 
           {/* Category */}
           <div className="workflows-form-group">
-            <label>Category</label>
+            <label>Category <span className="required-star">*</span></label>
             <div className="flow-select-wrap">
               <select
                 name="category"
@@ -132,7 +151,7 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
           <div className="workflow-flow-container">
             {/* WHEN */}
             <div className="flow-box">
-              <label className="flow-label">When</label>
+              <label className="flow-label">When <span className="required-star">*</span></label>
               <div className="flow-select-wrap">
                 <select
                   name="trigger"
@@ -157,7 +176,7 @@ export default function CreateWorkflowModal({ onClose, onSave, initialData, isEd
 
             {/* ACTION */}
             <div className="flow-box">
-              <label className="flow-label">Action</label>
+              <label className="flow-label">Action <span className="required-star">*</span></label>
 
               <div className="action-cards-list">
                 {formData.actions.map((actionText, index) => (
