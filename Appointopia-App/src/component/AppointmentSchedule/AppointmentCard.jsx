@@ -72,22 +72,24 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         }
     };
 
-    // ✅ Delete handler with toast
-    const handleDelete = () => {
+    // ✅ Delete handler with toast - FIXED with async/await
+    const handleDelete = async () => {
         // ✅ Confirmation first
-        if (!window.confirm(`Are you sure you want to delete "${appointment.title}"?`)) {
-            return;
-        }
+        // if (!window.confirm(`Are you sure you want to delete "${appointment.title}"?`)) {
+        //     return;
+        // }
         
         const loadingToast = toast.loading('🗑️ Deleting...', 'Please wait');
         
         try {
-            onDelete(appointment.id);
+            // ✅ Wait for onDelete to complete
+            await onDelete(appointment.id);
             loadingToast.success(
                 '✅ Deleted!',
                 `"${appointment.title}" has been removed successfully.`
             );
         } catch (error) {
+            console.error('Delete error:', error);
             loadingToast.error(
                 '❌ Delete Failed',
                 error.message || 'Something went wrong. Please try again.'
@@ -95,8 +97,8 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         }
     };
 
-    // ✅ Edit toggle function
-    const handleEditToggle = () => {
+    // ✅ Edit toggle function - FIXED with async/await
+    const handleEditToggle = async () => {
         if (isEditing) {
             // ✅ Validate before saving
             if (!editedTitle.trim()) {
@@ -121,21 +123,29 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                     updatedAt: new Date().toISOString()
                 };
                 
-                onUpdate(updatedData);
+                // ✅ Wait for onUpdate to complete
+                await onUpdate(updatedData);
                 loadingToast.success(
                     '✅ Updated!',
                     `"${editedTitle}" has been updated successfully.`
                 );
+                
+                // ✅ Exit edit mode after successful save
+                setIsEditing(false);
+                return;
             } catch (error) {
+                console.error('Update error:', error);
                 loadingToast.error(
                     '❌ Update Failed',
                     error.message || 'Something went wrong. Please try again.'
                 );
+                return;
             }
         }
-        setIsEditing(!isEditing);
         
-        if (onEdit && !isEditing) {
+        // ✅ Toggle edit mode
+        setIsEditing(true);
+        if (onEdit) {
             onEdit();
         }
     };
