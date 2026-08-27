@@ -4,11 +4,13 @@ import { Link, useNavigate } from "react-router-dom";
 import { signIn } from "../../services/authService";
 
 import logo from "../../assets/images/logo.png";
-
 import "./auth.css";
+import { useToast } from "../Toast";
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const toast = useToast();
+  console.log(' SignIn component mounted, toast:', toast);
 
   const [formData, setFormData] = useState({
     email: "",
@@ -16,7 +18,6 @@ export default function SignIn() {
   });
 
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -44,22 +45,20 @@ export default function SignIn() {
     e.preventDefault();
 
     setErrors({});
-    setSuccessMessage("");
     setLoading(true);
 
     if (!validateForm()) {
+      toast.warning("Validation Error", "Please fix the errors before continuing");
       setLoading(false);
       return;
     }
 
     try {
-      // ✅ Firebase Sign In
       const user = await signIn(
         formData.email.trim().toLowerCase(),
         formData.password
       );
 
-      // ✅ Save user to localStorage for app state
       const userData = {
         uid: user.uid,
         email: user.email,
@@ -67,30 +66,42 @@ export default function SignIn() {
       };
       localStorage.setItem("currentUser", JSON.stringify(userData));
 
-      setSuccessMessage("Login successful!");
+      // ✅ Success toast
+      toast.success(
+        "👋 Welcome Back!",
+        `Hello ${userData.name}! You have been signed in successfully.`
+      );
+      console.log('✅ Toast called successfully');
       setFormData({ email: "", password: "" });
 
       setTimeout(() => {
         navigate("/");
-      }, 800);
+      }, 1500);
     } catch (error) {
       // ✅ Handle Firebase errors
       let errorMessage = "Something went wrong. Please try again.";
+      let toastTitle = "❌ Sign In Failed";
+      
       switch (error.code) {
         case "auth/user-not-found":
           errorMessage = "No account found with this email. Please sign up first.";
+          toast.error(toastTitle, errorMessage);
           break;
         case "auth/wrong-password":
           errorMessage = "Incorrect password. Please try again.";
+          toast.error(toastTitle, errorMessage);
           break;
         case "auth/invalid-email":
           errorMessage = "Invalid email address.";
+          toast.error(toastTitle, errorMessage);
           break;
         case "auth/too-many-requests":
           errorMessage = "Too many failed attempts. Please try again later.";
+          toast.error(toastTitle, errorMessage);
           break;
         default:
           errorMessage = error.message || "Something went wrong. Please try again.";
+          toast.error(toastTitle, errorMessage);
       }
       setErrors({ email: errorMessage });
     } finally {
@@ -141,13 +152,7 @@ export default function SignIn() {
                 className={errors.email ? "input-error" : ""}
                 disabled={loading}
               />
-    {errors.email && <span className="error-message" style={{ 
-    display: "block", 
-    marginTop: "4px",
-    color: "#e53935",
-    fontSize: "12px",
-    fontWeight: "500"
-}}>{errors.email}</span>}
+              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
             {/* Password */}
@@ -175,12 +180,9 @@ export default function SignIn() {
               {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
 
-            {/* Forgot Password */}
             <div className="forgot-password">
               <span>Forgot password?</span>
             </div>
-
-            {successMessage && <p className="success-message">{successMessage}</p>}
 
             <button type="submit" className="auth-main-btn" disabled={loading}>
               {loading ? "Signing In..." : "Sign In"}

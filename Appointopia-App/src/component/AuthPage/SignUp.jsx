@@ -4,11 +4,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { signUp } from "../../services/authService";
 
 import logo from "../../assets/images/logo.png";
-
 import "./auth.css";
+import { useToast } from "../Toast";
 
 export default function SignUp() {
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -17,7 +18,6 @@ export default function SignUp() {
   });
 
   const [errors, setErrors] = useState({});
-  const [successMessage, setSuccessMessage] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -59,11 +59,10 @@ export default function SignUp() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // ✅ Reset errors and messages
     setErrors({});
-    setSuccessMessage("");
     
     if (!validateForm()) {
+      toast.warning("Validation Error", "Please fix the errors before continuing");
       return;
     }
 
@@ -85,7 +84,12 @@ export default function SignUp() {
 
       window.dispatchEvent(new Event("userLoggedIn"));
 
-      setSuccessMessage("Account created successfully!");
+      // ✅ Success toast
+      toast.success(
+        "🎉 Account Created!",
+        `Welcome ${formData.name.trim()}! Your account has been created successfully.`
+      );
+
       setFormData({
         name: "",
         email: "",
@@ -94,26 +98,30 @@ export default function SignUp() {
 
       setTimeout(() => {
         navigate("/");
-      }, 1000);
+      }, 1500);
     } catch (error) {
       console.error("Sign up error:", error);
       
-      // ✅ Clear previous errors and set new error
       let errorMessage = "Something went wrong. Please try again.";
+      let toastTitle = "❌ Sign Up Failed";
       
       if (error.code === "auth/email-already-in-use") {
-        errorMessage = "❌ This email is already registered. Please sign in instead.";
+        errorMessage = "This email is already registered. Please sign in instead.";
+        toast.error(toastTitle, errorMessage);
       } else if (error.code === "auth/invalid-email") {
-        errorMessage = "❌ Invalid email address.";
+        errorMessage = "Invalid email address.";
+        toast.error(toastTitle, errorMessage);
       } else if (error.code === "auth/weak-password") {
-        errorMessage = "❌ Password is too weak. Use at least 6 characters with uppercase, lowercase and number.";
+        errorMessage = "Password is too weak. Use at least 6 characters with uppercase, lowercase and number.";
+        toast.error(toastTitle, errorMessage);
       } else if (error.code === "auth/too-many-requests") {
-        errorMessage = "❌ Too many attempts. Please try again later.";
+        errorMessage = "Too many attempts. Please try again later.";
+        toast.error(toastTitle, errorMessage);
       } else if (error.message) {
-        errorMessage = `❌ ${error.message}`;
+        errorMessage = error.message;
+        toast.error(toastTitle, errorMessage);
       }
       
-      // ✅ Set error and ensure it shows in UI
       setErrors({ email: errorMessage });
     } finally {
       setLoading(false);
@@ -123,7 +131,6 @@ export default function SignUp() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    // ✅ Clear error for this field when user types
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
     }
@@ -179,14 +186,7 @@ export default function SignUp() {
                 className={errors.email ? "input-error" : ""}
                 disabled={loading}
               />
-              {/* ✅ Email error message - clearly visible */}
-              {errors.email && <span className="error-message" style={{ 
-                display: "block", 
-                marginTop: "4px",
-                color: "#e53935",
-                fontSize: "12px",
-                fontWeight: "500"
-              }}>{errors.email}</span>}
+              {errors.email && <span className="error-message">{errors.email}</span>}
             </div>
 
             {/* Password */}
@@ -213,8 +213,6 @@ export default function SignUp() {
               </div>
               {errors.password && <span className="error-message">{errors.password}</span>}
             </div>
-
-            {successMessage && <p className="success-message">{successMessage}</p>}
 
             <button type="submit" className="auth-main-btn" disabled={loading}>
               {loading ? "Creating Account..." : "Sign Up"}
