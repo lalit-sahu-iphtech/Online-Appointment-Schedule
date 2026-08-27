@@ -41,6 +41,7 @@ import Topbar from "../Comman/Topbar";
 import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
+import { useToast } from "../Toast";
 
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -49,6 +50,7 @@ export default function AppointmentSchedule() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const toast = useToast();
   
   // ===== ALL STATE HOOKS =====
   const [appointments, setAppointments] = useState([]);
@@ -250,6 +252,7 @@ export default function AppointmentSchedule() {
 
   // ===== ✅ CRUD OPERATIONS =====
   const handleAddAppointment = async (newAppointment, targetMonth) => {
+    const loadingToast = toast.loading('Creating Appointment...', 'Please wait');
     try {
       console.log("📝 Adding appointment:", newAppointment, "to month:", targetMonth);
       
@@ -270,12 +273,15 @@ export default function AppointmentSchedule() {
       await firebaseAddAppointment(appointmentWithDate);
       console.log("✅ Appointment saved to Firebase, reloading...");
       await loadAppointments();
+      loadingToast.success('Appointment Created !', `${newAppointment.title} has been schedule successfuly.`)
     } catch (error) {
+      loadingToast.error('Failed to Create', error.message || 'something went wrong. Please try again.')
       console.error("❌ Error adding appointment:", error);
     }
   };
 
   const handleUpdateAppointment = async (id, data) => {
+    const loadingToast = toast.loading('Updating Appointment...', 'Please wait');
     try {
       console.log("✏️ Updating appointment:", id, data);
       await firebaseUpdateAppointment(id, {
@@ -283,17 +289,39 @@ export default function AppointmentSchedule() {
         updatedAt: new Date().toISOString()
       });
       await loadAppointments();
+      loadingToast.success(
+        'Appointment Updated!',
+        'Your appointment has been updated successfully.'
+      );
     } catch (error) {
       console.error("❌ Error updating appointment:", error);
+      loadingToast.error(
+        'Update Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
   const handleDeleteAppointment = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this appointment?')) {
+      return;
+    }
+    const loadingToast = toast.loading('Deleting Appointment...', 'Please wait');
+
     try {
       await firebaseDeleteAppointment(id);
       await loadAppointments();
+      loadingToast.success(
+        'Appointment Deleted!',
+        'The appointment has been removed successfully.'
+      );
+
     } catch (error) {
-      console.error("❌ Error deleting appointment:", error);
+      console.error(" Error deleting appointment:", error);
+      loadingToast.error(
+        ' Delete Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
     }
   };
 
