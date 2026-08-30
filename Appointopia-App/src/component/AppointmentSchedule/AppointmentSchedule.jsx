@@ -790,14 +790,19 @@ export default function AppointmentSchedule() {
   };
 
   // ✅ Get events with +X more
+  // Sort ALL of the day's appointments chronologically FIRST, then decide what's
+  // visible. This guarantees the earliest events are always shown and the hidden
+  // count (+X more) is always accurate, no matter what order they came back from Firebase.
   const getEventsWithMoreButton = (dayAppointments, dateStr, isExpanded) => {
     const MAX_VISIBLE = 3;
-    const hasMore = dayAppointments.length > MAX_VISIBLE;
-    const visibleEvents = isExpanded ? dayAppointments : dayAppointments.slice(0, MAX_VISIBLE);
-    
-    const sortedEvents = [...visibleEvents].sort((a, b) => {
+
+    const sortedAll = [...dayAppointments].sort((a, b) => {
       return (a.startTime || "09:00").localeCompare(b.startTime || "09:00");
     });
+
+    const hasMore = sortedAll.length > MAX_VISIBLE;
+    const hiddenCount = Math.max(sortedAll.length - MAX_VISIBLE, 0);
+    const sortedEvents = isExpanded ? sortedAll : sortedAll.slice(0, MAX_VISIBLE);
     
     const groups = [];
     sortedEvents.forEach(event => {
@@ -819,7 +824,7 @@ export default function AppointmentSchedule() {
       }
     });
     
-    return { groups, hasMore };
+    return { groups, hasMore, hiddenCount };
   };
 
   return (
@@ -985,7 +990,21 @@ export default function AppointmentSchedule() {
                   const dateStr = `${year}-${month}-${dayNum}`;
                   
                   const isExpanded = expandedWeekEvents[dateStr] || false;
-                  const { groups, hasMore } = getEventsWithMoreButton(dayAppointments, dateStr, isExpanded);
+                  const { groups, hasMore, hiddenCount } = getEventsWithMoreButton(dayAppointments, dateStr, isExpanded);
+
+                  // ✅ Find the bottom edge of the last VISIBLE event so the
+                  // +X more / Show less chip sits right after the real events
+                  // (bottom-right of the stack), instead of floating pinned to
+                  // the bottom of the whole 24hr column.
+                  let chipTop = 44;
+                  groups.forEach(group => {
+                    group.forEach(appt => {
+                      const evStart = appt.startTime || "09:00";
+                      const evEnd = appt.endTime || "10:00";
+                      const pos = getEventPosition(evStart, evEnd);
+                      chipTop = Math.max(chipTop, pos.top + pos.height);
+                    });
+                  });
                   
                   return (
                     <div key={dayIndex} className={`week-day-column ${isToday ? 'today-column' : ''}`}>
@@ -1057,17 +1076,19 @@ export default function AppointmentSchedule() {
                         });
                       })}
 
-                      {hasMore && !isExpanded && (
+                      {hasMore && (
                         <div 
-                          className="week-show-more-btn"
+                          className={`week-show-more-btn${isExpanded ? ' show-less' : ''}`}
                           onClick={() => toggleWeekEvents(dateStr)}
                           style={{
                             position: 'absolute',
-                            bottom: '8px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            padding: '4px 12px',
-                            background: 'rgba(133, 85, 213, 0.9)',
+                            top: `${chipTop + 6}px`,
+                            right: '6px',
+                            left: 'auto',
+                            bottom: 'auto',
+                            transform: 'none',
+                            padding: '4px 10px',
+                            background: isExpanded ? 'rgba(239, 68, 68, 0.9)' : 'rgba(133, 85, 213, 0.9)',
                             color: 'white',
                             borderRadius: '12px',
                             fontSize: '10px',
@@ -1076,62 +1097,32 @@ export default function AppointmentSchedule() {
                             zIndex: 50,
                             border: 'none',
                             boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            transition: 'all 0.3s ease',
+                            transition: 'transform 0.2s ease, background 0.2s ease',
                             display: 'flex',
                             alignItems: 'center',
                             gap: '4px',
                             backdropFilter: 'blur(4px)',
                           }}
                           onMouseEnter={(e) => {
-                            e.target.style.transform = 'translateX(-50%) scale(1.05)';
-                            e.target.style.background = 'rgba(133, 85, 213, 1)';
+                            e.currentTarget.style.transform = 'scale(1.05)';
+                            e.currentTarget.style.background = isExpanded ? 'rgba(239, 68, 68, 1)' : 'rgba(133, 85, 213, 1)';
                           }}
                           onMouseLeave={(e) => {
-                            e.target.style.transform = 'translateX(-50%) scale(1)';
-                            e.target.style.background = 'rgba(133, 85, 213, 0.9)';
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.background = isExpanded ? 'rgba(239, 68, 68, 0.9)' : 'rgba(133, 85, 213, 0.9)';
                           }}
                         >
-                          <FaChevronDown size={8} />
-                          <span>+{dayAppointments.length - 3} more</span>
-                        </div>
-                      )}
-
-                      {hasMore && isExpanded && (
-                        <div 
-                          className="week-show-more-btn show-less"
-                          onClick={() => toggleWeekEvents(dateStr)}
-                          style={{
-                            position: 'absolute',
-                            bottom: '8px',
-                            left: '50%',
-                            transform: 'translateX(-50%)',
-                            padding: '4px 12px',
-                            background: 'rgba(239, 68, 68, 0.9)',
-                            color: 'white',
-                            borderRadius: '12px',
-                            fontSize: '10px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            zIndex: 50,
-                            border: 'none',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                            transition: 'all 0.3s ease',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '4px',
-                            backdropFilter: 'blur(4px)',
-                          }}
-                          onMouseEnter={(e) => {
-                            e.target.style.transform = 'translateX(-50%) scale(1.05)';
-                            e.target.style.background = 'rgba(239, 68, 68, 1)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.target.style.transform = 'translateX(-50%) scale(1)';
-                            e.target.style.background = 'rgba(239, 68, 68, 0.9)';
-                          }}
-                        >
-                          <FaChevronUp size={8} />
-                          <span>Show less</span>
+                          {isExpanded ? (
+                            <>
+                              <FaChevronUp size={8} />
+                              <span>Show less</span>
+                            </>
+                          ) : (
+                            <>
+                              <FaChevronDown size={8} />
+                              <span>+{hiddenCount} more</span>
+                            </>
+                          )}
                         </div>
                       )}
 
