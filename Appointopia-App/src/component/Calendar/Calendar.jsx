@@ -35,7 +35,7 @@ import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
 import { useToast } from "../Toast";
 
-// ✅ Firebase Services
+//  Firebase Services
 import {
   getMeetings,
   addMeeting as firebaseAddMeeting,
@@ -92,7 +92,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     return () => clearInterval(timer);
   }, []);
 
-  // ===== ✅ LOAD MEETINGS FROM FIREBASE =====
+  // ===== LOAD MEETINGS FROM FIREBASE =====
   useEffect(() => {
     loadMeetings();
   }, []);
@@ -102,7 +102,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     try {
       setLoading(true);
       const data = await getMeetings();
-      console.log("📥 Calendar meetings loaded:", data.length);
+      console.log(" Calendar meetings loaded:", data.length);
       
       const formattedData = data.map(item => ({
         ...item,
@@ -116,8 +116,8 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       setMeeting(formattedData);
       if (onEventsChange) onEventsChange(formattedData);
     } catch (error) {
-      console.error("❌ Error loading meetings:", error);
-      toast.error('❌ Load Failed', 'Failed to load meetings. Please refresh the page.');
+      console.error(" Error loading meetings:", error);
+      toast.error(' Load Failed', 'Failed to load meetings. Please refresh the page.');
     } finally {
       setLoading(false);
     }
@@ -127,7 +127,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   // Save meeting to Firebase
   const handleSaveMeeting = async (data) => {
-    const loadingToast = toast.loading('⏳ Creating Meeting...', 'Please wait');
+    const loadingToast = toast.loading(' Creating Meeting...', 'Please wait');
     
     try {
       const userStr = localStorage.getItem("currentUser");
@@ -143,13 +143,13 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       await loadMeetings();
       
       loadingToast.success(
-        '🎉 Meeting Created!',
+        ' Meeting Created!',
         `"${data.meetingName}" has been scheduled successfully.`
       );
     } catch (error) {
-      console.error("❌ Error saving meeting:", error);
+      console.error(" Error saving meeting:", error);
       loadingToast.error(
-        '❌ Creation Failed',
+        ' Creation Failed',
         error.message || 'Something went wrong. Please try again.'
       );
       throw error;
@@ -158,20 +158,20 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   // Update meeting in Firebase
   const handleUpdateMeeting = async (id, data) => {
-    const loadingToast = toast.loading('⏳ Updating Meeting...', 'Please wait');
+    const loadingToast = toast.loading(' Updating Meeting...', 'Please wait');
     
     try {
       await firebaseUpdateMeeting(id, data);
       await loadMeetings();
       
       loadingToast.success(
-        '✅ Meeting Updated!',
+        ' Meeting Updated!',
         `"${data.meetingName}" has been updated successfully.`
       );
     } catch (error) {
-      console.error("❌ Error updating meeting:", error);
+      console.error(" Error updating meeting:", error);
       loadingToast.error(
-        '❌ Update Failed',
+        ' Update Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
@@ -179,25 +179,25 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   // Delete meeting from Firebase
   const handleDeleteMeeting = async (id) => {
-    // ✅ Confirmation
+    //  Confirmation
     if (!window.confirm('Are you sure you want to delete this meeting?')) {
       return;
     }
     
-    const loadingToast = toast.loading('🗑️ Deleting Meeting...', 'Please wait');
+    const loadingToast = toast.loading(' Deleting Meeting...', 'Please wait');
     
     try {
       await firebaseDeleteMeeting(id);
       await loadMeetings();
       
       loadingToast.success(
-        '✅ Meeting Deleted!',
+        ' Meeting Deleted!',
         'The meeting has been removed successfully.'
       );
     } catch (error) {
-      console.error("❌ Error deleting meeting:", error);
+      console.error(" Error deleting meeting:", error);
       loadingToast.error(
-        '❌ Delete Failed',
+        ' Delete Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
@@ -210,10 +210,10 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     getLabel,
   } = useNotifications(meeting, 60);
 
-  // ✅ Add calendar notifications to global context
+  //  Add calendar notifications to global context
   useEffect(() => {
     if (upcomingNotifications.length === 0) {
-      console.log("📢 No upcoming calendar notifications");
+      console.log(" No upcoming calendar notifications");
       return;
     }
     
@@ -226,7 +226,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       location: n.location,
       source: "calendar",
     }));
-    console.log("📢 Adding calendar notifications:", formattedNotifications);
+    console.log(" Adding calendar notifications:", formattedNotifications);
     addNotifications("calendar", formattedNotifications);
   }, [upcomingNotifications, addNotifications]);
 
@@ -247,7 +247,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
         ? { ...prev, comments: [...(prev.comments || []), newComment] }
         : prev
     );
-    toast.success('💬 Comment Added', 'Your comment has been added successfully.');
+    toast.success(' Comment Added', 'Your comment has been added successfully.');
   };
 
   // ===== SEARCH RESULTS =====
@@ -278,7 +278,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     const today = new Date();
     setCurrentDate(today);
     setSelectedDate(today);
-    toast.info('📅 Today', 'Showing today\'s schedule.');
+    toast.info(' Today', 'Showing today\'s schedule.');
   };
 
   const getHeaderText = () => {
@@ -355,7 +355,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     console.log("Joining meeting:", event);
     if (event.onlineLink) {
       window.open(event.onlineLink, "_blank");
-      toast.info('🔗 Joining Meeting', `Opening ${event.meetingName}...`);
+      toast.info(' Joining Meeting', `Opening ${event.meetingName}...`);
     } else {
       toast.warning('⚠️ No Link', 'This meeting does not have an online link.');
     }
@@ -363,7 +363,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   const handleDismissReminder = (eventId) => {
     console.log("Reminder dismissed:", eventId);
-    toast.info('🔕 Reminder Dismissed', 'You have dismissed this reminder.');
+    toast.info(' Reminder Dismissed', 'You have dismissed this reminder.');
   };
 
   const handleEditMeeting = (event) => {
@@ -384,7 +384,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
           url: link,
         })
         .then(() => {
-          toast.success('📤 Shared!', `"${event.meetingName}" shared successfully.`);
+          toast.success(' Shared!', `"${event.meetingName}" shared successfully.`);
         })
         .catch(() => {});
       return;
@@ -392,7 +392,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
     navigator.clipboard.writeText(link);
     setShareToast(true);
-    toast.success('📋 Copied!', 'Meeting link copied to clipboard.');
+    toast.success(' Copied!', 'Meeting link copied to clipboard.');
     setTimeout(() => setShareToast(false), 2000);
   };
 
@@ -400,7 +400,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     navigate("/signin");
-    toast.success('👋 Logged Out', 'You have been logged out successfully.');
+    toast.success(' Logged Out', 'You have been logged out successfully.');
   };
 
   const handleProfileClick = () => {
@@ -414,7 +414,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   // ===== VIEW CHANGE =====
   const handleViewChange = (newView) => {
     setView(newView);
-    toast.info(`📋 ${newView.charAt(0).toUpperCase() + newView.slice(1)} View`, `Switched to ${newView} view.`);
+    toast.info(`${newView.charAt(0).toUpperCase() + newView.slice(1)} View`, `Switched to ${newView} view.`);
   };
 
   if (checkingAuth) {
@@ -442,7 +442,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
           const event = meeting.find(m => m.id === item.id);
           if (event) {
             setSelectedEvent(event);
-            toast.info('🔍 Found', `Showing "${event.meetingName}" details.`);
+            toast.info(' Found', `Showing "${event.meetingName}" details.`);
           }
           setSearchTerm("");
         }}
