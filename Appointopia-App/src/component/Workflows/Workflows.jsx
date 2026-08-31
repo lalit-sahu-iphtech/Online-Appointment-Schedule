@@ -17,14 +17,12 @@ import CreateWorkflowModal from "./CreateWorkflowModal";
 import "./workflows.css";
 import { useLocation, useNavigate } from "react-router-dom";
 
-// Import Common Topbar & Notification System
 import Topbar from "../Comman/Topbar";
 import { useNotifications } from "../../hooks/useNotifications";
 import { getNotificationLabel } from "../../utils/notificationService";
 import { useNotificationsContext } from "../../context/NotificationContext";
 import { useToast } from "../Toast";
 
-// ✅ Firebase Services
 import {
   getWorkflows as firebaseGetWorkflows,
   addWorkflow as firebaseAddWorkflow,
@@ -32,7 +30,8 @@ import {
   deleteWorkflow as firebaseDeleteWorkflow
 } from "../../services/firestoreService";
 
-// DEFAULT WORKFLOWS (Templates)
+import { executeWorkflow } from "../../services/workflowExecutor";
+
 const DEFAULT_WORKFLOWS = [
   {
     id: 1,
@@ -91,7 +90,6 @@ export default function Workflows({ onWorkflowsChange }) {
   const location = useLocation();
   const toast = useToast();
 
-  // ===== ALL STATE HOOKS =====
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
@@ -107,12 +105,8 @@ export default function Workflows({ onWorkflowsChange }) {
   const [activeFilter, setActiveFilter] = useState("all");
   const [activePanel, setActivePanel] = useState(null);
 
-  // Get notification context
   const { addNotifications } = useNotificationsContext();
 
-  // ===== ALL EFFECTS =====
-
-  // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
@@ -128,7 +122,6 @@ export default function Workflows({ onWorkflowsChange }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // ✅ LOAD WORKFLOWS FROM FIREBASE
   useEffect(() => {
     loadWorkflows();
   }, []);
@@ -138,36 +131,35 @@ export default function Workflows({ onWorkflowsChange }) {
       setLoading(true);
       const data = await firebaseGetWorkflows();
       
-      // ✅ Separate templates and user workflows
       const templates = data.filter(w => w.isTemplate === true);
       const userWorkflows = data.filter(w => w.isTemplate === false);
       
-      // ✅ Merge with default templates (if any missing)
       const mergedTemplates = DEFAULT_WORKFLOWS.map(template => {
         const existing = templates.find(w => w.id === template.id);
         return existing || template;
       });
       
-      setWorkflows([...mergedTemplates, ...userWorkflows]);
+      const allWorkflows = [...mergedTemplates, ...userWorkflows];
+      setWorkflows(allWorkflows);
       
+      // ✅ Notify parent about workflow changes
       if (onWorkflowsChange) {
-        onWorkflowsChange([...mergedTemplates, ...userWorkflows]);
+        onWorkflowsChange(allWorkflows);
       }
     } catch (error) {
-      console.error("❌ Error loading workflows:", error);
-      toast.error('❌ Load Failed', 'Failed to load workflows. Please refresh.');
-      // ✅ Fallback to default templates
+      console.error("Error loading workflows:", error);
+      toast.error('Load Failed', 'Failed to load workflows. Please refresh.');
       setWorkflows(DEFAULT_WORKFLOWS);
+      if (onWorkflowsChange) {
+        onWorkflowsChange(DEFAULT_WORKFLOWS);
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  // ===== ✅ CRUD OPERATIONS =====
-
-  // ✅ Add workflow
   const handleAddWorkflow = async (newWorkflow) => {
-    const loadingToast = toast.loading('⏳ Creating Workflow...', 'Please wait');
+    const loadingToast = toast.loading('Creating Workflow...', 'Please wait');
     
     try {
       const userStr = localStorage.getItem("currentUser");
@@ -186,21 +178,20 @@ export default function Workflows({ onWorkflowsChange }) {
       await loadWorkflows();
       
       loadingToast.success(
-        '✅ Workflow Created!',
+        'Workflow Created',
         `"${newWorkflow.title}" has been created successfully.`
       );
     } catch (error) {
-      console.error("❌ Error adding workflow:", error);
+      console.error("Error adding workflow:", error);
       loadingToast.error(
-        '❌ Creation Failed',
+        'Creation Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
   };
 
-  // ✅ Update workflow
   const handleUpdateWorkflow = async (id, data) => {
-    const loadingToast = toast.loading('⏳ Updating Workflow...', 'Please wait');
+    const loadingToast = toast.loading('Updating Workflow...', 'Please wait');
     
     try {
       await firebaseUpdateWorkflow(id, {
@@ -210,40 +201,91 @@ export default function Workflows({ onWorkflowsChange }) {
       await loadWorkflows();
       
       loadingToast.success(
-        '✅ Workflow Updated!',
+        'Workflow Updated',
         `"${data.title}" has been updated successfully.`
       );
     } catch (error) {
-      console.error("❌ Error updating workflow:", error);
+      console.error("Error updating workflow:", error);
       loadingToast.error(
-        '❌ Update Failed',
+        'Update Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
   };
 
-  // ✅ Delete workflow
   const handleDeleteWorkflow = async (id) => {
-    const loadingToast = toast.loading('🗑️ Deleting Workflow...', 'Please wait');
+    const loadingToast = toast.loading('Deleting Workflow...', 'Please wait');
     
     try {
       await firebaseDeleteWorkflow(id);
       await loadWorkflows();
       
       loadingToast.success(
-        '✅ Workflow Deleted!',
+        'Workflow Deleted',
         'The workflow has been removed successfully.'
       );
     } catch (error) {
-      console.error("❌ Error deleting workflow:", error);
+      console.error("Error deleting workflow:", error);
       loadingToast.error(
-        '❌ Delete Failed',
+        'Delete Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
   };
 
-  // Auth check
+  // Execute workflow
+  const handleExecuteWorkflow = async (id) => {
+    const workflow = workflows.find(w => w.id === id);
+    if (!workflow) {
+      toast.warning("Not Found", "Workflow not found");
+      return;
+    }
+
+    const userStr = localStorage.getItem("currentUser");
+    const user = userStr ? JSON.parse(userStr) : null;
+
+    const testMeeting = {
+      meetingName: "Test Meeting - " + new Date().toLocaleString(),
+      date: new Date().toISOString().split('T')[0],
+      startTime: "10:00",
+      endTime: "11:00",
+      location: "Conference Room A",
+      onlineLink: "https://meet.google.com/test",
+      organizerEmail: user?.email || "test@example.com",
+      organizerName: user?.email?.split('@')[0] || "Test User",
+      invitees: [
+        { name: "Test User", email: user?.email || "test@example.com" }
+      ]
+    };
+
+    const loadingToast = toast.loading('Executing Workflow...', 'Running: ' + workflow.title);
+
+    try {
+      const results = await executeWorkflow(workflow, testMeeting);
+      
+      const successCount = results.filter(r => r.success).length;
+      const totalCount = results.length;
+      
+      if (successCount === totalCount) {
+        loadingToast.success(
+          'Execution Complete',
+          'All ' + totalCount + ' actions executed successfully!'
+        );
+      } else {
+        loadingToast.warning(
+          'Partial Execution',
+          successCount + '/' + totalCount + ' actions executed successfully.'
+        );
+      }
+    } catch (error) {
+      console.error("Error executing workflow:", error);
+      loadingToast.error(
+        'Execution Failed',
+        error.message || 'Something went wrong. Please try again.'
+      );
+    }
+  };
+
   useEffect(() => {
     const stored = localStorage.getItem("currentUser");
     if (!stored) {
@@ -262,7 +304,6 @@ export default function Workflows({ onWorkflowsChange }) {
     setCheckingAuth(false);
   }, [navigate, location.pathname]);
 
-  // ===== ✅ HOOKS =====
   const workflowEvents = useMemo(() => {
     return workflows.map(w => ({
       id: w.id,
@@ -291,7 +332,6 @@ export default function Workflows({ onWorkflowsChange }) {
     addNotifications("workflows", formattedNotifications);
   }, [workflowNotifs, addNotifications]);
 
-  // ===== CONDITIONAL RETURNS =====
   if (checkingAuth) {
     return null;
   }
@@ -300,12 +340,11 @@ export default function Workflows({ onWorkflowsChange }) {
     return <div className="workflows-container">Loading workflows...</div>;
   }
 
-  // ===== FUNCTIONS =====
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
     navigate("/signin");
-    toast.success('👋 Logged Out', 'You have been logged out successfully.');
+    toast.success('Logged Out', 'You have been logged out successfully.');
   };
 
   const handleProfileClick = () => {
@@ -320,22 +359,13 @@ export default function Workflows({ onWorkflowsChange }) {
 
   const toggleCollapse = (key) => {
     setCollapsed((prev) => ({ ...prev, [key]: !prev[key] }));
-    const label = key === "before" ? "Before Event" : "After Event";
-    toast.info(`📂 ${collapsed[key] ? 'Expanded' : 'Collapsed'}`, `${label} section ${collapsed[key] ? 'expanded' : 'collapsed'}.`);
   };
 
   const applyFilter = (value) => {
     setActiveFilter(value);
     setFilterOpen(false);
-    const filterLabels = {
-      all: "All workflows",
-      before: "Before Event/Meeting",
-      after: "After Event/Meeting"
-    };
-    toast.info('🔍 Filter Applied', `Showing ${filterLabels[value] || 'All workflows'}.`);
   };
 
-  // Get workflows based on active tab
   const getWorkflowsByTab = () => {
     if (activeTab === "my") {
       return workflows.filter(w => !w.isTemplate);
@@ -346,7 +376,6 @@ export default function Workflows({ onWorkflowsChange }) {
 
   const filteredWorkflows = getWorkflowsByTab();
 
-  // Filter by category
   const beforeEvents = filteredWorkflows.filter(
     (w) => w.category === "Before Event/Meeting"
   );
@@ -354,7 +383,6 @@ export default function Workflows({ onWorkflowsChange }) {
     (w) => w.category === "After Event/Meeting"
   );
 
-  // Search filter
   const filterBySearch = (items) => {
     if (!search) return items;
     return items.filter(
@@ -367,34 +395,28 @@ export default function Workflows({ onWorkflowsChange }) {
   const searchedBefore = filterBySearch(beforeEvents);
   const searchedAfter = filterBySearch(afterEvents);
 
-  // Category filter
   const filteredBefore = activeFilter === "after" ? [] : searchedBefore;
   const filteredAfter = activeFilter === "before" ? [] : searchedAfter;
 
-  // Show more logic
   const displayBefore = showAll ? filteredBefore : filteredBefore.slice(0, 2);
   const displayAfter = showAll ? filteredAfter : filteredAfter.slice(0, 3);
 
   const totalCount = filteredBefore.length + filteredAfter.length;
   const visibleCount = displayBefore.length + displayAfter.length;
 
-  // Use workflow
   const handleUseWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
-    toast.success('⚡ Workflow Activated!', `"${workflow?.title}" has been activated successfully.`);
+    toast.success('Workflow Activated', `"${workflow?.title}" has been activated successfully.`);
   };
 
-  // Edit workflow
   const handleEditWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
       setEditingWorkflow(workflow);
       setShowCreateModal(true);
-      toast.info('✏️ Editing', `Editing "${workflow.title}" workflow.`);
     }
   };
 
-  // Delete workflow
   const handleDeleteWorkflowClick = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
@@ -404,7 +426,6 @@ export default function Workflows({ onWorkflowsChange }) {
     }
   };
 
-  // Add/Edit workflow
   const addWorkflow = (newWorkflow) => {
     if (editingWorkflow) {
       handleUpdateWorkflow(editingWorkflow.id, newWorkflow);
@@ -415,7 +436,6 @@ export default function Workflows({ onWorkflowsChange }) {
     setShowCreateModal(false);
   };
 
-  // Search results
   const getSearchResults = () => {
     if (!search.trim()) return [];
     return workflows.filter(
@@ -431,23 +451,15 @@ export default function Workflows({ onWorkflowsChange }) {
 
   const searchResults = getSearchResults();
 
-  // Tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
     setShowAll(false);
-    const tabLabels = {
-      my: "My Workflows",
-      templates: "Templates"
-    };
-    toast.info(`📋 ${tabLabels[tab]}`, `Switched to ${tabLabels[tab]}.`);
   };
 
-  // Comments count
   const commentsCount = 0;
 
   return (
     <>
-      {/* TOPBAR */}
       <Topbar
         title="Workflows"
         createButtonLabel="Create"
@@ -461,7 +473,6 @@ export default function Workflows({ onWorkflowsChange }) {
         onSearchResultClick={() => {
           setActivePanel(null);
           setSearch("");
-          toast.info('🔍 Found', 'Showing workflow details.');
         }}
         commentsCount={commentsCount}
         currentUser={currentUser}
@@ -470,9 +481,7 @@ export default function Workflows({ onWorkflowsChange }) {
         onSettingsClick={handleSettingsClick}
       />
 
-      {/* WORKFLOWS CONTAINER */}
       <div className="workflows-container">
-        {/* TABS + FILTER */}
         <div className="workflows-tabs-row">
           <div className="workflows-tabs">
             <button
@@ -532,7 +541,6 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         </div>
 
-        {/* Empty State for My Workflow */}
         {activeTab === "my" && filteredWorkflows.length === 0 && (
           <div className="workflows-empty">
             <div className="workflows-empty-icon">📋</div>
@@ -550,7 +558,6 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         )}
 
-        {/* Before Event/Meeting Section */}
         {displayBefore.length > 0 && (
           <div className="workflows-section">
             <div className="workflows-section-header">
@@ -571,6 +578,7 @@ export default function Workflows({ onWorkflowsChange }) {
                     onUse={handleUseWorkflow}
                     onEdit={handleEditWorkflow}
                     onDelete={handleDeleteWorkflowClick}
+                    onExecute={handleExecuteWorkflow}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}
@@ -579,7 +587,6 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         )}
 
-        {/* After Event/Meeting Section */}
         {displayAfter.length > 0 && (
           <div className="workflows-section">
             <div className="workflows-section-header">
@@ -600,6 +607,7 @@ export default function Workflows({ onWorkflowsChange }) {
                     onUse={handleUseWorkflow}
                     onEdit={handleEditWorkflow}
                     onDelete={handleDeleteWorkflowClick}
+                    onExecute={handleExecuteWorkflow}
                     isTemplate={workflow.isTemplate}
                   />
                 ))}
@@ -608,7 +616,6 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         )}
 
-        {/* Show More / Show Less */}
         {totalCount > visibleCount && (
           <div className="workflows-show-more">
             <button onClick={() => setShowAll(true)}>
@@ -623,7 +630,6 @@ export default function Workflows({ onWorkflowsChange }) {
           </div>
         )}
 
-        {/* Empty State for Templates */}
         {activeTab === "templates" && filteredWorkflows.length === 0 && (
           <div className="workflows-empty">
             <p>No templates available</p>
@@ -631,7 +637,6 @@ export default function Workflows({ onWorkflowsChange }) {
         )}
       </div>
 
-      {/* Create/Edit Workflow Modal */}
       {showCreateModal && (
         <CreateWorkflowModal
           onClose={() => {
