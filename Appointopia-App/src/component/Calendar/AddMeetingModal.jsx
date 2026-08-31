@@ -15,6 +15,9 @@ import emailjs from "@emailjs/browser";
 import AddInviteeModal from "./AddInviteeModal";
 import { useToast } from "../Toast";
 
+// Import workflow executor
+import { executeMatchingWorkflows } from "../../services/workflowExecutor";
+
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
@@ -72,7 +75,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
     const addInvitee = ({ name, email }) => {
         if (formData.invitees.some(item => item.email.toLowerCase() === email.toLowerCase())) {
-            toast.warning('⚠️ Already Invited', `${name} is already invited to this meeting.`);
+            toast.warning('Already Invited', `${name} is already invited.`);
             return;
         }
 
@@ -85,14 +88,14 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         };
 
         setFormData(prev => ({ ...prev, invitees: [...prev.invitees, newInvitee] }));
-        toast.success('👤 Invitee Added', `${name} has been added to the meeting.`);
+        toast.success('Invitee Added', `${name} has been added.`);
     };
 
     const removeInvitee = (id) => {
         const invitee = formData.invitees.find(item => item.id === id);
         setFormData({ ...formData, invitees: formData.invitees.filter(item => item.id !== id) });
         if (invitee) {
-            toast.info('🗑️ Removed', `${invitee.name} has been removed from the meeting.`);
+            toast.info('Removed', `${invitee.name} has been removed.`);
         }
     };
 
@@ -119,7 +122,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                         online_link: data.onlineLink || "N/A",
                         organizer_name: currentUser?.email?.split('@')[0] || "Organizer",
                         organizer_email: currentUser?.email || "organizer@example.com",
-                        custom_message: data.customMessage || "Looking forward to seeing you!"
+                        custom_message: "Looking forward to seeing you!"
                     },
                     EMAILJS_PUBLIC_KEY
                 );
@@ -132,13 +135,14 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         setIsSending(false);
     
         if (failed.length > 0) {
-            toast.error('❌ Email Failed', `Could not send invite to: ${failed.join(", ")}`);
+            toast.error('Email Failed', `Could not send to: ${failed.join(", ")}`);
         } else if (data.invitees.length > 0) {
-            toast.success('📧 Invitations Sent!', `Invitations sent to ${data.invitees.length} people!`);
+            toast.success('Invitations Sent', `Sent to ${data.invitees.length} people!`);
         }
     };
 
-    const handleSubmit = (e) => {
+    //  UPDATED: handleSubmit with workflow execution
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const newErrors = {};
@@ -148,23 +152,58 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
         if (Object.keys(newErrors).length > 0) {
             setErrors(newErrors);
-            toast.warning('⚠️ Validation Error', 'Please fill in all required fields.');
+            toast.warning('Validation Error', 'Please fill in all required fields.');
             return;
         }
 
         if (formData.startTime >= formData.endTime) {
-            toast.error('⏰ Invalid Time', 'End time must be after start time.');
+            toast.error('Invalid Time', 'End time must be after start time.');
             return;
         }
 
+        //  Get current user
+        const userStr = localStorage.getItem("currentUser");
+        const user = userStr ? JSON.parse(userStr) : null;
+
+        // Prepare meeting data for workflows
+        const meetingData = {
+            meetingName: formData.meetingName,
+            date: formData.date,
+            startTime: formData.startTime,
+            endTime: formData.endTime,
+            location: formData.location || "Online",
+            onlineLink: formData.onlineLink || "",
+            invitees: formData.invitees || [],
+            organizerEmail: user?.email || "unknown",
+            organizerName: user?.email?.split('@')[0] || "User",
+            description: formData.description || "",
+            customMessage: "Looking forward to seeing you!"
+        };
+
+        //  Save meeting
         onSave(formData);
+
+        //  Send invites
         sendInviteEmails(formData);
+
+        //  Execute matching workflows
+        try {
+            const executedCount = await executeMatchingWorkflows(meetingData);
+            if (executedCount > 0) {
+                console.log(` ${executedCount} workflow(s) executed for this meeting`);
+                toast.success('Workflows Executed', `${executedCount} workflow(s) ran successfully.`);
+            }
+        } catch (error) {
+            console.error(" Error executing workflows:", error);
+            toast.error('Execution Failed', 'Workflows could not be executed.');
+        }
+
         onClose();
         
         if (isEditMode) {
-            toast.success('✅ Meeting Updated!', `"${formData.meetingName}" has been updated.`);
+            toast.success('Meeting Updated', `"${formData.meetingName}" has been updated.`);
         } else {
-            toast.success('🎉 Meeting Created!', `"${formData.meetingName}" has been scheduled.`);
+            toast.success('Meeting Created', `"${formData.meetingName}" has been scheduled.`);
         }
     };
 
@@ -195,7 +234,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     const handleAdvancedSettings = () => {
         onClose();
         navigate("/settings");
-        toast.info('⚙️ Settings', 'Opening advanced settings...');
+        toast.info('Settings', 'Opening advanced settings...');
     };
 
     return (
@@ -349,7 +388,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                         }
                                         const endTime = `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
                                         setFormData({ ...formData, endTime });
-                                        toast.info('⏱️ Quick Time Set', `Meeting duration set to ${duration}.`);
+                                        toast.info('Quick Time Set', `Duration set to ${duration}.`);
                                     }}
                                 >
                                     {duration}
@@ -364,12 +403,12 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             className="advanced-btn"
                             onClick={handleAdvancedSettings}
                         >
-                            ⚙️ Advanced settings
+                            Advanced settings
                         </button>
                         <button type="submit" className="save-meeting-btn" disabled={isSending}>
                             {isSending
                                 ? "Sending invites..."
-                                : isEditMode ? "✅ Update Meeting" : "✅ Save Meeting"}
+                                : isEditMode ? "Update Meeting" : "Save Meeting"}
                         </button>
                     </div>
                 </form>

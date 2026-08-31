@@ -68,6 +68,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 22px;
+
 }
 
 .workflows-topbar h1 {
@@ -75,6 +76,7 @@
   font-size: 30px;
   font-weight: 700;
   color: #171a1f;
+
 }
 
 .workflows-topbar-right {
@@ -497,7 +499,6 @@
 
 .workflows-container {
   width: 100%;
-  
   max-height: calc(100vh - 100px);
   height: calc(100vh - 120px); 
   background: #ffffff;
@@ -506,6 +507,7 @@
   padding: 26px 28px 30px;
   min-height: calc(100vh - 220px);
   box-sizing: border-box;
+  margin-left: 20px;
 }
 
 /* =====================================================

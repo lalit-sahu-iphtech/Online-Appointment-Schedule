@@ -719,6 +719,23 @@
   box-shadow: 0 0 0 3px rgba(135, 85, 213, 0.1);
 }
 
+/* Hide the browser's native clock icon so only our custom icon shows */
+.time-input-wrap input::-webkit-calendar-picker-indicator {
+  opacity: 0;
+  -webkit-appearance: none;
+  position: absolute;
+  right: 0;
+  width: 32px;
+  height: 100%;
+  margin: 0;
+  cursor: pointer;
+}
+
+.time-input-wrap input::-webkit-clear-button,
+.time-input-wrap input::-webkit-inner-spin-button {
+  display: none;
+}
+
 .time-input-wrap svg {
   position: absolute;
   right: 10px;
@@ -726,7 +743,8 @@
   transform: translateY(-50%);
   color: #a0aec0;
   font-size: 12px;
-  pointer-events: none;
+  cursor: pointer;
+  z-index: 1;
 }
 
 .slot-arrow {

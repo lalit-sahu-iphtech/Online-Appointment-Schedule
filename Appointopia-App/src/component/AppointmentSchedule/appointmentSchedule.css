@@ -874,7 +874,10 @@
 .week-view-container {
   margin-top: 10px;
   overflow-x: auto;
-  padding-bottom: 10px;
+  background: #f7f8f9;
+  border-radius: 11px;
+  padding: 16px 16px 20px;
+  box-sizing: border-box;
 }
 
 /* Week Header */
@@ -885,6 +888,10 @@
   padding-bottom: 8px;
   margin-bottom: 4px;
   min-width: 700px;
+  position: sticky;
+  top: 0;
+  background: #f7f8f9;
+  z-index: 30;
 }
 
 .week-header-time {
@@ -935,6 +942,9 @@
   position: relative;
   min-width: 700px;
   min-height: 600px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #eef0f2;
 }
 
 /* Time Column */
@@ -966,6 +976,7 @@
   border-right: 1px solid #f3f4f6;
   min-height: 600px;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .week-day-column:last-child {
@@ -998,6 +1009,7 @@
 
 .week-event-item {
   position: absolute;
+  box-sizing: border-box;
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 11px;

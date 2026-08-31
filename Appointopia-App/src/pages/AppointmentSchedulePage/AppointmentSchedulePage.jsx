@@ -8,22 +8,21 @@ import "./appointmentSchedulePage.css";
 
 // ✅ Wrapper component to access context
 function AppointmentPageContent() {
-  const { appointments, loading } = useAppointments();
+  const { appointments, loading, syncAppointments } = useAppointments();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [sidebarKey, setSidebarKey] = useState(0);
 
-  // ✅ Force sidebar update when appointments change
-  useEffect(() => {
+  // ✅ Sync appointments when Schedule component updates
+  const handleAppointmentsSync = (data) => {
+    syncAppointments(data);
     setSidebarKey(prev => prev + 1);
-  }, [appointments]);
+  };
 
   // ✅ Convert appointments to events format for Sidebar
   const sidebarEvents = useMemo(() => {
     const events = [];
     const today = new Date();
     const dateStr = today.toISOString().split('T')[0];
-    
-    console.log("🔄 Converting appointments to events:", appointments);
     
     appointments.forEach(monthData => {
       monthData.appointments.forEach(apt => {
@@ -47,7 +46,7 @@ function AppointmentPageContent() {
         
         events.push({
           id: apt.id,
-          meetingName: apt.title,
+          meetingName: apt.title || apt.meetingName || "Untitled Appointment",
           date: apt.date || dateStr,
           startTime: startTime,
           endTime: endTime,
@@ -58,12 +57,11 @@ function AppointmentPageContent() {
       });
     });
     
-    console.log("📊 Generated sidebar events:", events);
     return events;
   }, [appointments]);
 
-  if (loading) {
-    return <div className="appointment-page">Loading...</div>;
+  if (loading && appointments.length === 0) {
+    return <div className="appointment-page">Loading appointments...</div>;
   }
 
   return (
@@ -76,7 +74,7 @@ function AppointmentPageContent() {
 
       <div className="appointment-main">
         <main className="appointment-content">
-          <AppointmentSchedule />
+          <AppointmentSchedule onAppointmentsSync={handleAppointmentsSync} />
         </main>
       </div>
     </div>

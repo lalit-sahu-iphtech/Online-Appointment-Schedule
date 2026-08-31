@@ -70,14 +70,14 @@ export default function CreateAppointment({ onClose, onSave }) {
     }));
   };
 
-  // ✅ Copy link handler with toast
+  // Copy link handler with toast
   const handleCopyLink = async (link) => {
     try {
       await navigator.clipboard.writeText(link);
-      toast.success('📋 Copied!', 'Link copied to clipboard successfully.');
+      toast.success('Copied!', 'Link copied to clipboard successfully.');
     } catch (err) {
       console.error("Failed to copy:", err);
-      toast.error('❌ Copy Failed', 'Unable to copy link. Please try again.');
+      toast.error('Copy Failed', 'Unable to copy link. Please try again.');
     }
   };
 
@@ -86,7 +86,7 @@ export default function CreateAppointment({ onClose, onSave }) {
   ========================================= */
 
   const [scheduleData, setScheduleData] = useState({
-    selectMode: "days", // "days" | "range"
+    selectMode: "days", // "days" | "weeks" | "months"
     daysCount: "7",
     duration: "60 mins",
     timezone: "Eastern Time Zone (ET) - UTC-5",
@@ -123,7 +123,7 @@ export default function CreateAppointment({ onClose, onSave }) {
         ],
       },
     }));
-    toast.info('➕ Slot Added', `New time slot added for ${day}`);
+    toast.info('Slot Added', `New time slot added for ${day}`);
   };
 
   // Remove a time slot; if it was the last one, mark the day unavailable
@@ -141,7 +141,7 @@ export default function CreateAppointment({ onClose, onSave }) {
         },
       };
     });
-    toast.info('🗑️ Slot Removed', `Time slot removed for ${day}`);
+    toast.info('Slot Removed', `Time slot removed for ${day}`);
   };
 
   // Update start/end value of a specific slot
@@ -158,48 +158,45 @@ export default function CreateAppointment({ onClose, onSave }) {
   };
 
   /* =========================================
-     NAVIGATION
+     HELPER FUNCTIONS
   ========================================= */
 
-  const handleNext = () => {
-    // ✅ Validate before going to next step
-    if (!formData.eventName.trim()) {
-      toast.warning('⚠️ Missing Event Name', 'Please enter an event name.');
-      return;
+  // Convert 12-hour to 24-hour format
+  const convertTo24Hour = (timeStr) => {
+    if (!timeStr) return "09:00";
+    const match = timeStr.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
+    if (match) {
+      let hours = parseInt(match[1]);
+      const minutes = match[2];
+      const ampm = match[3].toUpperCase();
+      if (ampm === 'PM' && hours !== 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+      return `${String(hours).padStart(2, '0')}:${minutes}`;
     }
-    
-    if (!formData.location.trim()) {
-      toast.warning('⚠️ Missing Location', 'Please enter a location.');
-      return;
+    // If already 24-hour format
+    if (/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/.test(timeStr)) {
+      return timeStr;
     }
-    
-    console.log("Appointment Data:", {
-      ...formData,
-      color: selectedColor,
-    });
-    setStep(2);
-    toast.info('📝 Step 2', 'Now configure your schedule settings.');
+    return "09:00";
   };
 
-  const handleBack = () => {
-    setStep(1);
+  // Format date to YYYY-MM-DD
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
   };
 
-  const handleReview = () => {
-    // ✅ Validate schedule before review
-    const hasAvailability = Object.values(availability).some(day => day.enabled && day.slots.length > 0);
-    
-    if (!hasAvailability) {
-      toast.error('⏰ No Availability', 'Please add at least one available time slot.');
-      return;
-    }
-    
-    setStep(3);
-    toast.info('📋 Review', 'Please review your appointment details before sharing.');
+  // Get day index (MON=0, TUE=1, ..., SUN=6)
+  const getDayIndex = (date) => {
+    const day = date.getDay(); // 0 = Sunday, 1 = Monday, ...
+    return day === 0 ? 6 : day - 1; // Convert to MON=0, SUN=6
   };
 
-  const handleEdit = () => {
-    setStep(1);
+  // Get day name from index
+  const getDayName = (index) => {
+    return DAYS[index] || "MON";
   };
 
   const slugify = (text) =>
@@ -209,102 +206,197 @@ export default function CreateAppointment({ onClose, onSave }) {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "");
 
-  // =========================================
-  // ✅ handleShare with toast messages
-  // =========================================
-  const handleShare = () => {
-    // ✅ Validate all fields before sharing
+  /* =========================================
+     NAVIGATION
+  ========================================= */
+
+  const handleNext = () => {
+    // Validate before going to next step
     if (!formData.eventName.trim()) {
-      toast.warning('⚠️ Missing Event Name', 'Please enter an event name.');
+      toast.warning('Missing Event Name', 'Please enter an event name.');
       return;
     }
     
     if (!formData.location.trim()) {
-      toast.warning('⚠️ Missing Location', 'Please enter a location.');
+      toast.warning('Missing Location', 'Please enter a location.');
+      return;
+    }
+    
+    console.log("Appointment Data:", {
+      ...formData,
+      color: selectedColor,
+    });
+    setStep(2);
+    toast.info('Step 2', 'Now configure your schedule settings.');
+  };
+
+  const handleBack = () => {
+    setStep(1);
+  };
+
+  const handleReview = () => {
+    // Validate schedule before review
+    const hasAvailability = Object.values(availability).some(day => day.enabled && day.slots.length > 0);
+    
+    if (!hasAvailability) {
+      toast.error('No Availability', 'Please add at least one available time slot.');
+      return;
+    }
+    
+    setStep(3);
+    toast.info('Review', 'Please review your appointment details before sharing.');
+  };
+
+  const handleEdit = () => {
+    setStep(1);
+  };
+
+  // =========================================
+  // handleShare with automatic scheduling
+  // =========================================
+  const handleShare = async () => {
+    // Validate all fields before sharing
+    if (!formData.eventName.trim()) {
+      toast.warning('Missing Event Name', 'Please enter an event name.');
+      return;
+    }
+    
+    if (!formData.location.trim()) {
+      toast.warning('Missing Location', 'Please enter a location.');
       return;
     }
     
     const hasAvailability = Object.values(availability).some(day => day.enabled && day.slots.length > 0);
     if (!hasAvailability) {
-      toast.error('⏰ No Availability', 'Please add at least one available time slot.');
+      toast.error('No Availability', 'Please add at least one available time slot.');
       return;
     }
 
-    // ✅ Show loading toast while saving
-    const loadingToast = toast.loading('⏳ Creating Appointment...', 'Please wait');
+    // Show loading toast while saving
+    const loadingToast = toast.loading('Creating Appointments...', 'Please wait');
 
     try {
-      // ✅ Get current time for start time
-      const now = new Date();
-      const startHour = now.getHours() + 1;
-      const startMin = now.getMinutes();
-      const startTime = `${String(startHour).padStart(2, '0')}:${String(startMin).padStart(2, '0')}`;
-      
-      // ✅ Parse duration
-      const durationMatch = scheduleData.duration?.match(/(\d+)/);
-      const durationMinutes = durationMatch ? parseInt(durationMatch[1]) : 60;
-      
-      // ✅ Calculate end time
-      const endTotalMinutes = (startHour * 60 + startMin) + durationMinutes;
-      const endHour = Math.floor(endTotalMinutes / 60);
-      const endMin = endTotalMinutes % 60;
-      const endTime = `${String(endHour).padStart(2, '0')}:${String(endMin).padStart(2, '0')}`;
-      
-      // ✅ Get LOCAL date
-      const today = new Date();
-      const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
-      const localDateStr = `${year}-${month}-${day}`;
-      
-      // ✅ Get current user
+      // Get current user
       const userStr = localStorage.getItem("currentUser");
       const user = userStr ? JSON.parse(userStr) : null;
 
       if (!user) {
-        loadingToast.error('❌ Not Logged In', 'Please sign in to create appointments.');
+        loadingToast.error('Not Logged In', 'Please sign in to create appointments.');
         return;
       }
-      
-      // ✅ Build the appointment object
-      const newAppointment = {
+
+      // Calculate number of days to create
+      let daysToCreate = 0;
+      const startDate = new Date();
+
+      if (scheduleData.selectMode === "days") {
+        daysToCreate = parseInt(scheduleData.daysCount) || 7;
+      } else if (scheduleData.selectMode === "weeks") {
+        daysToCreate = (parseInt(scheduleData.daysCount) || 1) * 7;
+      } else if (scheduleData.selectMode === "months") {
+        daysToCreate = (parseInt(scheduleData.daysCount) || 1) * 30;
+      }
+
+      // Limit to prevent excessive appointments
+      if (daysToCreate > 365) {
+        loadingToast.error('Too Many Days', 'Please select 365 days or less.');
+        return;
+      }
+
+      // Get available time slots grouped by day
+      const availableSlots = {};
+      DAYS.forEach((day, index) => {
+        if (availability[day]?.enabled && availability[day].slots.length > 0) {
+          availableSlots[index] = availability[day].slots;
+        }
+      });
+
+      if (Object.keys(availableSlots).length === 0) {
+        loadingToast.error('No Availability', 'Please add at least one available time slot.');
+        return;
+      }
+
+      // Base appointment data
+      const baseAppointment = {
         title: formData.eventName,
         location: formData.location,
         onlineLink: formData.onlineLink,
         duration: scheduleData.duration,
         bookings: 0,
-        bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}`,
         color: selectedColor,
-        startTime: startTime,
-        endTime: endTime,
-        date: localDateStr,
         organizerEmail: user?.email || "unknown",
         organizerName: user?.email?.split('@')[0] || "User",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        description: formData.description,
+        maxInvitees: formData.maxInvitees,
       };
-      
-      // ✅ Call onSave with the new appointment and target month
-      if (onSave) {
-        onSave(newAppointment, scheduleData.targetMonth);
-        loadingToast.success(
-          '🎉 Appointment Created!',
-          `"${formData.eventName}" has been scheduled successfully for ${scheduleData.targetMonth}.`
-        );
-      } else {
-        loadingToast.error('❌ Save Failed', 'Unable to save appointment. Please try again.');
+
+      // Generate appointments for each day
+      const appointments = [];
+      let currentDate = new Date(startDate);
+      let dayCounter = 1;
+
+      for (let i = 0; i < daysToCreate; i++) {
+        const dayIndex = getDayIndex(currentDate);
+        const slots = availableSlots[dayIndex] || [];
+
+        if (slots.length > 0) {
+          // Use the first available slot for this day
+          const slot = slots[0];
+          const startTime24 = convertTo24Hour(slot.start);
+          const endTime24 = convertTo24Hour(slot.end);
+          const dateStr = formatDate(currentDate);
+          
+          // Create unique title with day number
+          const daySuffix = dayCounter > 1 ? ` - Day ${dayCounter}` : '';
+          
+          const appointment = {
+            ...baseAppointment,
+            title: `${formData.eventName}${daySuffix}`,
+            date: dateStr,
+            startTime: startTime24,
+            endTime: endTime24,
+            bookingPage: `${formData.onlineLink.replace(/^https?:\/\//, "")}/${slugify(formData.eventName)}${daySuffix ? `-day-${dayCounter}` : ''}`,
+            targetMonth: scheduleData.targetMonth,
+            // Store the day of week for reference
+            dayOfWeek: getDayName(dayIndex),
+          };
+          
+          appointments.push(appointment);
+          dayCounter++;
+        }
+        
+        // Move to next day
+        currentDate.setDate(currentDate.getDate() + 1);
+      }
+
+      if (appointments.length === 0) {
+        loadingToast.error('No Appointments', 'No appointments could be created for the selected days.');
         return;
       }
-      
-      // ✅ Close the modal after a short delay
+
+      // Save all appointments
+      let savedCount = 0;
+      for (const appointment of appointments) {
+        await onSave(appointment, scheduleData.targetMonth);
+        savedCount++;
+      }
+
+      const displayCount = savedCount;
+      loadingToast.success(
+        'Appointments Created!',
+        `${displayCount} appointment${displayCount > 1 ? 's' : ''} have been scheduled successfully.`
+      );
+
       setTimeout(() => {
         onClose();
-      }, 1000);
-      
+      }, 1500);
+
     } catch (error) {
-      console.error('Error creating appointment:', error);
+      console.error('Error creating appointments:', error);
       loadingToast.error(
-        '❌ Creation Failed',
+        'Creation Failed',
         error.message || 'Something went wrong. Please try again.'
       );
     }
@@ -340,11 +432,11 @@ export default function CreateAppointment({ onClose, onSave }) {
           <button
             className="create-close-btn"
             onClick={() => {
-              // ✅ Confirm before closing if not on step 3
+              // Confirm before closing if not on step 3
               if (step !== 3 && (formData.eventName !== "One-on-one" || formData.location !== "Room 01")) {
                 if (window.confirm('Are you sure you want to close? Your changes will not be saved.')) {
                   onClose();
-                  toast.info('❌ Cancelled', 'Appointment creation cancelled.');
+                  toast.info('Cancelled', 'Appointment creation cancelled.');
                 }
               } else {
                 onClose();
@@ -505,7 +597,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                         }}
                         onClick={() => {
                           setSelectedColor(item.id);
-                          toast.info('🎨 Color Changed', `Event color set to ${item.id}`);
+                          toast.info('Color Changed', `Event color set to ${item.id}`);
                         }}
                         aria-label={`${item.id} color`}
                       />
@@ -624,10 +716,19 @@ export default function CreateAppointment({ onClose, onSave }) {
 
                   <div className="select-with-icon unit-select">
 
-                    <select defaultValue="Days">
-                      <option>Days</option>
-                      <option>Weeks</option>
-                      <option>Months</option>
+                    <select 
+                      value={scheduleData.selectMode === "days" ? "Days" : scheduleData.selectMode === "weeks" ? "Weeks" : "Months"}
+                      onChange={(e) => {
+                        const value = e.target.value.toLowerCase();
+                        setScheduleData((prev) => ({
+                          ...prev,
+                          selectMode: value,
+                        }));
+                      }}
+                    >
+                      <option value="Days">Days</option>
+                      <option value="Weeks">Weeks</option>
+                      <option value="Months">Months</option>
                     </select>
 
                     <FaChevronDown />
@@ -778,85 +879,83 @@ export default function CreateAppointment({ onClose, onSave }) {
                       </span>
 
                       {dayData.enabled ? (
-
-                        <div className="slots-column">
-
-                          {dayData.slots.map((slot, index) => (
-
-                            <div
-                              className="slot-row"
-                              key={index}
-                            >
-
-                              <div className="time-input-wrap">
-
-                                <input
-                                  type="text"
-                                  value={slot.start}
-                                  onChange={(e) =>
-                                    updateSlot(
-                                      day,
-                                      index,
-                                      "start",
-                                      e.target.value
-                                    )
+                      <div className="slots-column">
+                        {dayData.slots.map((slot, index) => (
+                          <div className="slot-row" key={index}>
+                            
+                            {/* START TIME */}
+                            <div className="time-input-wrap">
+                              <input
+                                type="time"
+                                value={slot.start}
+                                onChange={(e) =>
+                                  updateSlot(day, index, "start", e.target.value)
+                                }
+                                id={`start-${day}-${index}`}
+                              />
+                              <FaClock 
+                                className="time-icon"
+                                onClick={() => {
+                                  const input = document.getElementById(`start-${day}-${index}`);
+                                  if (input) {
+                                    input.showPicker?.();
+                                    input.focus();
                                   }
-                                />
-
-                                <FaClock />
-
-                              </div>
-
-                              <FaArrowRight className="slot-arrow" />
-
-                              <div className="time-input-wrap">
-
-                                <input
-                                  type="text"
-                                  value={slot.end}
-                                  onChange={(e) =>
-                                    updateSlot(
-                                      day,
-                                      index,
-                                      "end",
-                                      e.target.value
-                                    )
-                                  }
-                                />
-
-                                <FaClock />
-
-                              </div>
-
-                              <button
-                                type="button"
-                                className="remove-slot-btn"
-                                onClick={() => removeSlot(day, index)}
-                                aria-label={`Remove slot for ${day}`}
-                              >
-                                <FaTimes />
-                              </button>
-
-                              {index === dayData.slots.length - 1 && (
-
-                                <button
-                                  type="button"
-                                  className="add-slot-btn"
-                                  onClick={() => addSlot(day)}
-                                  aria-label={`Add slot for ${day}`}
-                                >
-                                  <FaPlus />
-                                </button>
-
-                              )}
-
+                                }}
+                              />
                             </div>
 
-                          ))}
+                            <FaArrowRight className="slot-arrow" />
 
-                        </div>
+                            {/* END TIME */}
+                            <div className="time-input-wrap">
+                              <input
+                                type="time"
+                                value={slot.end}
+                                onChange={(e) =>
+                                  updateSlot(day, index, "end", e.target.value)
+                                }
+                                id={`end-${day}-${index}`}
+                              />
+                              <FaClock 
+                                className="time-icon"
+                                onClick={() => {
+                                  const input = document.getElementById(`end-${day}-${index}`);
+                                  if (input) {
+                                    input.showPicker?.();
+                                    input.focus();
+                                  }
+                                }}
+                              />
+                            </div>
 
-                      ) : (
+                            {/* REMOVE BUTTON */}
+                            <button
+                              type="button"
+                              className="remove-slot-btn"
+                              onClick={() => removeSlot(day, index)}
+                              aria-label={`Remove slot for ${day}`}
+                            >
+                              <FaTimes />
+                            </button>
+
+                            {/* ADD BUTTON (only on last slot) */}
+                            {index === dayData.slots.length - 1 && (
+                              <button
+                                type="button"
+                                className="add-slot-btn"
+                                onClick={() => addSlot(day)}
+                                aria-label={`Add slot for ${day}`}
+                              >
+                                <FaPlus />
+                              </button>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+
+
 
                         <div className="unavailable-row">
 
@@ -892,7 +991,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                 type="button"
                 className="add-workflow-box"
                 onClick={() => {
-                  toast.info('🔧 Workflow', 'Add Workflow feature coming soon!');
+                  toast.info('Workflow', 'Add Workflow feature coming soon!');
                 }}
               >
 
@@ -1032,6 +1131,10 @@ export default function CreateAppointment({ onClose, onSave }) {
                   <div className="review-value">
                     {scheduleData.selectMode === "days"
                       ? `${scheduleData.daysCount} days into the future`
+                      : scheduleData.selectMode === "weeks"
+                      ? `${scheduleData.daysCount} weeks into the future`
+                      : scheduleData.selectMode === "months"
+                      ? `${scheduleData.daysCount} months into the future`
                       : "Within a date range"}
                   </div>
 

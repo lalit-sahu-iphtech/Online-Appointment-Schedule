@@ -7,45 +7,38 @@ export function AppointmentProvider({ children }) {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Load from localStorage on mount
+  // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('appointments');
-    console.log("📂 Loading appointments from localStorage:", saved);
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        console.log("✅ Loaded appointments:", parsed);
         setAppointments(parsed);
       } catch (e) {
         console.error('Error loading appointments:', e);
         setAppointments([]);
       }
     } else {
-      // ✅ No default appointments - empty array
-      console.log("📭 No appointments found in localStorage");
       setAppointments([]);
     }
     setLoading(false);
   }, []);
 
-  // ✅ Save to localStorage whenever appointments change
+  // Save to localStorage whenever appointments change
   useEffect(() => {
     if (!loading) {
-      console.log("💾 Saving appointments to localStorage:", appointments);
       localStorage.setItem('appointments', JSON.stringify(appointments));
     }
   }, [appointments, loading]);
 
   const addAppointment = (newAppointment, targetMonth) => {
     const monthUpper = targetMonth.toUpperCase();
-    console.log("📝 Adding appointment:", newAppointment, "to month:", monthUpper);
     
     setAppointments(prev => {
       const existingMonth = prev.find(m => m.month === monthUpper);
       
       let newAppointments;
       if (existingMonth) {
-        // Add to existing month
         newAppointments = prev.map(m => 
           m.month === monthUpper 
             ? { 
@@ -56,7 +49,6 @@ export function AppointmentProvider({ children }) {
             : m
         );
       } else {
-        // Create new month
         newAppointments = [
           ...prev,
           {
@@ -67,13 +59,11 @@ export function AppointmentProvider({ children }) {
         ];
       }
       
-      console.log("✅ New appointments:", newAppointments);
       return newAppointments;
     });
   };
 
   const deleteAppointment = (id) => {
-    console.log("🗑️ Deleting appointment:", id);
     setAppointments(prev => {
       const newAppointments = prev
         .map(month => ({
@@ -83,37 +73,54 @@ export function AppointmentProvider({ children }) {
         }))
         .filter(month => month.appointments.length > 0);
       
-      console.log("✅ After delete:", newAppointments);
       return newAppointments;
     });
   };
 
-  // ✅ NEW: Update appointment function
   const updateAppointment = (updatedAppointment) => {
-    console.log("✏️ Updating appointment:", updatedAppointment);
-    
     setAppointments(prev => {
       const newAppointments = prev.map(month => ({
         ...month,
         appointments: month.appointments.map(apt => 
           apt.id === updatedAppointment.id ? updatedAppointment : apt
         ),
-        // Update events count
         events: `${month.appointments.length} Event${month.appointments.length !== 1 ? 's' : ''}`
       }));
       
-      console.log("✅ After update:", newAppointments);
       return newAppointments;
     });
   };
 
-  // ✅ Value mein updateAppointment add karein
+  // ✅ Sync appointments from Firebase (called by AppointmentSchedule)
+  const syncAppointments = (data) => {
+    if (!data || data.length === 0) {
+      setAppointments([]);
+      return;
+    }
+
+    // Group appointments by month
+    const monthsMap = {};
+    data.forEach(apt => {
+      const month = apt.month || apt.targetMonth || 
+        new Date(apt.date).toLocaleString('default', { month: 'long' }).toUpperCase();
+      if (!monthsMap[month]) {
+        monthsMap[month] = { month, appointments: [] };
+      }
+      monthsMap[month].appointments.push(apt);
+    });
+
+    const groupedAppointments = Object.values(monthsMap);
+    setAppointments(groupedAppointments);
+    setLoading(false);
+  };
+
   const value = {
     appointments,
     loading,
     addAppointment,
     deleteAppointment,
-    updateAppointment  // ✅ Yahan add karein
+    updateAppointment,
+    syncAppointments,
   };
 
   return (

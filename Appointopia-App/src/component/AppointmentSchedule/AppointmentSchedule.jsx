@@ -23,7 +23,7 @@ import {
   FaTimes,
 } from "react-icons/fa";
 
-// ✅ Firebase Services
+// Firebase Services
 import {
   getAppointments,
   addAppointment as firebaseAddAppointment,
@@ -46,8 +46,7 @@ import { useToast } from "../Toast";
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-export default function AppointmentSchedule() {
-
+export default function AppointmentSchedule({ onAppointmentsSync }) {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -68,10 +67,10 @@ export default function AppointmentSchedule() {
   const [activePanel, setActivePanel] = useState(null);
   const [currentWeekStart, setCurrentWeekStart] = useState(new Date());
 
-  // ✅ Week view expanded events state
+  // Week view expanded events state
   const [expandedWeekEvents, setExpandedWeekEvents] = useState({});
 
-  // ✅ Edit mode state
+  // Edit mode state
   const [editingEvent, setEditingEvent] = useState(null);
   const [editFormData, setEditFormData] = useState({
     title: "",
@@ -128,7 +127,7 @@ export default function AppointmentSchedule() {
     setCheckingAuth(false);
   }, [navigate, location.pathname]);
 
-  // ===== ✅ LOAD APPOINTMENTS FROM FIREBASE =====
+  // ===== LOAD APPOINTMENTS FROM FIREBASE =====
   useEffect(() => {
     loadAppointments();
   }, []);
@@ -137,12 +136,11 @@ export default function AppointmentSchedule() {
     try {
       setLoading(true);
       const data = await getAppointments();
-      console.log("📥 Appointments loaded from Firebase:", data.length);
       
       if (data.length === 0) {
-        console.log("📭 No appointments found");
         setAppointments([]);
         setLoading(false);
+        if (onAppointmentsSync) onAppointmentsSync([]);
         return;
       }
 
@@ -161,8 +159,7 @@ export default function AppointmentSchedule() {
         month: item.targetMonth || new Date(item.date).toLocaleString('default', { month: 'long' }).toUpperCase()
       }));
       
-      console.log("📊 Formatted appointments:", formattedData.length);
-      
+      // Group appointments by month
       const monthsMap = {};
       formattedData.forEach(apt => {
         const monthKey = apt.month || new Date(apt.date).toLocaleString('default', { month: 'long' }).toUpperCase();
@@ -173,7 +170,6 @@ export default function AppointmentSchedule() {
       });
       
       const groupedAppointments = Object.values(monthsMap);
-      console.log("📊 Grouped months:", groupedAppointments.map(m => m.month));
       setAppointments(groupedAppointments);
       
       const state = {};
@@ -181,16 +177,22 @@ export default function AppointmentSchedule() {
         state[month.month] = true;
       });
       setExpandedMonths(state);
+      
+      // ✅ Sync appointments to context for Sidebar
+      if (onAppointmentsSync) {
+        onAppointmentsSync(formattedData);
+      }
+      
     } catch (error) {
-      console.error("❌ Error loading appointments:", error);
+      console.error("Error loading appointments:", error);
       setAppointments([]);
-      toast.error('❌ Load Failed', 'Failed to load appointments. Please refresh.');
+      toast.error('Load Failed', 'Failed to load appointments. Please refresh.');
     } finally {
       setLoading(false);
     }
   };
 
-  // ===== ✅ TOGGLE WEEK EVENTS =====
+  // ===== TOGGLE WEEK EVENTS =====
   const toggleWeekEvents = (dateStr) => {
     setExpandedWeekEvents(prev => ({
       ...prev,
@@ -198,7 +200,7 @@ export default function AppointmentSchedule() {
     }));
   };
 
-  // ===== ✅ EDIT FUNCTIONS =====
+  // ===== EDIT FUNCTIONS =====
   const startEditing = (appointment) => {
     setEditingEvent(appointment.id);
     setEditFormData({
@@ -211,7 +213,7 @@ export default function AppointmentSchedule() {
       bookings: appointment.bookings || 0,
       bookingPage: appointment.bookingPage || ""
     });
-    toast.info('✏️ Editing', `Editing "${appointment.title}"`);
+    toast.info('Editing', `Editing "${appointment.title}"`);
   };
 
   const cancelEditing = () => {
@@ -226,18 +228,16 @@ export default function AppointmentSchedule() {
       bookings: 0,
       bookingPage: ""
     });
-    toast.info('✏️ Edit Cancelled', 'Changes have been discarded.');
+    toast.info('Edit Cancelled', 'Changes have been discarded.');
   };
 
   const saveEdit = async (appointmentId) => {
-    // ✅ Show loading toast
-    const loadingToast = toast.loading('💾 Saving Changes...', 'Please wait');
+    const loadingToast = toast.loading('Saving Changes...', 'Please wait');
     
     try {
-      // ✅ Validate
       if (!editFormData.title.trim()) {
         loadingToast.dismiss();
-        toast.warning('⚠️ Missing Title', 'Please enter an appointment title.');
+        toast.warning('Missing Title', 'Please enter an appointment title.');
         return;
       }
       
@@ -257,28 +257,17 @@ export default function AppointmentSchedule() {
       await loadAppointments();
       cancelEditing();
       
-      // ✅ Success toast
-      loadingToast.success(
-        '✅ Appointment Updated!',
-        `"${editFormData.title}" has been updated successfully.`
-      );
-      console.log("✅ Appointment updated successfully!");
+      loadingToast.success('Appointment Updated!', `"${editFormData.title}" has been updated successfully.`);
     } catch (error) {
-      console.error("❌ Error updating appointment:", error);
-      // ✅ Error toast
-      loadingToast.error(
-        '❌ Update Failed',
-        error.message || 'Something went wrong. Please try again.'
-      );
+      console.error("Error updating appointment:", error);
+      loadingToast.error('Update Failed', error.message || 'Something went wrong. Please try again.');
     }
   };
 
-  // ===== ✅ CRUD OPERATIONS =====
+  // ===== CRUD OPERATIONS =====
   const handleAddAppointment = async (newAppointment, targetMonth) => {
     const loadingToast = toast.loading('Creating Appointment...', 'Please wait');
     try {
-      console.log("📝 Adding appointment:", newAppointment, "to month:", targetMonth);
-      
       const userStr = localStorage.getItem("currentUser");
       const user = userStr ? JSON.parse(userStr) : null;
 
@@ -294,64 +283,65 @@ export default function AppointmentSchedule() {
       };
 
       await firebaseAddAppointment(appointmentWithDate);
-      console.log("✅ Appointment saved to Firebase, reloading...");
       await loadAppointments();
-      loadingToast.success(
-        '🎉 Appointment Created!',
-        `"${newAppointment.title}" has been scheduled successfully.`
-      );
+      loadingToast.success('Appointment Created!', `"${newAppointment.title}" has been scheduled successfully.`);
     } catch (error) {
-      console.error("❌ Error adding appointment:", error);
-      loadingToast.error(
-        '❌ Creation Failed',
-        error.message || 'Something went wrong. Please try again.'
-      );
+      console.error("Error adding appointment:", error);
+      loadingToast.error('Creation Failed', error.message || 'Something went wrong. Please try again.');
     }
   };
 
+  // Update appointment — Local state update + Firebase update
   const handleUpdateAppointment = async (id, data) => {
     const loadingToast = toast.loading('Updating Appointment...', 'Please wait');
+    
     try {
-      console.log("✏️ Updating appointment:", id, data);
       await firebaseUpdateAppointment(id, {
         ...data,
         updatedAt: new Date().toISOString()
       });
+      
+      // Update local state (INSTANT UI UPDATE)
+      setAppointments(prevAppointments => {
+        return prevAppointments.map(month => ({
+          ...month,
+          appointments: month.appointments.map(apt => 
+            apt.id === id ? { ...apt, ...data } : apt
+          )
+        }));
+      });
+      
+      // Background refresh (silent sync)
       await loadAppointments();
-      loadingToast.success(
-        '✅ Appointment Updated!',
-        'Your appointment has been updated successfully.'
-      );
+      
+      loadingToast.success('Appointment Updated!', 'Changes saved successfully.');
     } catch (error) {
-      console.error("❌ Error updating appointment:", error);
-      loadingToast.error(
-        '❌ Update Failed',
-        error.message || 'Something went wrong. Please try again.'
-      );
+      console.error("Error updating appointment:", error);
+      loadingToast.error('Update Failed', error.message || 'Something went wrong.');
+      await loadAppointments();
     }
   };
 
+  // Delete appointment — Local state update + Firebase delete
   const handleDeleteAppointment = async (id) => {
-    // ✅ Confirmation
-    // if (!window.confirm('Are you sure you want to delete this appointment?')) {
-    //   return;
-    // }
-    
-    const loadingToast = toast.loading('🗑️ Deleting Appointment...', 'Please wait');
+    const loadingToast = toast.loading('Deleting Appointment...', 'Please wait');
 
     try {
       await firebaseDeleteAppointment(id);
-      await loadAppointments();
-      loadingToast.success(
-        '✅ Appointment Deleted!',
-        'The appointment has been removed successfully.'
-      );
+      
+      // Update local state (INSTANT UI UPDATE)
+      setAppointments(prevAppointments => {
+        return prevAppointments.map(month => ({
+          ...month,
+          appointments: month.appointments.filter(apt => apt.id !== id)
+        })).filter(month => month.appointments.length > 0);
+      });
+      
+      loadingToast.success('Appointment Deleted!', 'Removed successfully.');
     } catch (error) {
-      console.error("❌ Error deleting appointment:", error);
-      loadingToast.error(
-        '❌ Delete Failed',
-        error.message || 'Something went wrong. Please try again.'
-      );
+      console.error("Error deleting appointment:", error);
+      loadingToast.error('Delete Failed', error.message || 'Something went wrong.');
+      await loadAppointments();
     }
   };
 
@@ -403,7 +393,7 @@ export default function AppointmentSchedule() {
     localStorage.removeItem("currentUser");
     setActivePanel(null);
     navigate("/signin");
-    toast.success('👋 Logged Out', 'You have been logged out successfully.');
+    toast.success('Logged Out', 'You have been logged out successfully.');
   };
   
   const handleProfileClick = () => {
@@ -425,17 +415,17 @@ export default function AppointmentSchedule() {
 
   const previousYear = () => {
     setCurrentYear(y => y - 1);
-    toast.info('📅 Year Changed', `Showing ${currentYear - 1}`);
+    toast.info('Year Changed', `Showing ${currentYear - 1}`);
   };
   
   const nextYear = () => {
     setCurrentYear(y => y + 1);
-    toast.info('📅 Year Changed', `Showing ${currentYear + 1}`);
+    toast.info('Year Changed', `Showing ${currentYear + 1}`);
   };
   
   const goToThisMonth = () => {
     setCurrentYear(new Date().getFullYear());
-    toast.info('📅 This Month', 'Showing current month.');
+    toast.info('This Month', 'Showing current month.');
   };
 
   const goToPreviousWeek = () => {
@@ -452,7 +442,7 @@ export default function AppointmentSchedule() {
 
   const goToThisWeek = () => {
     setCurrentWeekStart(new Date());
-    toast.info('📅 This Week', 'Showing current week.');
+    toast.info('This Week', 'Showing current week.');
   };
 
   const getWeekRangeText = () => {
@@ -611,7 +601,7 @@ export default function AppointmentSchedule() {
     { name: 'brown', bg: '#8B5E3C', text: '#ffffff' }
   ];
 
-  // ✅ Render month edit form
+  // Render month edit form
   const renderMonthEditForm = (appointment) => {
     return (
       <div className="month-edit-form" style={{
@@ -789,11 +779,8 @@ export default function AppointmentSchedule() {
     );
   };
 
-  // ✅ Get events with +X more
-  // Sort ALL of the day's appointments chronologically FIRST, then decide what's
-  // visible. This guarantees the earliest events are always shown and the hidden
-  // count (+X more) is always accurate, no matter what order they came back from Firebase.
-  const getEventsWithMoreButton = (dayAppointments, dateStr, isExpanded) => {
+  // Decide which of a day's appointments are visible vs hidden behind "+X more"
+  const getVisibleDayEvents = (dayAppointments, isExpanded) => {
     const MAX_VISIBLE = 3;
 
     const sortedAll = [...dayAppointments].sort((a, b) => {
@@ -802,29 +789,65 @@ export default function AppointmentSchedule() {
 
     const hasMore = sortedAll.length > MAX_VISIBLE;
     const hiddenCount = Math.max(sortedAll.length - MAX_VISIBLE, 0);
-    const sortedEvents = isExpanded ? sortedAll : sortedAll.slice(0, MAX_VISIBLE);
-    
-    const groups = [];
-    sortedEvents.forEach(event => {
-      const eventStart = event.startTime || "09:00";
-      const eventEnd = event.endTime || "10:00";
-      
-      let placed = false;
-      for (let group of groups) {
-        const lastEvent = group[group.length - 1];
-        const lastEnd = lastEvent.endTime || "10:00";
-        if (eventStart >= lastEnd) {
-          group.push(event);
-          placed = true;
-          break;
+    const visibleEvents = isExpanded ? sortedAll : sortedAll.slice(0, MAX_VISIBLE);
+
+    return { visibleEvents, hasMore, hiddenCount };
+  };
+
+  // Lay out a day's events side-by-side
+  const layoutDayEvents = (events) => {
+    if (events.length === 0) return [];
+
+    const sorted = [...events].sort((a, b) =>
+      (a.startTime || "09:00").localeCompare(b.startTime || "09:00")
+    );
+
+    // Split into clusters of overlapping events
+    const clusters = [];
+    let cluster = [sorted[0]];
+    let clusterEnd = sorted[0].endTime || "10:00";
+
+    for (let i = 1; i < sorted.length; i++) {
+      const ev = sorted[i];
+      const start = ev.startTime || "09:00";
+      const end = ev.endTime || "10:00";
+
+      if (start < clusterEnd) {
+        cluster.push(ev);
+        if (end > clusterEnd) clusterEnd = end;
+      } else {
+        clusters.push(cluster);
+        cluster = [ev];
+        clusterEnd = end;
+      }
+    }
+    clusters.push(cluster);
+
+    // Within each cluster, pack events into columns
+    const placements = [];
+    clusters.forEach((clusterEvents) => {
+      const columnEnds = [];
+      const clusterPlacements = [];
+
+      clusterEvents.forEach((event) => {
+        const start = event.startTime || "09:00";
+        const end = event.endTime || "10:00";
+
+        let col = columnEnds.findIndex((endTime) => endTime <= start);
+        if (col === -1) {
+          col = columnEnds.length;
+          columnEnds.push(end);
+        } else {
+          columnEnds[col] = end;
         }
-      }
-      if (!placed) {
-        groups.push([event]);
-      }
+        clusterPlacements.push({ event, col });
+      });
+
+      const totalCols = columnEnds.length;
+      clusterPlacements.forEach((p) => placements.push({ ...p, totalCols }));
     });
-    
-    return { groups, hasMore, hiddenCount };
+
+    return placements;
   };
 
   return (
@@ -891,7 +914,7 @@ export default function AppointmentSchedule() {
                   className={view === "week" ? "active" : ""} 
                   onClick={() => {
                     setView("week");
-                    toast.info('📋 Week View', 'Switched to week view.');
+                    toast.info('Week View', 'Switched to week view.');
                   }}
                 >
                   Week
@@ -900,7 +923,7 @@ export default function AppointmentSchedule() {
                   className={view === "month" ? "active" : ""} 
                   onClick={() => {
                     setView("month");
-                    toast.info('📋 Month View', 'Switched to month view.');
+                    toast.info('Month View', 'Switched to month view.');
                   }}
                 >
                   Month
@@ -939,7 +962,7 @@ export default function AppointmentSchedule() {
                   setFilterType("all");
                   setFilterDuration("all");
                   setShowFilter(false);
-                  toast.info('🧹 Filters Cleared', 'All filters have been reset.');
+                  toast.info('Filters Cleared', 'All filters have been reset.');
                 }}
                 className="clear-filter"
               >
@@ -948,7 +971,7 @@ export default function AppointmentSchedule() {
             </div>
           )}
 
-          {/* ✅ WEEK VIEW */}
+          {/* WEEK VIEW */}
           {view === "week" ? (
             <div className="week-view-container">
               <div className="week-header">
@@ -990,20 +1013,16 @@ export default function AppointmentSchedule() {
                   const dateStr = `${year}-${month}-${dayNum}`;
                   
                   const isExpanded = expandedWeekEvents[dateStr] || false;
-                  const { groups, hasMore, hiddenCount } = getEventsWithMoreButton(dayAppointments, dateStr, isExpanded);
+                  const { visibleEvents, hasMore, hiddenCount } = getVisibleDayEvents(dayAppointments, isExpanded);
+                  const placements = layoutDayEvents(visibleEvents);
 
-                  // ✅ Find the bottom edge of the last VISIBLE event so the
-                  // +X more / Show less chip sits right after the real events
-                  // (bottom-right of the stack), instead of floating pinned to
-                  // the bottom of the whole 24hr column.
+                  // Find the bottom edge of the last VISIBLE event
                   let chipTop = 44;
-                  groups.forEach(group => {
-                    group.forEach(appt => {
-                      const evStart = appt.startTime || "09:00";
-                      const evEnd = appt.endTime || "10:00";
-                      const pos = getEventPosition(evStart, evEnd);
-                      chipTop = Math.max(chipTop, pos.top + pos.height);
-                    });
+                  placements.forEach(({ event }) => {
+                    const evStart = event.startTime || "09:00";
+                    const evEnd = event.endTime || "10:00";
+                    const pos = getEventPosition(evStart, evEnd);
+                    chipTop = Math.max(chipTop, pos.top + pos.height);
                   });
                   
                   return (
@@ -1014,66 +1033,52 @@ export default function AppointmentSchedule() {
                         ))}
                       </div>
 
-                      {groups.map((group, groupIndex) => {
-                        const groupSize = group.length;
-                        const widthPerEvent = groupSize > 1 ? 100 / groupSize : 100;
-                        
-                        return group.map((appointment, eventIndex) => {
-                          const startTime = appointment.startTime || "09:00";
-                          const endTime = appointment.endTime || "10:00";
-                          const { top, height } = getEventPosition(startTime, endTime);
-                          const color = getEventColor(appointment.color || "purple");
-                          
-                          const offset = groupSize > 1 ? (eventIndex * widthPerEvent) : 0;
-                          const width = groupSize > 1 ? widthPerEvent - 4 : 100;
-                          
-                          return (
-                            <div
-                              key={appointment.id}
-                              className="week-event-item"
-                              style={{
-                                top: `${top}px`,
-                                height: `${height}px`,
-                                left: `${4 + (offset * 0.96)}%`,
-                                width: `${width}%`,
-                                background: color.bg,
-                                color: color.text,
-                                zIndex: 10 + eventIndex,
-                                position: 'absolute',
-                                borderRadius: '6px',
-                                padding: '6px 8px',
-                                fontSize: '11px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                gap: '2px',
-                                overflow: 'hidden',
-                                cursor: 'default',
-                                minHeight: '30px',
-                                border: '1px solid rgba(255,255,255,0.2)',
+                      {placements.map(({ event: appointment, col, totalCols }) => {
+                        const startTime = appointment.startTime || "09:00";
+                        const endTime = appointment.endTime || "10:00";
+                        const { top, height } = getEventPosition(startTime, endTime);
+                        const color = getEventColor(appointment.color || "purple");
+
+                        const GAP = totalCols > 1 ? 2 : 0;
+                        const usableWidth = 96;
+                        const colWidth = (usableWidth - GAP * (totalCols - 1)) / totalCols;
+                        const left = 2 + col * (colWidth + GAP);
+
+                        return (
+                          <div
+                            key={appointment.id}
+                            className="week-event-item"
+                            style={{
+                              top: `${top}px`,
+                              height: `${height}px`,
+                              left: `${left}%`,
+                              width: `${colWidth}%`,
+                              background: color.bg,
+                              color: color.text,
+                              zIndex: 10 + col,
+                            }}
+                          >
+                            <button
+                              className="week-event-delete"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDeleteAppointment(appointment.id);
                               }}
                             >
-                              <button
-                                className="week-event-delete"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDeleteAppointment(appointment.id);
-                                }}
-                              >
-                                <FaTrash />
-                              </button>
-                              <strong>{appointment.title}</strong>
-                              <span>
-                                <FaClock style={{ fontSize: '8px', marginRight: '2px' }} />
-                                {startTime} - {endTime}
+                              <FaTrash />
+                            </button>
+                            <strong>{appointment.title}</strong>
+                            <span>
+                              <FaClock style={{ fontSize: '8px', marginRight: '2px' }} />
+                              {startTime} - {endTime}
+                            </span>
+                            {appointment.location && (
+                              <span style={{ fontSize: '8px', opacity: 0.8 }}>
+                                {appointment.location}
                               </span>
-                              {appointment.location && (
-                                <span style={{ fontSize: '8px', opacity: 0.8 }}>
-                                  📍 {appointment.location}
-                                </span>
-                              )}
-                            </div>
-                          );
-                        });
+                            )}
+                          </div>
+                        );
                       })}
 
                       {hasMore && (
@@ -1146,7 +1151,7 @@ export default function AppointmentSchedule() {
               </div>
             </div>
           ) : (
-            /* ✅ MONTH VIEW */
+            /* MONTH VIEW */
             <div className="months-container">
               {visibleMonths.map((month) => (
                 <div className="month-section" key={month.month}>
@@ -1214,7 +1219,6 @@ export default function AppointmentSchedule() {
         <CreateAppointment
           onClose={() => setShowCreate(false)}
           onSave={(newAppointment, targetMonth) => {
-            console.log("📝 CreateAppointment onSave called:", newAppointment, targetMonth);
             handleAddAppointment(newAppointment, targetMonth);
             setShowCreate(false);
             

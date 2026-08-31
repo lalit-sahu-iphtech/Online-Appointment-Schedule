@@ -15,17 +15,17 @@ export default function AddInviteeModal({ onClose, onAdd }) {
     const handleAdd = () => {
         if (!name.trim()) {
             setError("Name is required");
-            toast.warning('⚠️ Missing Name', 'Please enter a name.');
+            toast.warning("Missing Name", "Please enter a name.");
             return;
         }
         if (!isValidEmail(email.trim())) {
             setError("Enter a valid email address");
-            toast.warning('⚠️ Invalid Email', 'Please enter a valid email address.');
+            toast.warning("Invalid Email", "Please enter a valid email address.");
             return;
         }
 
         onAdd({ name: name.trim(), email: email.trim() });
-        toast.success('👤 Invitee Added', `${name.trim()} has been added.`);
+        toast.success("Invitee Added", name.trim() + " has been added.");
         
         setName("");
         setEmail("");
@@ -41,7 +41,7 @@ export default function AddInviteeModal({ onClose, onAdd }) {
 
     const handleDone = () => {
         onClose();
-        toast.info('✅ Done', 'Invitee modal closed.');
+        toast.info("Done", "Invitee modal closed.");
     };
 
     return (

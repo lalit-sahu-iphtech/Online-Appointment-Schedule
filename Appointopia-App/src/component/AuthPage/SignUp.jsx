@@ -86,7 +86,7 @@ export default function SignUp() {
 
       // ✅ Success toast
       toast.success(
-        "🎉 Account Created!",
+        " Account Created!",
         `Welcome ${formData.name.trim()}! Your account has been created successfully.`
       );
 
@@ -97,13 +97,13 @@ export default function SignUp() {
       });
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/calendar");
       }, 1500);
     } catch (error) {
       console.error("Sign up error:", error);
       
       let errorMessage = "Something went wrong. Please try again.";
-      let toastTitle = "❌ Sign Up Failed";
+      let toastTitle = " Sign Up Failed";
       
       if (error.code === "auth/email-already-in-use") {
         errorMessage = "This email is already registered. Please sign in instead.";

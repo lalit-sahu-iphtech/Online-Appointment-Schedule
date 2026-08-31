@@ -58,7 +58,7 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
     }
     if (event.onlineLink) {
       window.open(event.onlineLink, "_blank");
-      toast.info('🔗 Joining Meeting', `Opening ${event.meetingName}...`);
+      toast.info(' Joining Meeting', `Opening ${event.meetingName}...`);
     } else {
       toast.warning('⚠️ No Link', 'This meeting does not have an online link.');
     }
@@ -117,13 +117,13 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
 
             {event.location && (
               <div className="reminder-location">
-                📍 {event.location}
+                 {event.location}
               </div>
             )}
 
             {event.diffMinutes <= 0 && event.diffMinutes >= -5 && (
               <div className="reminder-urgency">
-                🔴 Meeting in progress
+                 Meeting in progress
               </div>
             )}
           </div>

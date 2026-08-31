@@ -1,5 +1,5 @@
 // src/component/Workflows/WorkflowCard.jsx
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaPlay } from "react-icons/fa";
 import "./WorkflowCard.css";
 import { useToast } from "../Toast";
 
@@ -11,6 +11,7 @@ export default function WorkflowCard({
   onUse, 
   onEdit, 
   onDelete, 
+  onExecute,
   isTemplate = true 
 }) {
   const toast = useToast();
@@ -20,7 +21,7 @@ export default function WorkflowCard({
 
   const handleUse = () => {
     onUse(id);
-    toast.success('⚡ Workflow Activated!', `"${title}" has been activated.`);
+    toast.success('Workflow Activated', `"${title}" has been activated.`);
   };
 
   const handleEdit = () => {
@@ -37,6 +38,12 @@ export default function WorkflowCard({
     }
   };
 
+  const handleExecute = () => {
+    if (onExecute) {
+      onExecute(id);
+    }
+  };
+
   return (
     <div className={`workflow-card ${isBefore ? "card-before" : "card-after"}`}>
       <div className="workflow-card-left-border" />
@@ -47,8 +54,8 @@ export default function WorkflowCard({
             <div className="workflow-card-title-row">
               <h3 className="workflow-card-title">{title}</h3>
               
-              {/* ✅ Edit aur Delete button */}
               <div className="workflow-card-actions">
+                
                 {onEdit && (
                   <button 
                     className="workflow-card-edit-btn" 
@@ -71,7 +78,6 @@ export default function WorkflowCard({
             </div>
             <p className="workflow-card-description">{description}</p>
             
-            {/* ✅ Sirf badge */}
             <span className="workflow-card-badge">
               {isTemplate ? "Template" : "My Workflow"}
             </span>
