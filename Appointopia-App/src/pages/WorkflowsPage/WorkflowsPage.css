@@ -1,95 +1,321 @@
-/* src/pages/WorkflowsPage/WorkflowsPage.css */
-
+/* src/pages/workflowsPage.css */
 /* =====================================================
-   WORKFLOWS PAGE — layout shell only
+   WORKFLOWS PAGE
 ===================================================== */
 
 .workflows-page {
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    background: #ffffff;
-    font-family: "Poppins", sans-serif;
-    overflow: hidden;
-  }
-  
-  /* Sidebar */
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  background: #ffffff;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+
+/* Sidebar */
+.workflows-page > .sidebar {
+  width: 208px;
+  height: 100vh;
+  flex-shrink: 0;
+}
+
+/* Main Content */
+.workflows-page .workflows-main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* Workflows Content */
+.workflows-page .workflows-content {
+  width: 100%;
+  height: 100%;
+  padding: 20px 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =====================================================
+ WORKFLOWS TOPBAR (Same as Calendar)
+===================================================== */
+
+.workflows-content .workflows-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.workflows-content .workflows-topbar h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #171A1F;
+}
+
+.workflows-content .workflows-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Create Button - Same as Calendar */
+.workflows-content .workflows-create-btn {
+  height: 42px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  background-color: #8659D3;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.workflows-content .workflows-create-btn span {
+  font-size: 25px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.workflows-content .workflows-create-btn:hover {
+  background-color: #7544c8;
+}
+
+/* Icons - Same as Calendar */
+.workflows-content .workflows-topbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.workflows-content .workflows-icon-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background-color: #F3F4F6;
+  color: #667085;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+}
+
+.workflows-content .workflows-icon-btn:hover {
+  background-color: #e7e8eb;
+}
+
+/* Notification Dot */
+.workflows-content .workflows-notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #F3F4F6;
+}
+
+/* Avatar - Same as Calendar */
+.workflows-content .workflows-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.workflows-content .workflows-avatar-icon {
+  width: 36px;
+  height: 36px;
+  color: #8659D3;
+}
+
+.workflows-content .workflows-avatar-chevron {
+  font-size: 11px;
+  color: #667085;
+}
+
+/* =====================================================
+ WORKFLOWS CONTAINER
+===================================================== */
+
+.workflows-content .workflows-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 15px 24px 25px;
+  min-height: calc(100vh - 200px);
+  box-sizing: border-box;
+}
+
+/* =====================================================
+ RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
   .workflows-page > .sidebar {
-    width: 208px;
-    height: 100vh;
-    flex-shrink: 0;
-  }
-  
-  /* Main */
-  .workflows-page .workflows-main {
-    flex: 1;
-    min-width: 0;
-    height: 100vh;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-  
-  /* Content scroll area */
-  .workflows-page .workflows-content {
-    width: 100%;
-    height: 100%;
-    padding: 24px 32px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-  
-  /* Scrollbar */
-  .workflows-page .workflows-content::-webkit-scrollbar {
-    width: 6px;
-  }
-  
-  .workflows-page .workflows-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  
-  .workflows-page .workflows-content::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
-  }
-  
-  .workflows-page .workflows-content::-webkit-scrollbar-thumb:hover {
-    background: #b8bbc1;
-  }
-  
-  /* =====================================================
-     RESPONSIVE
-  ===================================================== */
-  
-  @media (max-width: 1000px) {
-    .workflows-page > .sidebar {
       width: 200px;
       flex-basis: 200px;
-    }
-  
-    .workflows-page .workflows-content {
-      padding: 20px;
-    }
   }
-  
-  @media (max-width: 768px) {
-    .workflows-page > .sidebar {
+
+  .workflows-page .workflows-content {
+      padding: 20px;
+  }
+
+  .workflows-content .workflows-topbar h1 {
+      font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .workflows-page > .sidebar {
       width: 75px;
       flex-basis: 75px;
-    }
-  
-    .workflows-page .workflows-content {
-      padding: 16px;
-    }
   }
-  
-  @media (max-width: 500px) {
-    .workflows-page > .sidebar {
+
+  .workflows-page .workflows-content {
+      padding: 15px;
+  }
+
+  .workflows-content .workflows-topbar {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+  }
+
+  .workflows-content .workflows-topbar h1 {
+      font-size: 24px;
+  }
+
+  .workflows-content .workflows-topbar-right {
+      width: 100%;
+      justify-content: flex-start;
+  }
+
+  .workflows-content .workflows-create-btn {
+      height: 38px;
+      padding: 0 14px;
+      font-size: 13px;
+  }
+
+  .workflows-content .workflows-create-btn span {
+      font-size: 20px;
+  }
+
+  .workflows-content .workflows-icon-btn {
+      width: 34px;
+      height: 34px;
+      font-size: 13px;
+  }
+
+  .workflows-content .workflows-avatar-icon {
+      width: 30px;
+      height: 30px;
+  }
+
+  /* Hide comment icon on tablet */
+  .workflows-content .workflows-topbar-icons .workflows-icon-btn:nth-child(3) {
+      display: none;
+  }
+
+  .workflows-content .workflows-container {
+      padding: 12px 16px 20px;
+      min-height: calc(100vh - 260px);
+  }
+}
+
+@media (max-width: 500px) {
+  .workflows-page > .sidebar {
       width: 60px;
       flex-basis: 60px;
-    }
-  
-    .workflows-page .workflows-content {
-      padding: 12px;
-    }
   }
+
+  .workflows-page .workflows-content {
+      padding: 10px;
+  }
+
+  .workflows-content .workflows-topbar h1 {
+      font-size: 20px;
+  }
+
+  .workflows-content .workflows-topbar-right {
+      gap: 8px;
+  }
+
+  .workflows-content .workflows-create-btn {
+      height: 34px;
+      padding: 0 10px;
+      font-size: 12px;
+  }
+
+  .workflows-content .workflows-create-btn span {
+      font-size: 18px;
+  }
+
+  .workflows-content .workflows-icon-btn {
+      width: 30px;
+      height: 30px;
+      font-size: 12px;
+  }
+
+  .workflows-content .workflows-avatar-icon {
+      width: 28px;
+      height: 28px;
+  }
+
+  .workflows-content .workflows-avatar-chevron {
+      font-size: 9px;
+  }
+
+  .workflows-content .workflows-notification-dot {
+      width: 6px;
+      height: 6px;
+      top: 6px;
+      right: 6px;
+  }
+
+  .workflows-content .workflows-container {
+      padding: 10px 12px 16px;
+      min-height: calc(100vh - 220px);
+  }
+
+  /* Hide comment and notification on mobile */
+  .workflows-content .workflows-topbar-icons .workflows-icon-btn:nth-child(2),
+  .workflows-content .workflows-topbar-icons .workflows-icon-btn:nth-child(3) {
+      display: none;
+  }
+}
+
+/* =====================================================
+ SCROLLBAR STYLING
+===================================================== */
+
+.workflows-page .workflows-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.workflows-page .workflows-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.workflows-page .workflows-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.workflows-page .workflows-content::-webkit-scrollbar-thumb:hover {
+  background: #b8bbc1;
+}
