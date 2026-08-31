@@ -26,7 +26,7 @@ export default function EventDetailsModal({ event, onClose, onExpand, onEdit, on
       return;
     }
     navigator.clipboard.writeText(meetingLink);
-    toast.success('📋 Copied!', 'Meeting link copied to clipboard.');
+    toast.success(' Copied!', 'Meeting link copied to clipboard.');
   };
 
   const handleEdit = () => {
