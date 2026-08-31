@@ -15,10 +15,10 @@
 }
 
 .topbar h1 {
-    margin: 0;
     font-size: 32px;
     font-weight: 700;
     color: #171A1F;
+    margin-left: 20px;
 }
 
 /* =====================================================
