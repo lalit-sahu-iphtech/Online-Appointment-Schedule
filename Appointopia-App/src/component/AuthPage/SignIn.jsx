@@ -68,19 +68,19 @@ export default function SignIn() {
 
       // ✅ Success toast
       toast.success(
-        "👋 Welcome Back!",
+        " Welcome Back!",
         `Hello ${userData.name}! You have been signed in successfully.`
       );
-      console.log('✅ Toast called successfully');
+      console.log(' Toast called successfully');
       setFormData({ email: "", password: "" });
 
       setTimeout(() => {
-        navigate("/");
+        navigate("/calendar");
       }, 1500);
     } catch (error) {
       // ✅ Handle Firebase errors
       let errorMessage = "Something went wrong. Please try again.";
-      let toastTitle = "❌ Sign In Failed";
+      let toastTitle = " Sign In Failed";
       
       switch (error.code) {
         case "auth/user-not-found":
