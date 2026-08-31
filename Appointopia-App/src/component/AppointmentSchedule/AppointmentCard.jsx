@@ -55,19 +55,19 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         if (navigator.share) {
             try {
                 await navigator.share(shareData);
-                toast.success('📤 Shared!', `"${appointment.title}" shared successfully.`);
+                toast.success(' Shared!', `"${appointment.title}" shared successfully.`);
             } catch (err) {
                 if (err.name !== 'AbortError') {
-                    toast.error('❌ Share Failed', 'Unable to share. Please try again.');
+                    toast.error(' Share Failed', 'Unable to share. Please try again.');
                 }
             }
         } else {
             try {
                 await navigator.clipboard.writeText(`https://${appointment.bookingPage || 'appointopia.com'}`);
-                toast.success('📋 Copied!', 'Booking link copied to clipboard.');
+                toast.success(' Copied!', 'Booking link copied to clipboard.');
             } catch (err) {
                 console.error('Failed to copy:', err);
-                toast.error('❌ Copy Failed', 'Unable to copy link. Please try again.');
+                toast.error(' Copy Failed', 'Unable to copy link. Please try again.');
             }
         }
     };
@@ -79,19 +79,19 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         //     return;
         // }
         
-        const loadingToast = toast.loading('🗑️ Deleting...', 'Please wait');
+        const loadingToast = toast.loading(' Deleting...', 'Please wait');
         
         try {
             // ✅ Wait for onDelete to complete
             await onDelete(appointment.id);
             loadingToast.success(
-                '✅ Deleted!',
+                ' Deleted!',
                 `"${appointment.title}" has been removed successfully.`
             );
         } catch (error) {
             console.error('Delete error:', error);
             loadingToast.error(
-                '❌ Delete Failed',
+                ' Delete Failed',
                 error.message || 'Something went wrong. Please try again.'
             );
         }
@@ -107,7 +107,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
             }
             
             // Save changes
-            const loadingToast = toast.loading('💾 Saving...', 'Please wait');
+            const loadingToast = toast.loading(' Saving...', 'Please wait');
             
             try {
                 const updatedData = {
@@ -126,7 +126,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                 // ✅ Wait for onUpdate to complete
                 await onUpdate(updatedData);
                 loadingToast.success(
-                    '✅ Updated!',
+                    ' Updated!',
                     `"${editedTitle}" has been updated successfully.`
                 );
                 
@@ -136,7 +136,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
             } catch (error) {
                 console.error('Update error:', error);
                 loadingToast.error(
-                    '❌ Update Failed',
+                    ' Update Failed',
                     error.message || 'Something went wrong. Please try again.'
                 );
                 return;
@@ -161,13 +161,13 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         setEditedColor(appointment.color || "purple");
         setEditedBookingPage(appointment.bookingPage || "");
         setIsEditing(false);
-        toast.info('✏️ Edit Cancelled', 'Changes have been discarded.');
+        toast.info(' Edit Cancelled', 'Changes have been discarded.');
     };
 
     // ✅ Color change handler
     const handleColorChange = (colorName) => {
         setEditedColor(colorName);
-        toast.info('🎨 Color Changed', `Event color set to ${colorName}`);
+        toast.info(' Color Changed', `Event color set to ${colorName}`);
     };
 
     return (
@@ -241,7 +241,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                 ) : (
                     appointment.location && (
                         <div style={{ fontSize: '12px', color: '#4e5662', marginTop: '6px' }}>
-                            📍 {appointment.location}
+                             {appointment.location}
                         </div>
                     )
                 )}
