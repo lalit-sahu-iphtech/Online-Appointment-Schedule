@@ -8,7 +8,7 @@ A modern, full-featured appointment scheduling application built with React. Man
 [![EmailJS](https://img.shields.io/badge/EmailJS-3-FF6B6B?logo=emailjs)](https://www.emailjs.com/)
 [![License](https://img.shields.io/badge/License-MIT-green)](#license)
 
-![Appointopia Banner](./public/banner.png)
+
 
 ---
 
