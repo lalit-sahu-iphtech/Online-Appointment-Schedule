@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import Workflows from "../../component/Workflows/Workflows";
 import Sidebar from "../../component/Sidebar/Sidebar";
-import "./workflowsPage.css";
+import "./WorkflowsPage.css";
 
 export default function WorkflowsPage() {
     const [workflows, setWorkflows] = useState([]);
