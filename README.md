@@ -145,142 +145,53 @@ Appointopia-App/
 │   │   └── images/                     # Icons & general images (logo, social, illustrations)
 │   ├── component/                      # Reusable UI components
 │   │   ├── AppointmentSchedule/        # Appointment cards & schedule list
-│   │   │   ├── AppointmentCard.jsx
-│   │   │   ├── AppointmentCard.css
-│   │   │   ├── AppointmentSchedule.jsx
-│   │   │   └── appointmentSchedule.css
 │   │   ├── AuthPage/                   # Sign in / Sign up
-│   │   │   ├── SignIn.jsx
-│   │   │   ├── SignUp.jsx
-│   │   │   └── auth.css
 │   │   ├── Calendar/                   # Calendar views & modals
-│   │   │   ├── Calendar.jsx
-│   │   │   ├── DayView.jsx
-│   │   │   ├── WeekView.jsx
-│   │   │   ├── MonthView.jsx
-│   │   │   ├── AddMeetingModal.jsx / .css
-│   │   │   ├── AddInviteeModal.jsx / .css
-│   │   │   ├── EventDetailsModal.jsx / .css
-│   │   │   ├── Reminder.jsx / .css
-│   │   │   └── calendar.css
 │   │   ├── Comman/                     # Shared Topbar component
-│   │   │   ├── Topbar.jsx
-│   │   │   └── Topbar.css
 │   │   ├── CreateAppointment/          # Appointment creation modal
-│   │   │   ├── CreateAppointment.jsx
-│   │   │   └── createAppointment.css
 │   │   ├── Faq/
-│   │   │   ├── Faq.jsx
-│   │   │   └── faq.css
 │   │   ├── Footer/
-│   │   │   ├── Footer.jsx
-│   │   │   └── footer.css
 │   │   ├── GetStarted/
-│   │   │   ├── GetStarted.jsx
-│   │   │   └── getstarted.css
 │   │   ├── Hero/
-│   │   │   ├── Hero.jsx
-│   │   │   └── hero.css
 │   │   ├── Navbar/
-│   │   │   ├── Navbar.jsx
-│   │   │   └── navbar.css
 │   │   ├── Scheduling/
-│   │   │   ├── Scheduling.jsx
-│   │   │   └── scheduling.css
 │   │   ├── Sidebar/
-│   │   │   ├── Sidebar.jsx
-│   │   │   └── sidebar.css
 │   │   ├── Statistics/
-│   │   │   ├── Statistics.jsx
-│   │   │   └── statistics.css
 │   │   ├── Toast/                      # Toast notification system
-│   │   │   ├── ToastContainer.jsx
-│   │   │   ├── ToastContext.jsx
-│   │   │   ├── ToastItem.jsx
-│   │   │   ├── useToast.js
-│   │   │   ├── index.js
-│   │   │   └── toast.css
 │   │   ├── WhatsNew/
-│   │   │   ├── WhatsNew.jsx
-│   │   │   └── whatsnew.css
 │   │   ├── Workflows/                  # Workflow automation UI
-│   │   │   ├── Workflows.jsx
-│   │   │   ├── WorkflowCard.jsx / .css
-│   │   │   ├── CreateWorkflowModal.jsx
-│   │   │   ├── createWorkflowModal.css
-│   │   │   └── workflows.css
 │   │   ├── Layout.jsx                  # App shell layout (Sidebar + Topbar)
 │   │   └── Layout.css
 │   ├── context/                        # React Context providers
-│   │   ├── AppointmentContext.jsx
-│   │   └── NotificationContext.jsx
 │   ├── data/
-│   │   └── appointmentData.js          # Seed/mock appointment data
+         # Seed/mock appointment data
 │   ├── firebase/
-│   │   └── firebase.js                 # Firebase app configuration
+             # Firebase app configuration
 │   ├── hooks/
-│   │   └── useNotifications.js
+
 │   ├── layouts/
-│   │   ├── FooterLayout.jsx            # Layout wrapper for marketing/footer pages
+          # Layout wrapper for marketing/footer pages
 │   │   └── FooterLayout.css
 │   ├── pages/                          # Route-level pages
 │   │   ├── AppointmentSchedulePage/
-│   │   │   ├── AppointmentSchedulePage.jsx
-│   │   │   └── appointmentSchedulePage.css
 │   │   ├── CalendarPage/
-│   │   │   ├── CalendarPage.jsx
-│   │   │   └── calendarPage.css
 │   │   ├── CompanyPage/
-│   │   │   ├── CompanyPage.jsx
-│   │   │   └── companyPage.css
 │   │   ├── FooterPages/                # Marketing / static content pages
 │   │   │   ├── About/
-│   │   │   │   ├── AboutUs.jsx
-│   │   │   │   └── ContactUs.jsx
 │   │   │   ├── Blog/
-│   │   │   │   ├── Organization.jsx
-│   │   │   │   ├── Personal.jsx
-│   │   │   │   └── Startup.jsx
 │   │   │   ├── Legal/
-│   │   │   │   ├── Privacy.jsx
-│   │   │   │   ├── Sitemap.jsx
-│   │   │   │   └── Terms.jsx
 │   │   │   ├── Product/
-│   │   │   │   ├── Features.jsx
-│   │   │   │   └── Pricing.jsx
 │   │   │   ├── Resource/
-│   │   │   │   ├── Blog.jsx
-│   │   │   │   ├── UserGuides.jsx
-│   │   │   │   └── Webinars.jsx
 │   │   │   └── Page.css
 │   │   ├── PricingPage/
-│   │   │   ├── PricingPage.jsx
-│   │   │   └── pricingPage.css
 │   │   ├── ProductPage/
-│   │   │   ├── ProductPage.jsx
-│   │   │   └── productPage.css
 │   │   ├── Profile/
-│   │   │   ├── Profile.jsx
-│   │   │   └── profile.css
-│   │   ├── ResourcePage/
-│   │   │   ├── ResourcePage.jsx
-│   │   │   └── resourcePage.css
+│   │   ├── ResourcePage/  
 │   │   ├── Setting/
-│   │   │   ├── Setting.jsx
-│   │   │   └── setting.css
 │   │   └── WorkflowsPage/
-│   │       ├── WorkflowsPage.jsx
-│   │       └── WorkflowsPage.css
 │   ├── services/                       # Firebase-backed data/service layer
-│   │   ├── authService.js
-│   │   ├── firestoreService.js
-│   │   └── workflowExecutor.js
+│   │    
 │   ├── utils/                          # Utility helpers
-│   │   ├── colorUtils.js
-│   │   ├── dateTimeHelper.js
-│   │   ├── dateUtils.js
-│   │   ├── nextEventHelper.js
-│   │   └── notificationService.js
 │   ├── App.jsx                         # Root component & routes
 │   ├── App.css
 │   ├── index.css                       # Global styles
