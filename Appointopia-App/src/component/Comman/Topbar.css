@@ -343,15 +343,18 @@
         gap: 10px;
         flex-direction: column;
     }
+   
 
     .topbar h1 {
         font-size: 22px;
+        margin-left: 30px;
     }
 
     .topbar-create-btn {
         height: 38px;
         padding: 0 12px;
         font-size: 13px;
+        margin-left: 30px;
     }
 
     .topbar-dropdown {

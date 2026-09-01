@@ -1,0 +1,26 @@
+/* src/layouts/FooterLayout.css */
+.footer-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  .footer-page-content {
+    flex: 1;
+    padding: 100px 8% 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  
+  @media (max-width: 768px) {
+    .footer-page-content {
+      padding: 80px 5% 40px;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .footer-page-content {
+      padding: 70px 4% 30px;
+    }
+  }

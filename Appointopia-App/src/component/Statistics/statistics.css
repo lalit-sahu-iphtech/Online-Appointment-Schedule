@@ -3,244 +3,342 @@
 ========================= */
 
 .statistics {
-    width: 100%;
-  
-    background: #ffffff;
-  
-    padding: 45px 0 65px;
-  
-    font-family: "Poppins", sans-serif;
-  
-    box-sizing: border-box;
+  width: 100%;
+  background: #ffffff;
+  padding: 45px 0 65px;
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   CONTAINER
+========================= */
+
+.statistics-container {
+  width: 82%;
+  max-width: 1470px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 30px;
+}
+
+
+/* =========================
+   CARD - Clickable
+========================= */
+
+.stat-card {
+  min-height: 250px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-sizing: border-box;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  user-select: none;
+}
+
+.stat-card:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.stat-card:active {
+  transform: scale(0.97);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Tooltip hint on hover */
+.stat-card::after {
+  content: 'Click to learn more';
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  color: #70727c;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-weight: 400;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.stat-card:hover::after {
+  opacity: 0.7;
+}
+
+/* Focus state for keyboard navigation */
+.stat-card:focus-visible {
+  outline: 3px solid #8555d5;
+  outline-offset: 2px;
+}
+
+
+/* =========================
+   ICON
+========================= */
+
+.stat-icon {
+  height: 55px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 50px;
+}
+
+.stat-icon svg {
+  width: 52px;
+  height: 52px;
+  stroke-width: 1.5;
+}
+
+
+/* =========================
+   NUMBER
+========================= */
+
+.stat-card h2 {
+  margin: 0 0 8px;
+  font-size: 32px;
+  color: #8659D3FF;
+  line-height: 1;
+  font-weight: 700;
+}
+
+
+/* =========================
+   TITLE
+========================= */
+
+.stat-card p {
+  margin: 0;
+  color: #303440;
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+
+
+/* =========================
+   CARD 1 - Users
+========================= */
+
+.users-card {
+  background: #f6f3fcff;
+}
+
+.users-card .stat-icon,
+.users-card h2 {
+  color: #8659D3FF;
+}
+
+.users-card:hover {
+  background: #ede6fa;
+}
+
+
+/* =========================
+   CARD 2 - Meeting
+========================= */
+
+.meeting-card-st {
+  background: #fff7f0ff;
+}
+
+.meeting-card-st .stat-icon,
+.meeting-card-st h2 {
+  color: #ff7f00ff;
+}
+
+.meeting-card-st:hover {
+  background: #ffede0;
+}
+
+
+/* =========================
+   CARD 3 - Business
+========================= */
+
+.business-card {
+  background: #ebfdfdff;
+}
+
+.business-card .stat-icon,
+.business-card h2 {
+  color: #0ea5a8ff;
+}
+
+.business-card:hover {
+  background: #d9f8f8;
+}
+
+
+/* =========================
+   CARD 4 - Time
+========================= */
+
+.time-card {
+  background: #f2F7FDFF;
+}
+
+.time-card .stat-icon,
+.time-card h2 {
+  color: #237BD3FF;
+}
+
+.time-card:hover {
+  background: #e3edf7;
+}
+
+
+/* =====================================================
+   TABLET
+===================================================== */
+
+@media (max-width: 1000px) {
+  .statistics {
+    padding: 35px 0 50px;
   }
-  
-  
-  /* =========================
-     CONTAINER
-  ========================= */
-  
+
   .statistics-container {
-    width: 82%;
-  
-    max-width: 1470px;
-  
-    margin: 0 auto;
-  
-    display: grid;
-  
-    grid-template-columns: repeat(4, 1fr);
-  
-    gap: 30px;
+    width: 90%;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
   }
-  
-  
-  /* =========================
-     CARD
-  ========================= */
-  
+
   .stat-card {
-    min-height: 250px;
-  
-    border-radius: 12px;
-  
-    display: flex;
-  
-    flex-direction: column;
-  
-    align-items: center;
-  
-    justify-content: center;
-  
-    text-align: center;
-  
-    box-sizing: border-box;
-  
-    transition: transform 0.2s ease;
+    min-height: 220px;
   }
-  
-  
-  .stat-card:hover {
-    transform: translateY(-4px);
+
+  .stat-card::after {
+    font-size: 10px;
+    bottom: 8px;
   }
-  
-  
-  /* =========================
-     ICON
-  ========================= */
-  
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media (max-width: 600px) {
+  .statistics {
+    padding: 25px 0 40px;
+  }
+
+  .statistics-container {
+    width: 90%;
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .stat-card {
+    min-height: 190px;
+  }
+
+  .stat-card::after {
+    display: none; /* hide tooltip on small screens */
+  }
+
   .stat-icon {
-    height: 55px;
-  
-    display: flex;
-  
-    align-items: center;
-  
-    justify-content: center;
-  
-    margin-bottom: 50px;
+    margin-bottom: 15px;
   }
-  
-  
+
   .stat-icon svg {
-    width: 52px;
-  
-    height: 52px;
-  
-    stroke-width: 1.5;
+    width: 45px;
+    height: 45px;
   }
-  
-  
-  /* =========================
-     NUMBER
-  ========================= */
-  
+
   .stat-card h2 {
-    margin: 0 0 8px;
-  
     font-size: 32px;
-    color: #8659D3FF;
-  
-    line-height: 1;
-  
-    font-weight: 700;
   }
-  
-  
-  /* =========================
-     TITLE
-  ========================= */
-  
+
   .stat-card p {
-    margin: 0;
-  
-    color: #303440;
-  
-    font-size: 20px;
-  
-    font-weight: 400;
-  
-    line-height: 1.4;
+    font-size: 17px;
   }
-  
-  
-  /* =========================
-     CARD 1
-  ========================= */
-  
-  .users-card {
-    background: #f6f3fcff;
+}
+
+/* =====================================================
+   EXTRA SMALL MOBILE
+===================================================== */
+
+@media (max-width: 360px) {
+  .statistics {
+    padding: 20px 0 30px;
   }
-  
-  .users-card .stat-icon,
-  .users-card h2 {
-    color: #8659D3FF;
+
+  .statistics-container {
+    width: 95%;
+    gap: 12px;
   }
-  
-  
-  /* =========================
-     CARD 2
-  ========================= */
-  
-  .meeting-card-st {
-    background: #fff7f0ff;
+
+  .stat-card {
+    min-height: 160px;
+    padding: 15px;
   }
-  
-  .meeting-card-st .stat-icon,
-  .meeting-card-st h2 {
-    color: #ff7f00ff;
+
+  .stat-icon {
+    margin-bottom: 10px;
   }
-  
-  
-  /* =========================
-     CARD 3
-  ========================= */
-  
-  .business-card {
-    background: #ebfdfdff;
+
+  .stat-icon svg {
+    width: 38px;
+    height: 38px;
   }
-  
-  .business-card .stat-icon,
-  .business-card h2 {
-    color: #0ea5a8ff;
+
+  .stat-card h2 {
+    font-size: 28px;
   }
-  
-  
-  /* =========================
-     CARD 4
-  ========================= */
-  
-  .time-card {
-    background: #f2F7FDFF;
+
+  .stat-card p {
+    font-size: 15px;
   }
-  
-  .time-card .stat-icon,
-  .time-card h2 {
-    color: #237BD3FF;
+}
+
+/* =====================================================
+   UTILITY - Disable click if needed
+===================================================== */
+
+.stat-card.disabled {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.stat-card.disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.stat-card.disabled::after {
+  display: none !important;
+}
+
+/* =====================================================
+   ACCESSIBILITY - Reduced motion
+===================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-card {
+    transition: none !important;
   }
-  
-  
-  /* =========================
-     TABLET
-  ========================= */
-  
-  @media (max-width: 1000px) {
-  
-    .statistics {
-      padding: 35px 0 50px;
-    }
-  
-    .statistics-container {
-      width: 90%;
-  
-      grid-template-columns: repeat(2, 1fr);
-  
-      gap: 20px;
-    }
-  
-    .stat-card {
-      min-height: 220px;
-    }
-  
+
+  .stat-card::after {
+    transition: none !important;
   }
-  
-  
-  /* =========================
-     MOBILE
-  ========================= */
-  
-  @media (max-width: 600px) {
-  
-    .statistics {
-      padding: 25px 0 40px;
-    }
-  
-    .statistics-container {
-      width: 90%;
-  
-      grid-template-columns: 1fr;
-  
-      gap: 16px;
-    }
-  
-    .stat-card {
-      min-height: 190px;
-    }
-  
-    .stat-icon {
-      margin-bottom: 15px;
-    }
-  
-    .stat-icon svg {
-      width: 45px;
-      height: 45px;
-    }
-  
-    .stat-card h2 {
-      font-size: 32px;
-    }
-  
-    .stat-card p {
-      font-size: 17px;
-    }
-  
+
+  .stat-card:hover {
+    transform: none !important;
   }
+
+  .stat-card:active {
+    transform: none !important;
+  }
+}

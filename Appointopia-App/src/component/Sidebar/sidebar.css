@@ -23,7 +23,7 @@
 }
 
 /* =========================
-   MOBILE MENU BUTTON
+   MOBILE MENU BUTTON - UPDATED
 ========================= */
 
 .sidebar-mobile-toggle {
@@ -96,7 +96,7 @@
 
 
 /* =========================
-   MOBILE CLOSE BUTTON
+   MOBILE CLOSE BUTTON - UPDATED
 ========================= */
 
 .sidebar-close-mobile {
@@ -109,14 +109,14 @@
     border-radius: 50%;
 
     background: #f3f4f6;
-    color: #6b7280;
+    color: #8555D5;
 
     cursor: pointer;
 
     align-items: center;
     justify-content: center;
 
-    font-size: 15px;
+    font-size: 18px;
 
     flex-shrink: 0;
 
@@ -125,7 +125,7 @@
 
 .sidebar-close-mobile:hover {
     background: #f4effd;
-    color: #8555D5;
+    color: #7346c4;
     transform: rotate(90deg);
 }
 
@@ -785,10 +785,6 @@
    RESPONSIVE - MOBILE (up to 768px)
 ========================= */
 
-/* =========================
-   RESPONSIVE - MOBILE
-========================= */
-
 @media (max-width: 768px) {
 
     /* =========================
@@ -886,6 +882,7 @@
 
     .sidebar-close-mobile {
         display: flex;
+        font-size: 18px;  /* ✅ Larger icon for close */
     }
 
 
@@ -988,6 +985,7 @@
         font-size: 28px;
     }
 }
+
 /* =========================
    RESPONSIVE - EXTRA SMALL (up to 500px)
 ========================= */

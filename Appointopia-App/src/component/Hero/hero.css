@@ -450,18 +450,21 @@
 
 
 /* =========================
-   MOBILE
+   MOBILE - UPDATED
 ========================= */
 
 @media (max-width: 500px) {
 
   .hero {
-    min-height: 600px;
+    min-height: 550px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
 
   .hero-content {
-    padding: 45px 15px 0;
+    padding: 35px 15px 0;
   }
 
 
@@ -480,6 +483,8 @@
     font-size: 10px;
 
     line-height: 1.6;
+    
+    max-width: 100%;
   }
 
 
@@ -495,75 +500,65 @@
   }
 
 
+  /* =========================
+     HIDE PROFILE IMAGES ON MOBILE
+  ========================= */
+  
+  .hero-profile-left,
+  .hero-profile-right,
+  .hero-profile-small {
+    display: none !important;
+  }
+
+
+  /* =========================
+     HIDE HEART ICON ON MOBILE
+  ========================= */
+  
+  .hero-heart {
+    display: none !important;
+  }
+
+
+  /* =========================
+     CENTER ILLUSTRATION ON MOBILE
+  ========================= */
+  
   .hero-illustration {
     width: 100%;
-
-    height: 270px;
-
-    margin-top: 10px;
+    max-width: 400px;
+    height: auto;
+    min-height: 220px;
+    margin: 10px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+ 
   }
 
 
   .hero-main-image {
-    width: 320px;
-
-    height: 260px;
-
-    left: 50%;
+    width: 100%;
+    max-width: 320px;
+    height: auto;
+    position: relative;
+    left: 0;
+    transform: none;
+    margin: 0 auto;
+    display: block;
+    margin-left: -30px;
+    margin-top: 20px;
   }
 
 
   .hero-dots {
-    width: 210px;
-    height: 170px;
-
+    width: 180px;
+    height: 140px;
+    position: absolute;
     right: 2%;
-
-    top: 30px;
-  }
-
-
-  .hero-heart {
-    width: 44px;
-    height: 44px;
-
-    right: 8%;
-
-    top: 70px;
-  }
-
-
-  .hero-heart svg {
-    font-size: 20px;
-  }
-
-
-  .hero-profile-left {
-    width: 40px;
-    height: 40px;
-
-    left: 4%;
-
-    top: 90px;
-  }
-
-
-  .hero-profile-right {
-    width: 40px;
-    height: 40px;
-
-    right: 4%;
-
-    top: 90px;
-  }
-
-
-  .hero-profile-small {
-    width: 30px;
-    height: 30px;
-
-    right: 12%;
-
-    top: 270px;
+    top: 20px;
+    opacity: 0.6;
+    
   }
 }

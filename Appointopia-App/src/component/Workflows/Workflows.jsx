@@ -85,7 +85,7 @@ const DEFAULT_WORKFLOWS = [
   },
 ];
 
-export default function Workflows({ onWorkflowsChange }) {
+export default function Workflows({ onWorkflowsChange, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -104,8 +104,16 @@ export default function Workflows({ onWorkflowsChange }) {
   const [filterOpen, setFilterOpen] = useState(false);
   const [activeFilter, setActiveFilter] = useState("all");
   const [activePanel, setActivePanel] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   const { addNotifications } = useNotificationsContext();
+
+  // ✅ Notify parent when date changes
+  useEffect(() => {
+    if (onDateChange) {
+      onDateChange(selectedDate);
+    }
+  }, [selectedDate, onDateChange]);
 
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));

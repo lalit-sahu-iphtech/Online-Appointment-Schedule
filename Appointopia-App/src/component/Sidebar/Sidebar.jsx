@@ -14,7 +14,8 @@ import {
   FaCalendarCheck,
   FaMapPin,
   FaTimes,
-  FaBars
+  FaAngleDoubleRight,
+  FaAngleDoubleLeft
 } from "react-icons/fa";
 import { MdEventNote } from "react-icons/md";
 import { BiGitBranch } from "react-icons/bi";
@@ -79,26 +80,6 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
       }
     });
     return count;
-  };
-
-  // ✅ Get color based on event category or type
-  const getEventCardColor = (event) => {
-    if (event.color) {
-      const colorMap = {
-        purple: '#8755D5',
-        teal: '#16A6AD',
-        orange: '#FF7800',
-        blue: '#2F80D7',
-        pink: '#E84C8A',
-        green: '#27AE60',
-        red: '#E74C3C',
-        yellow: '#F2C94C',
-        indigo: '#4A56E2',
-        brown: '#8B5E3C'
-      };
-      return colorMap[event.color] || '#8755D5';
-    }
-    return '#8755D5';
   };
 
   // ✅ Get event type label
@@ -253,19 +234,18 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
     return event.onlineLink || event.link || null;
   };
 
-  // ✅ Get event date
-  const getEventDate = (event) => {
-    if (event.date) {
-      const d = new Date(event.date);
-      if (!isNaN(d.getTime())) {
-        return d.toLocaleDateString('en-US', { 
-          weekday: 'short', 
-          month: 'short', 
-          day: 'numeric' 
-        });
-      }
+  // ✅ Check if path is active (FIXED - More robust)
+  const isPathActive = (path) => {
+    const currentPath = location.pathname;
+    
+    // For Calendar - match exactly or home page
+    if (path === '/calendar') {
+      return currentPath === '/calendar' || currentPath === '/';
     }
-    return null;
+    
+    // For other paths - check if current path starts with the menu path
+    // This handles /appointment-schedule and /workflows properly
+    return currentPath.startsWith(path);
   };
 
   return (
@@ -277,7 +257,7 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
           onClick={toggleMobileSidebar}
           aria-label="Open sidebar"
         >
-          <FaBars />
+          <FaAngleDoubleRight />
         </button>
       )}
 
@@ -303,14 +283,14 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
             onClick={() => setIsMobileOpen(false)}
             aria-label="Close sidebar"
           >
-            <FaTimes />
+            <FaAngleDoubleLeft />
           </button>
         </div>
 
         {/* Menu */}
         <nav className="sidebar-menu">
           {menuItems.map(({ path, label, icon: Icon }) => {
-            const isActive = location.pathname.startsWith(path);
+            const isActive = isPathActive(path);
             return (
               <Link to={path} key={path} className="sidebar-link" onClick={() => setIsMobileOpen(false)}>
                 <div className={isActive ? "sidebar-item-active" : "sidebar-item"}>
@@ -329,11 +309,6 @@ export default function Sidebar({ events = [], selectedDate = new Date() }) {
               <span className="next-event-label">
                 {getEventTypeLabel(nextEvent)}
               </span>
-              {/* {getEventDate(nextEvent) && (
-                <span className="next-event-date">
-                  {getEventDate(nextEvent)}
-                </span>
-              )} */}
             </div>
             
             <div className="next-event-content">

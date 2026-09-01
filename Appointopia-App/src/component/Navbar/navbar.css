@@ -14,10 +14,10 @@
 
   box-sizing: border-box;
   position: relative;
-  z-index: 10;
+  z-index: 100;
 }
 
-.logo-link{
+.logo-link {
   text-decoration: none;
 }
 
@@ -197,7 +197,173 @@
 }
 
 /* =========================
-   RESPONSIVE
+   MOBILE MENU TOGGLE BUTTON
+========================= */
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #292929;
+  cursor: pointer;
+  padding: 4px;
+  margin-top: -2px;
+  transition: color 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+  color: #8555d5;
+}
+
+/* =========================
+   MOBILE MENU OVERLAY
+========================= */
+
+.mobile-menu-overlay {
+  display: none;
+  position: fixed;
+  top: 42px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  animation: fadeIn 0.3s ease;
+}
+
+.mobile-menu-overlay.active {
+  display: block;
+}
+
+.mobile-menu-content {
+  background: #ffffff;
+  height: auto;
+  padding: 20px 24px 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: slideDown 0.3s ease;
+}
+
+.mobile-nav-links {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 24px 0;
+}
+
+.mobile-nav-links li {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.mobile-nav-links li:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-links a {
+  text-decoration: none;
+  color: #292929;
+  font-size: 18px;
+  font-weight: 500;
+  transition: color 0.2s ease;
+  display: block;
+}
+
+.mobile-nav-links a:hover {
+  color: #8555d5;
+}
+
+/* Mobile Auth Buttons */
+.mobile-auth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.mobile-sign-in-btn {
+  color: #8555d5;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.mobile-sign-in-btn:hover {
+  background: #f5f0ff;
+}
+
+.mobile-sign-up-btn {
+  color: #ffffff;
+  background-color: #8555d5;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 10px;
+  text-align: center;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.mobile-sign-up-btn:hover {
+  background-color: #7346c4;
+  transform: translateY(-1px);
+}
+
+.mobile-logout-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: none;
+  background: #fef2f2;
+  color: #ef4444;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-logout-btn:hover {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.mobile-logout-btn .logout-icon {
+  font-size: 16px;
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* =========================
+   RESPONSIVE - TABLET & MOBILE
 ========================= */
 
 @media (max-width: 768px) {
@@ -205,39 +371,65 @@
     display: none;
   }
 
+  .nav-right {
+    display: none;
+  }
+
+  .mobile-menu-toggle {
+    display: block;
+  }
+
   .navbar {
     padding: 5px 16px 0 12px;
+    align-items: center;
+    height: 56px;
   }
 
   .nav-left h1 {
     font-size: 20px;
   }
-
-  .sign-in-btn,
-  .sign-up-btn,
-  .logout-btn {
-    font-size: 12px;
-    padding: 4px 10px;
-  }
 }
 
 @media (max-width: 500px) {
+  .navbar {
+    height: 52px;
+    padding: 5px 12px 0 12px;
+  }
+
   .nav-left h1 {
     font-size: 18px;
   }
 
-  .sign-in-btn {
-    font-size: 11px;
-    padding: 4px 2px;
+  .mobile-menu-toggle {
+    font-size: 22px;
   }
 
-  .sign-up-btn {
-    font-size: 11px;
-    padding: 4px 10px;
+  .mobile-menu-content {
+    padding: 16px 20px 24px;
   }
 
-  .logout-btn {
-    font-size: 11px;
-    padding: 4px 10px;
+  .mobile-nav-links a {
+    font-size: 16px;
+  }
+
+  .mobile-sign-in-btn,
+  .mobile-sign-up-btn,
+  .mobile-logout-btn {
+    font-size: 15px;
+    padding: 8px;
+  }
+}
+
+/* =========================
+   LARGE SCREEN SAFETY
+========================= */
+
+@media (min-width: 769px) {
+  .mobile-menu-toggle {
+    display: none !important;
+  }
+  
+  .mobile-menu-overlay {
+    display: none !important;
   }
 }

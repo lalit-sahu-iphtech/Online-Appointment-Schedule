@@ -23,6 +23,32 @@ import ResourcePage from "./pages/ResourcePage/ResourcePage";
 import CompanyPage from "./pages/CompanyPage/CompanyPage";
 import PricingPage from "./pages/PricingPage/PricingPage";
 
+// ===== FOOTER PAGE IMPORTS =====
+import FooterLayout from "./layouts/FooterLayout";
+
+// Product Pages
+import Features from "./pages/FooterPages/Product/Features";
+import Pricing from "./pages/FooterPages/Product/Pricing";
+
+// Resource Pages
+import Blog from "./pages/FooterPages/Resource/Blog";
+import UserGuides from "./pages/FooterPages/Resource/UserGuides";
+import Webinars from "./pages/FooterPages/Resource/Webinars";
+
+// About Pages
+import AboutUs from "./pages/FooterPages/About/AboutUs";
+import ContactUs from "./pages/FooterPages/About/ContactUs";
+
+// Blog Category Pages
+import Personal from "./pages/FooterPages/Blog/Personal";
+import Startup from "./pages/FooterPages/Blog/Startup";
+import Organization from "./pages/FooterPages/Blog/Organization";
+
+// Legal Pages
+import Privacy from "./pages/FooterPages/Legal/Privacy";
+import Terms from "./pages/FooterPages/Legal/Terms";
+import Sitemap from "./pages/FooterPages/Legal/Sitemap";
+
 function App() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -103,6 +129,30 @@ function App() {
       {/* Auth Pages */}
       <Route path="/signup" element={<SignUp />} />
       <Route path="/signin" element={<SignIn />} />
+
+      {/* ===== FOOTER PAGES ===== */}
+      {/* Product */}
+      <Route path="/features" element={<FooterLayout><Features /></FooterLayout>} />
+      <Route path="/pricing-plans" element={<FooterLayout><Pricing /></FooterLayout>} />
+
+      {/* Resource */}
+      <Route path="/blog" element={<FooterLayout><Blog /></FooterLayout>} />
+      <Route path="/user-guides" element={<FooterLayout><UserGuides /></FooterLayout>} />
+      <Route path="/webinars" element={<FooterLayout><Webinars /></FooterLayout>} />
+
+      {/* About */}
+      <Route path="/about" element={<FooterLayout><AboutUs /></FooterLayout>} />
+      <Route path="/contact" element={<FooterLayout><ContactUs /></FooterLayout>} />
+
+      {/* Blog Categories */}
+      <Route path="/blog/personal" element={<FooterLayout><Personal /></FooterLayout>} />
+      <Route path="/blog/startup" element={<FooterLayout><Startup /></FooterLayout>} />
+      <Route path="/blog/organization" element={<FooterLayout><Organization /></FooterLayout>} />
+
+      {/* Legal */}
+      <Route path="/privacy" element={<FooterLayout><Privacy /></FooterLayout>} />
+      <Route path="/terms" element={<FooterLayout><Terms /></FooterLayout>} />
+      <Route path="/sitemap" element={<FooterLayout><Sitemap /></FooterLayout>} />
     </Routes>
   );
 }

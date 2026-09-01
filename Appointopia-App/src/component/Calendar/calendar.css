@@ -1233,9 +1233,14 @@
     .calendar-date h2 {
         font-size: 13px;
     }
+    .today-btn{
+        margin-left: 10px;
+    }
+
 
     .calendar-view button {
         min-width: 50px;
+        margin-left: 40px;
     }
 
     .time-column {
