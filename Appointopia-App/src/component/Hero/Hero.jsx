@@ -2,7 +2,7 @@ import "./hero.css"
 import { FaRegHeart } from "react-icons/fa";
 
 import profile1 from "../../assets/hero/A1.jpg";
-import profile2 from "../../assets/hero/j1.jpg";
+import profile2 from "../../assets/hero/J1.jpg";
 import profile3 from "../../assets/hero/B1.jpg";
 import heroImg from "../../assets/hero/hero.png";
 import dotImg from "../../assets/images/dotImg.png";
