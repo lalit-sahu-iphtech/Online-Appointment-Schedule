@@ -1,7 +1,7 @@
 // src/component/AppointmentSchedule/AppointmentSchedule.jsx
 import { getEventColor } from "../../utils/colorUtils";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   FaPlus,
   FaSearch,
@@ -46,7 +46,7 @@ import { useToast } from "../Toast";
 const MONTHS = ["JAN", "FEB", "MARCH", "APRIL", "MAY", "JUNE", 
                 "JULY", "AUG", "SEP", "OCT", "NOV", "DEC"];
 
-export default function AppointmentSchedule({ onAppointmentsSync }) {
+export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }) {
   const navigate = useNavigate();
   const location = useLocation();
   const toast = useToast();
@@ -90,7 +90,29 @@ export default function AppointmentSchedule({ onAppointmentsSync }) {
   const { addNotifications } = useNotificationsContext();
 
   // ===== ALL EFFECTS =====
+  const isFirstRender = useRef(true);
+  const prevDateRef = useRef(null);
   
+  // ✅ Notify parent when date changes (currentWeekStart or currentYear)
+  useEffect(() => {
+    // Skip first render to avoid unnecessary calls
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
+    if (onDateChange) {
+      const dateToSend = view === "week" ? currentWeekStart : new Date(currentYear, 0, 1);
+      
+      // ✅ Check if date actually changed
+      const dateStr = dateToSend.toDateString();
+      if (prevDateRef.current !== dateStr) {
+        prevDateRef.current = dateStr;
+        onDateChange(dateToSend);
+      }
+    }
+  }, [currentWeekStart, currentYear, view, onDateChange]);
+
   // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
