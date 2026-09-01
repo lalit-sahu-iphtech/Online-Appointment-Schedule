@@ -1,5 +1,5 @@
 // src/component/Workflows/Workflows.jsx
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import {
   FaSearch,
   FaRegBell,
@@ -40,8 +40,9 @@ const DEFAULT_WORKFLOWS = [
     description:
       "Reminder emails prevent overlooking important events/tasks in both professional and personal settings.",
     trigger: "1 day before event happens",
-    actions: ["Send email to guests"],
+    actions: [{ type: "email", label: "Send email to guests", config: {} }],
     isTemplate: true,
+    isDefault: true,
   },
   {
     id: 2,
@@ -50,8 +51,9 @@ const DEFAULT_WORKFLOWS = [
     description:
       "A cancellation email is a communication sent to inform recipients that a previously scheduled event has been canceled.",
     trigger: "2 hours before event happens",
-    actions: ["Send cancellation notification"],
+    actions: [{ type: "email", label: "Send cancellation notification", config: {} }],
     isTemplate: true,
+    isDefault: true,
   },
   {
     id: 3,
@@ -60,8 +62,9 @@ const DEFAULT_WORKFLOWS = [
     description:
       "Thank-you emails are a thoughtful way to acknowledge someone's actions and show that their efforts are valued and recognized.",
     trigger: "Immediately after event happens",
-    actions: ["Send thank you email"],
+    actions: [{ type: "email", label: "Send thank you email", config: {} }],
     isTemplate: true,
+    isDefault: true,
   },
   {
     id: 4,
@@ -70,8 +73,9 @@ const DEFAULT_WORKFLOWS = [
     description:
       "The presentations cover a wide range of topics discussed by our esteemed speakers, offering valuable insights.",
     trigger: "Immediately after event happens",
-    actions: ["Send eBook download link"],
+    actions: [{ type: "email", label: "Send eBook download link", config: {} }],
     isTemplate: true,
+    isDefault: true,
   },
   {
     id: 5,
@@ -80,10 +84,14 @@ const DEFAULT_WORKFLOWS = [
     description:
       "Wrap-Up Report that highlights the key takeaways, accomplishments, and insights from the event.",
     trigger: "1 day after event happens",
-    actions: ["Send wrap-up report"],
+    actions: [{ type: "email", label: "Send wrap-up report", config: {} }],
     isTemplate: true,
+    isDefault: true,
   },
 ];
+
+// ✅ Default workflow IDs for quick reference
+const DEFAULT_WORKFLOW_IDS = [1, 2, 3, 4, 5];
 
 export default function Workflows({ onWorkflowsChange, onDateChange }) {
   const navigate = useNavigate();
@@ -107,13 +115,33 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const { addNotifications } = useNotificationsContext();
+  
+  // ✅ Refs to prevent infinite loop
+  const prevDateRef = useRef(null);
+  const onDateChangeRef = useRef(onDateChange);
+  const isFirstRender = useRef(true);
 
-  // ✅ Notify parent when date changes
+  // ✅ Update ref when prop changes
   useEffect(() => {
-    if (onDateChange) {
-      onDateChange(selectedDate);
+    onDateChangeRef.current = onDateChange;
+  }, [onDateChange]);
+
+  // ✅ Notify parent when date changes (without infinite loop)
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
     }
-  }, [selectedDate, onDateChange]);
+
+    if (!onDateChangeRef.current) return;
+
+    const dateStr = selectedDate.toDateString();
+    
+    if (prevDateRef.current !== dateStr) {
+      prevDateRef.current = dateStr;
+      onDateChangeRef.current(selectedDate);
+    }
+  }, [selectedDate]);
 
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
@@ -142,6 +170,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
       const templates = data.filter(w => w.isTemplate === true);
       const userWorkflows = data.filter(w => w.isTemplate === false);
       
+      // ✅ Merge default templates with Firebase templates
       const mergedTemplates = DEFAULT_WORKFLOWS.map(template => {
         const existing = templates.find(w => w.id === template.id);
         return existing || template;
@@ -150,7 +179,6 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
       const allWorkflows = [...mergedTemplates, ...userWorkflows];
       setWorkflows(allWorkflows);
       
-      // ✅ Notify parent about workflow changes
       if (onWorkflowsChange) {
         onWorkflowsChange(allWorkflows);
       }
@@ -166,6 +194,11 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     }
   };
 
+  // ✅ Check if workflow is a default template (read-only)
+  const isDefaultTemplate = (workflow) => {
+    return DEFAULT_WORKFLOW_IDS.includes(workflow.id) && workflow.isTemplate === true;
+  };
+
   const handleAddWorkflow = async (newWorkflow) => {
     const loadingToast = toast.loading('Creating Workflow...', 'Please wait');
     
@@ -176,6 +209,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
       const workflowWithUser = {
         ...newWorkflow,
         isTemplate: false,
+        isDefault: false,
         createdBy: user?.email || "unknown",
         createdByName: user?.email?.split('@')[0] || "User",
         createdAt: new Date().toISOString(),
@@ -199,6 +233,13 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
   };
 
   const handleUpdateWorkflow = async (id, data) => {
+    // ✅ Check if it's a default template
+    const workflow = workflows.find(w => w.id === id);
+    if (isDefaultTemplate(workflow)) {
+      toast.warning('Cannot Edit', 'Default templates cannot be edited.');
+      return;
+    }
+
     const loadingToast = toast.loading('Updating Workflow...', 'Please wait');
     
     try {
@@ -221,7 +262,16 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     }
   };
 
+  // ✅ DELETE workflow - Modified to prevent deleting default templates
   const handleDeleteWorkflow = async (id) => {
+    const workflow = workflows.find(w => w.id === id);
+    
+    // ✅ Check if it's a default template
+    if (isDefaultTemplate(workflow)) {
+      toast.warning('Cannot Delete', 'Default templates cannot be deleted.');
+      return;
+    }
+
     const loadingToast = toast.loading('Deleting Workflow...', 'Please wait');
     
     try {
@@ -417,16 +467,28 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     toast.success('Workflow Activated', `"${workflow?.title}" has been activated successfully.`);
   };
 
+  // ✅ EDIT workflow - Modified to check if default template
   const handleEditWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
+      if (isDefaultTemplate(workflow)) {
+        toast.warning('Cannot Edit', 'Default templates cannot be edited.');
+        return;
+      }
       setEditingWorkflow(workflow);
       setShowCreateModal(true);
     }
   };
 
+  // ✅ DELETE click handler - Modified
   const handleDeleteWorkflowClick = (id) => {
     const workflow = workflows.find((w) => w.id === id);
+    
+    if (isDefaultTemplate(workflow)) {
+      toast.warning('Cannot Delete', 'Default templates are read-only and cannot be deleted.');
+      return;
+    }
+    
     if (workflow) {
       if (window.confirm(`Are you sure you want to delete "${workflow.title}"?`)) {
         handleDeleteWorkflow(id);
@@ -588,6 +650,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
                     onDelete={handleDeleteWorkflowClick}
                     onExecute={handleExecuteWorkflow}
                     isTemplate={workflow.isTemplate}
+                    isReadOnly={isDefaultTemplate(workflow)}
                   />
                 ))}
               </div>
@@ -617,6 +680,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
                     onDelete={handleDeleteWorkflowClick}
                     onExecute={handleExecuteWorkflow}
                     isTemplate={workflow.isTemplate}
+                    isReadOnly={isDefaultTemplate(workflow)}
                   />
                 ))}
               </div>
