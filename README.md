@@ -68,6 +68,15 @@ A modern, full-featured appointment scheduling application built with React. Man
 ### Landing Page
 ![Landing Page](./screenshots/landing-page.png)
 
+### Landing Page — Stats & Features
+![Landing Page Stats and Features](./screenshots/landing-features-stats.png)
+ 
+### Landing Page — Get Started & FAQ
+![Landing Page Get Started and FAQ](./screenshots/landing-getstarted-faq.png)
+ 
+### Landing Page — What's New & Footer
+![Landing Page Whats New and Footer](./screenshots/landing-whatsnew-footer.png)
+
 ### Sign Up
 ![Sign Up](./screenshots/sign-up.png)
 
