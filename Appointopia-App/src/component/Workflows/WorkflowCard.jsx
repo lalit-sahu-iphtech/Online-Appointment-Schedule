@@ -12,7 +12,8 @@ export default function WorkflowCard({
   onEdit, 
   onDelete, 
   onExecute,
-  isTemplate = true 
+  isTemplate = true,
+  isReadOnly = false
 }) {
   const toast = useToast();
   const { id, title, description, category } = workflow;
@@ -25,16 +26,22 @@ export default function WorkflowCard({
   };
 
   const handleEdit = () => {
+    if (isReadOnly) {
+      toast.warning('Read Only', 'Default templates cannot be edited.');
+      return;
+    }
     if (onEdit) {
       onEdit(id);
     }
   };
 
   const handleDelete = () => {
+    if (isReadOnly) {
+      toast.warning('Read Only', 'Default templates cannot be deleted.');
+      return;
+    }
     if (onDelete) {
-      if (window.confirm(`Are you sure you want to delete "${title}"?`)) {
-        onDelete(id);
-      }
+      onDelete(id);
     }
   };
 
@@ -45,41 +52,45 @@ export default function WorkflowCard({
   };
 
   return (
-    <div className={`workflow-card ${isBefore ? "card-before" : "card-after"}`}>
+    <div className={`workflow-card ${isBefore ? "card-before" : "card-after"} ${isReadOnly ? "readonly" : ""}`}>
       <div className="workflow-card-left-border" />
 
       <div className="workflow-card-body">
         <div className="workflow-card-header">
           <div className="workflow-card-title-wrap">
             <div className="workflow-card-title-row">
-              <h3 className="workflow-card-title">{title}</h3>
+              <h3 className="workflow-card-title">
+                {title}
+                {isReadOnly && (
+                  <span className="workflow-card-lock" title="Default template - Read only">
+                    🔒
+                  </span>
+                )}
+              </h3>
               
               <div className="workflow-card-actions">
-                
-                {onEdit && (
-                  <button 
-                    className="workflow-card-edit-btn" 
-                    onClick={handleEdit}
-                    title="Edit workflow"
-                  >
-                    <FaEdit />
-                  </button>
-                )}
-                {onDelete && (
-                  <button 
-                    className="workflow-card-delete-btn" 
-                    onClick={handleDelete}
-                    title="Delete workflow"
-                  >
-                    <FaTrash />
-                  </button>
-                )}
+                <button 
+                  className={`workflow-card-edit-btn ${isReadOnly ? 'readonly' : ''}`}
+                  onClick={handleEdit}
+                  title={isReadOnly ? "Default template - Cannot edit" : "Edit workflow"}
+                  disabled={isReadOnly}
+                >
+                  <FaEdit />
+                </button>
+                <button 
+                  className={`workflow-card-delete-btn ${isReadOnly ? 'readonly' : ''}`}
+                  onClick={handleDelete}
+                  title={isReadOnly ? "Default template - Cannot delete" : "Delete workflow"}
+                  disabled={isReadOnly}
+                >
+                  <FaTrash />
+                </button>
               </div>
             </div>
             <p className="workflow-card-description">{description}</p>
             
             <span className="workflow-card-badge">
-              {isTemplate ? "Template" : "My Workflow"}
+              {isTemplate ? "📋 Template" : "⚡ My Workflow"}
             </span>
           </div>
 
@@ -91,9 +102,14 @@ export default function WorkflowCard({
           </div>
         </div>
 
-        <button className="workflow-card-use-btn" onClick={handleUse}>
-          Use workflow
-        </button>
+        <div className="workflow-card-footer">
+          <button className="workflow-card-use-btn" onClick={handleUse}>
+            Use workflow
+          </button>
+          {isReadOnly && (
+            <span className="workflow-card-readonly-badge">Read Only</span>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -16,6 +16,16 @@
   transform: translateY(-2px);
 }
 
+/* Readonly card */
+.workflow-card.readonly {
+  opacity: 0.85;
+}
+
+.workflow-card.readonly:hover {
+  transform: translateY(0);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
+}
+
 /* Left accent border */
 .workflow-card-left-border {
   width: 6px;
@@ -53,7 +63,7 @@
   min-width: 0;
 }
 
-/* ✅ Title Row with Actions */
+/* Title Row with Actions */
 .workflow-card-title-row {
   display: flex;
   align-items: center;
@@ -69,7 +79,14 @@
   color: #1f242d;
 }
 
-/* ✅ Action Buttons */
+/* Lock icon for readonly */
+.workflow-card-lock {
+  font-size: 14px;
+  margin-left: 6px;
+  cursor: default;
+}
+
+/* Action Buttons */
 .workflow-card-actions {
   display: flex;
   align-items: center;
@@ -93,17 +110,30 @@
   font-size: 12px;
 }
 
-.workflow-card-edit-btn:hover {
+.workflow-card-edit-btn:hover:not(:disabled) {
   background: #f3f0ff;
   color: #8555D5;
 }
 
-.workflow-card-delete-btn:hover {
+.workflow-card-delete-btn:hover:not(:disabled) {
   background: #fef2f2;
   color: #ef4444;
 }
 
-/* ✅ Badge - My Workflow */
+/* Disabled/Readonly buttons */
+.workflow-card-edit-btn.readonly,
+.workflow-card-delete-btn.readonly {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.workflow-card-edit-btn.readonly:hover,
+.workflow-card-delete-btn.readonly:hover {
+  background: transparent;
+  color: #9aa1ad;
+}
+
+/* Badge - My Workflow */
 .workflow-card-badge {
   display: inline-block;
   font-size: 9px;
@@ -131,6 +161,14 @@
   width: 40px;
   height: 40px;
   object-fit: contain;
+}
+
+/* Footer */
+.workflow-card-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
 }
 
 /* Use workflow pill button */
@@ -165,7 +203,17 @@
   background-color: #e6d3fe;
 }
 
-/* ✅ Tab Count */
+/* Readonly badge */
+.workflow-card-readonly-badge {
+  font-size: 9px;
+  color: #9aa1ad;
+  background: #f3f4f6;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Tab Count */
 .workflows-tab-count {
   display: inline-block;
   font-size: 10px;
@@ -184,7 +232,7 @@
   color: #6b7280;
 }
 
-/* ✅ Empty State Icon */
+/* Empty State Icon */
 .workflows-empty-icon {
   font-size: 48px;
   margin-bottom: 12px;
@@ -226,5 +274,9 @@
       width: 24px;
       height: 24px;
       font-size: 10px;
+  }
+  
+  .workflow-card-lock {
+      font-size: 12px;
   }
 }
