@@ -3,22 +3,27 @@ import { useState, useEffect, useMemo } from "react";
 import AppointmentSchedule from "../../component/AppointmentSchedule/AppointmentSchedule";
 import Sidebar from "../../component/Sidebar/Sidebar";
 import { AppointmentProvider, useAppointments } from "../../context/AppointmentContext";
-
 import "./appointmentSchedulePage.css";
 
-// ✅ Wrapper component to access context
+//  Wrapper component to access context
 function AppointmentPageContent() {
   const { appointments, loading, syncAppointments } = useAppointments();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [sidebarKey, setSidebarKey] = useState(0);
 
-  // ✅ Sync appointments when Schedule component updates
+  //  Sync appointments when Schedule component updates
   const handleAppointmentsSync = (data) => {
     syncAppointments(data);
     setSidebarKey(prev => prev + 1);
   };
 
-  // ✅ Convert appointments to events format for Sidebar
+  // Handle date change from AppointmentSchedule
+  const handleDateChange = (date) => {
+    console.log(" Appointment date changed:", date);
+    setSelectedDate(date);
+  };
+
+  //  Convert appointments to events format for Sidebar
   const sidebarEvents = useMemo(() => {
     const events = [];
     const today = new Date();
@@ -26,7 +31,6 @@ function AppointmentPageContent() {
     
     appointments.forEach(monthData => {
       monthData.appointments.forEach(apt => {
-        // Use appointment's startTime if available, otherwise generate
         let startTime = apt.startTime;
         let endTime = apt.endTime;
         
@@ -57,6 +61,7 @@ function AppointmentPageContent() {
       });
     });
     
+    console.log("📋 Appointment sidebar events:", events.length);
     return events;
   }, [appointments]);
 
@@ -74,7 +79,10 @@ function AppointmentPageContent() {
 
       <div className="appointment-main">
         <main className="appointment-content">
-          <AppointmentSchedule onAppointmentsSync={handleAppointmentsSync} />
+          <AppointmentSchedule 
+            onAppointmentsSync={handleAppointmentsSync}
+            onDateChange={handleDateChange} 
+          />
         </main>
       </div>
     </div>
