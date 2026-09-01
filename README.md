@@ -63,6 +63,40 @@ A modern, full-featured appointment scheduling application built with React. Man
 
 ---
 
+## 📸 Screenshots
+
+### Landing Page
+![Landing Page](./screenshots/landing-page.png)
+
+### Sign Up
+![Sign Up](./screenshots/sign-up.png)
+
+### Calendar — Add New Meeting
+![Add New Meeting](./screenshots/add-new-meeting.png)
+
+### Calendar — Week View
+![Calendar Week View](./screenshots/calendar-week-view.png)
+
+### Create Appointment — General Information
+![Create Appointment - General Information](./screenshots/create-appointment-general.png)
+
+### Create Appointment — Schedule
+![Create Appointment - Schedule](./screenshots/create-appointment-schedule.png)
+
+### Appointment Details
+![Appointment Details](./screenshots/appointment-details.png)
+
+### Appointment Schedule List
+![Appointment Schedule List](./screenshots/appointment-schedule-list.png)
+
+### Workflows — Templates
+![Workflows Templates](./screenshots/workflows-templates.png)
+
+### Workflows — Create Workflow
+![Create Workflow](./screenshots/create-workflow.png)
+
+---
+
 ## 🛠️ Tech Stack
 
 ### Frontend
@@ -330,7 +364,6 @@ Contributions are what make the open-source community such an amazing place to l
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
 
 
 
