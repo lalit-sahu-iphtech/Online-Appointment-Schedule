@@ -1,4 +1,4 @@
-/* src/component/Settings/settings.css */
+/* src/component/Settings/setting.css */
 
 .settings-page {
     width: 100%;
@@ -6,6 +6,160 @@
     background: #f7f6fb;
     font-family: "Poppins", sans-serif;
     box-sizing: border-box;
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* =====================================================
+   DARK MODE
+===================================================== */
+
+.settings-page.dark-mode {
+    background: #1a1a2e;
+    color: #e0e0e0;
+}
+
+.settings-page.dark-mode .settings-topbar {
+    background: #16213e;
+    border-bottom-color: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-topbar h1 {
+    color: #e0e0e0;
+}
+
+.settings-page.dark-mode .settings-back-btn {
+    background: #2a2a4a;
+    color: #a78bfa;
+}
+
+.settings-page.dark-mode .settings-back-btn:hover {
+    background: #3a3a5a;
+}
+
+.settings-page.dark-mode .settings-card {
+    background: #16213e;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.3);
+}
+
+.settings-page.dark-mode .settings-card-header {
+    border-bottom-color: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-card-header h3 {
+    color: #e0e0e0;
+}
+
+.settings-page.dark-mode .settings-row {
+    border-bottom-color: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-row strong {
+    color: #e0e0e0;
+}
+
+.settings-page.dark-mode .settings-row span {
+    color: #9ca3af;
+}
+
+.settings-page.dark-mode .settings-toggle {
+    background: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-toggle.on {
+    background: #7c3aed;
+}
+
+.settings-page.dark-mode .settings-segmented {
+    background: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-segmented button {
+    color: #9ca3af;
+}
+
+.settings-page.dark-mode .settings-segmented button.active {
+    background: #16213e;
+    color: #a78bfa;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.settings-page.dark-mode .settings-select {
+    background: #2a2a4a;
+    color: #e0e0e0;
+    border-color: #3a3a5a;
+}
+
+.settings-page.dark-mode .settings-select option {
+    background: #16213e;
+}
+
+.settings-page.dark-mode .settings-save-btn {
+    background: #7c3aed;
+}
+
+.settings-page.dark-mode .settings-save-btn:hover {
+    background: #6d28d9;
+}
+
+.settings-page.dark-mode .settings-danger-card {
+    border-color: #4a1a2a;
+}
+
+.settings-page.dark-mode .settings-logout-btn {
+    border-color: #3a3a5a;
+    color: #9ca3af;
+}
+
+.settings-page.dark-mode .settings-logout-btn:hover {
+    background: #2a2a4a;
+}
+
+.settings-page.dark-mode .settings-delete-btn {
+    background: #4a1a2a;
+    color: #ef4444;
+}
+
+.settings-page.dark-mode .settings-delete-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+}
+
+.settings-page.dark-mode .settings-edit-profile-btn {
+    background: #2a2a4a;
+    color: #a78bfa;
+}
+
+.settings-page.dark-mode .settings-edit-profile-btn:hover {
+    background: #3a3a5a;
+}
+
+/* =====================================================
+   LOADING STATE
+===================================================== */
+
+.settings-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    gap: 16px;
+}
+
+.settings-loading-spinner {
+    font-size: 32px;
+    color: #8555d5;
+    animation: settings-spin 1s linear infinite;
+}
+
+@keyframes settings-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.settings-loading-container p {
+    color: #6b7280;
+    font-size: 14px;
 }
 
 /* =====================================================
@@ -20,6 +174,7 @@
     align-items: center;
     gap: 20px;
     padding: 0 28px;
+    transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .settings-topbar h1 {
@@ -27,6 +182,7 @@
     font-size: 18px;
     font-weight: 700;
     color: #20242a;
+    transition: color 0.3s ease;
 }
 
 .settings-back-btn {
@@ -50,6 +206,10 @@
     background: #ece3fb;
 }
 
+.settings-back-btn span {
+    display: inline;
+}
+
 /* =====================================================
    CONTENT
 ===================================================== */
@@ -70,6 +230,7 @@
     box-shadow: 0 10px 35px rgba(20, 20, 30, 0.06);
     padding: 22px 24px;
     box-sizing: border-box;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 .settings-card-header {
@@ -79,6 +240,7 @@
     margin-bottom: 16px;
     padding-bottom: 14px;
     border-bottom: 1px solid #eef0f3;
+    transition: border-color 0.3s ease;
 }
 
 .settings-card-icon {
@@ -91,6 +253,7 @@
     font-size: 14px;
     font-weight: 700;
     color: #20242a;
+    transition: color 0.3s ease;
 }
 
 /* =====================================================
@@ -103,6 +266,7 @@
     justify-content: space-between;
     gap: 16px;
     padding: 12px 0;
+    transition: border-color 0.3s ease;
 }
 
 .settings-row:not(:last-child) {
@@ -115,11 +279,13 @@
     font-weight: 600;
     color: #20242a;
     margin-bottom: 3px;
+    transition: color 0.3s ease;
 }
 
-.settings-row span {
+.settings-row > div > span {
     font-size: 11.5px;
     color: #9aa1ad;
+    transition: color 0.3s ease;
 }
 
 .settings-row-column {
@@ -174,6 +340,7 @@
     background: #f1f2f4;
     padding: 4px;
     border-radius: 9px;
+    transition: background 0.3s ease;
 }
 
 .settings-segmented button {
@@ -197,15 +364,100 @@
 }
 
 /* =====================================================
+   SELECT DROPDOWN
+===================================================== */
+
+.settings-select {
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f9fafb;
+    color: #374151;
+    font-family: "Poppins", sans-serif;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s ease, background 0.3s ease, color 0.3s ease;
+    cursor: pointer;
+}
+
+.settings-select:focus {
+    border-color: #8555d5;
+    box-shadow: 0 0 0 3px rgba(133, 85, 213, 0.1);
+}
+
+/* =====================================================
+   EDIT PROFILE BUTTON
+===================================================== */
+
+.settings-edit-profile-btn {
+    height: 34px;
+    padding: 0 16px;
+    border: none;
+    border-radius: 8px;
+    background: #f3f0ff;
+    color: #8555d5;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: "Poppins", sans-serif;
+    transition: 0.2s;
+    white-space: nowrap;
+}
+
+.settings-edit-profile-btn:hover {
+    background: #ece3fb;
+}
+
+/* =====================================================
    SAVE BUTTON
 ===================================================== */
 
-.settings-success-text {
-    margin: 0;
-    font-size: 12px;
+.settings-status-message {
+    width: 100%;
+    max-width: 560px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-size: 13px;
     font-weight: 500;
-    color: #22a06b;
     text-align: center;
+    animation: settings-fade-in 0.3s ease;
+}
+
+@keyframes settings-fade-in {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.settings-status-message.success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.settings-status-message.error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.settings-status-message.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.settings-page.dark-mode .settings-status-message.success {
+    background: #065f46;
+    color: #d1fae5;
+}
+
+.settings-page.dark-mode .settings-status-message.error {
+    background: #991b1b;
+    color: #fee2e2;
+}
+
+.settings-page.dark-mode .settings-status-message.warning {
+    background: #92400e;
+    color: #fef3c7;
 }
 
 .settings-save-btn {
@@ -221,10 +473,23 @@
     cursor: pointer;
     font-family: "Poppins", sans-serif;
     transition: 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
-.settings-save-btn:hover {
+.settings-save-btn:hover:not(:disabled) {
     background: #7446c3;
+}
+
+.settings-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.settings-spinner {
+    animation: settings-spin 1s linear infinite;
 }
 
 /* =====================================================
@@ -233,10 +498,16 @@
 
 .settings-danger-card {
     border: 1px solid #fde3e3;
+    transition: border-color 0.3s ease;
 }
 
 .settings-danger-icon {
     color: #ef4444;
+}
+
+.settings-delete-warning {
+    color: #ef4444 !important;
+    font-weight: 600 !important;
 }
 
 .settings-logout-btn {
@@ -274,11 +545,30 @@
     font-family: "Poppins", sans-serif;
     transition: 0.2s;
     white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
 }
 
-.settings-delete-btn:hover {
+.settings-delete-btn:hover:not(:disabled) {
     background: #ef4444;
     color: #ffffff;
+}
+
+.settings-delete-btn.confirm {
+    background: #ef4444;
+    color: #ffffff;
+    animation: settings-pulse 0.8s ease infinite;
+}
+
+@keyframes settings-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.settings-delete-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 /* =====================================================
@@ -316,5 +606,72 @@
     .settings-delete-btn {
         width: 100%;
         justify-content: center;
+    }
+
+    .settings-edit-profile-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .settings-segmented {
+        width: 100%;
+    }
+
+    .settings-segmented button {
+        flex: 1;
+        text-align: center;
+    }
+
+    .settings-select {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 400px) {
+    .settings-topbar {
+        padding: 0 12px;
+    }
+
+    .settings-topbar h1 {
+        font-size: 13px;
+    }
+
+    .settings-card {
+        padding: 14px;
+    }
+
+    .settings-row strong {
+        font-size: 12px;
+    }
+
+    .settings-row > div > span {
+        font-size: 10.5px;
+    }
+
+    .settings-toggle {
+        width: 38px;
+        height: 22px;
+    }
+
+    .settings-toggle-knob {
+        width: 16px;
+        height: 16px;
+        top: 3px;
+        left: 3px;
+    }
+
+    .settings-toggle.on .settings-toggle-knob {
+        transform: translateX(16px);
+    }
+
+    .settings-save-btn {
+        font-size: 12px;
+        height: 38px;
+    }
+
+    .settings-logout-btn,
+    .settings-delete-btn {
+        font-size: 11px;
+        height: 34px;
     }
 }
