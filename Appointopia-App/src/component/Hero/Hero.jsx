@@ -1,5 +1,3 @@
-
-
 import "./hero.css"
 import { FaRegHeart } from "react-icons/fa";
 
@@ -10,13 +8,12 @@ import heroImg from "../../assets/hero/hero.png";
 import dotImg from "../../assets/images/dotImg.png";
 import { Link } from "react-router-dom";
 
-
 export default function Hero() {
   return (
     <section className="hero">
 
       {/* =========================
-          PROFILE IMAGES
+          PROFILE IMAGES - Hidden on mobile
       ========================= */}
 
       <div className="hero-profile hero-profile-left">
@@ -30,7 +27,6 @@ export default function Hero() {
       <div className="hero-profile hero-profile-small">
         <img src={profile3} alt="profile" />
       </div>
-
 
       {/* =========================
           HERO CONTENT
@@ -51,17 +47,15 @@ export default function Hero() {
           on top of your schedule
         </p>
         <Link to="/calendar">
-        
-        <button className="hero-btn">
-          Get started
-        </button>
+          <button className="hero-btn">
+            Get started
+          </button>
         </Link>
 
       </div>
 
-
       {/* =========================
-          HERO ILLUSTRATION
+          HERO ILLUSTRATION - Centered on mobile
       ========================= */}
 
       <div className="hero-illustration">
@@ -73,12 +67,10 @@ export default function Hero() {
           className="hero-dots"
         />
 
-
-        {/* Heart */}
+        {/* Heart - Hidden on mobile */}
         <div className="hero-heart">
-        <FaRegHeart />
+          <FaRegHeart />
         </div>
-
 
         {/* Main Illustration */}
         <img
