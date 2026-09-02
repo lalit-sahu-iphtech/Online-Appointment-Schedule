@@ -28,7 +28,7 @@ import FooterLayout from "./layouts/FooterLayout";
 
 // Product Pages
 import Features from "./pages/FooterPages/Product/Features";
-import Pricing from "./pages/FooterPages/Product/Pricing";
+
 
 // Resource Pages
 import Blog from "./pages/FooterPages/Resource/Blog";
@@ -119,6 +119,7 @@ function App() {
       {/* User Pages */}
       <Route path="/profile" element={<Profile />} />
       <Route path="/settings" element={<Setting />} />
+      <Route path="/faq"element={<FAQ/>}/>
 
       {/* Static Pages */}
       <Route path="/product" element={<ProductPage />} />
@@ -133,7 +134,7 @@ function App() {
       {/* ===== FOOTER PAGES ===== */}
       {/* Product */}
       <Route path="/features" element={<FooterLayout><Features /></FooterLayout>} />
-      <Route path="/pricing-plans" element={<FooterLayout><Pricing /></FooterLayout>} />
+     
 
       {/* Resource */}
       <Route path="/blog" element={<FooterLayout><Blog /></FooterLayout>} />
