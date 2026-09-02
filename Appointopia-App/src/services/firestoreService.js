@@ -79,6 +79,50 @@ export const addWorkflow = async (workflowData) => {
 };
 
 // ============================================
+// 🌱 SEED DEFAULT WORKFLOWS (idempotent)
+// ============================================
+// Writes the app's hardcoded default workflow templates (Reminder,
+// Cancellation, Thank You, eBook, Wrap-Up) into Firestore if they aren't
+// there yet, so that workflowExecutor.js (which reads Firestore directly)
+// can actually find and run them. Safe to call on every app load — it
+// checks for existing default workflows first and never creates
+// duplicates.
+export const seedDefaultWorkflows = async (defaultWorkflows) => {
+    try {
+        // Find default workflows already sitting in Firestore
+        const existingSnap = await getDocs(
+            query(collection(db, COLLECTIONS.WORKFLOWS), where("isDefault", "==", true))
+        );
+        const existingDefaultIds = new Set();
+        existingSnap.forEach((docSnap) => {
+            const data = docSnap.data();
+            if (data.id !== undefined) existingDefaultIds.add(data.id);
+        });
+
+        // Only add the ones that are missing
+        const missing = defaultWorkflows.filter((wf) => !existingDefaultIds.has(wf.id));
+        if (missing.length === 0) {
+            console.log("🌱 Default workflows already seeded, skipping.");
+            return 0;
+        }
+
+        for (const wf of missing) {
+            await addDoc(collection(db, COLLECTIONS.WORKFLOWS), {
+                ...wf,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            });
+            console.log("🌱 Seeded default workflow:", wf.title);
+        }
+
+        return missing.length;
+    } catch (error) {
+        console.error("❌ Error seeding default workflows:", error);
+        return 0;
+    }
+};
+
+// ============================================
 // 📥 FETCH DATA (READ)
 // ============================================
 
