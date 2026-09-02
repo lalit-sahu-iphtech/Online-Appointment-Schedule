@@ -27,7 +27,8 @@ import {
   getWorkflows as firebaseGetWorkflows,
   addWorkflow as firebaseAddWorkflow,
   updateWorkflow as firebaseUpdateWorkflow,
-  deleteWorkflow as firebaseDeleteWorkflow
+  deleteWorkflow as firebaseDeleteWorkflow,
+  seedDefaultWorkflows
 } from "../../services/firestoreService";
 
 import { executeWorkflow } from "../../services/workflowExecutor";
@@ -40,7 +41,12 @@ const DEFAULT_WORKFLOWS = [
     description:
       "Reminder emails prevent overlooking important events/tasks in both professional and personal settings.",
     trigger: "1 day before event happens",
-    actions: [{ type: "email", label: "Send email to guests", config: {} }],
+    actions: [{ type: "email", 
+    label: "Send email to guests",
+     config: {
+      subject: " Reminder: Your meeting is coming up!"
+     } 
+    }],
     isTemplate: true,
     isDefault: true,
   },
@@ -51,7 +57,10 @@ const DEFAULT_WORKFLOWS = [
     description:
       "A cancellation email is a communication sent to inform recipients that a previously scheduled event has been canceled.",
     trigger: "2 hours before event happens",
-    actions: [{ type: "email", label: "Send cancellation notification", config: {} }],
+    actions: [{ type: "email", label: "Send cancellation notification", config: {
+      subject: " Meeting Cancelled", 
+            reason: "Scheduling conflict" 
+    } }],
     isTemplate: true,
     isDefault: true,
   },
@@ -165,6 +174,12 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
   const loadWorkflows = async () => {
     try {
       setLoading(true);
+
+      //  Make sure the 5 default templates actually exist in Firestore
+      // (previously they only lived in this component's local merge logic,
+      // so a direct Firestore read from workflowExecutor.js never saw them)
+      await seedDefaultWorkflows(DEFAULT_WORKFLOWS);
+
       const data = await firebaseGetWorkflows();
       
       const templates = data.filter(w => w.isTemplate === true);

@@ -7,22 +7,26 @@ import {
   FaUser,
   FaCalendarCheck,
   FaCamera,
+  FaEdit,
+  FaCheckCircle,
+  FaSpinner,
+  FaUserCircle,
+  FaClock,
+  FaChartLine,
 } from "react-icons/fa";
 import { auth, db } from "../../firebase/firebase";
 import {
   updateProfile,
   updateEmail,
-  sendEmailVerification,
-  reauthenticateWithCredential,
-  EmailAuthProvider,
 } from "firebase/auth";
 import { doc, updateDoc, getDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChange, getCurrentUserData } from "../../services/authService";
+import { onAuthStateChange } from "../../services/authService";
 import "./profile.css";
 
 const AVATAR_COLORS = [
   "#8755D5", "#16A6AD", "#FF7800", "#2F80D7",
   "#E84C8A", "#27AE60", "#F2C94C", "#4A56E2",
+  "#E74C3C", "#1ABC9C", "#9B59B6", "#3498DB"
 ];
 
 const getInitials = (text) => {
@@ -57,8 +61,9 @@ export default function Profile() {
   const [errors, setErrors] = useState({});
   const [savedMessage, setSavedMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  // ✅ Auth guard with Firebase
+  // Auth guard with Firebase
   useEffect(() => {
     const unsubscribe = onAuthStateChange(async (user) => {
       if (!user) {
@@ -74,7 +79,7 @@ export default function Profile() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Get meeting count from Firestore or localStorage
+  // Get meeting count from localStorage
   const getMeetingCount = () => {
     try {
       const saved = JSON.parse(localStorage.getItem("calendar_meetings")) || [];
@@ -84,29 +89,50 @@ export default function Profile() {
     }
   };
 
-  // ✅ Get member since date
+  // Get member since date with better formatting
   const getMemberSince = () => {
+    let date = null;
+    
     if (currentUser?.metadata?.creationTime) {
-      const date = new Date(currentUser.metadata.creationTime);
-      return date.toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      });
+      date = new Date(currentUser.metadata.creationTime);
+    } else if (currentUser?.createdAt) {
+      date = new Date(currentUser.createdAt);
     }
-    if (currentUser?.createdAt) {
-      const date = new Date(currentUser.createdAt);
-      return date.toLocaleDateString("en-US", {
-        month: "long",
-        year: "numeric",
-      });
+    
+    if (date && !isNaN(date.getTime())) {
+      const options = { 
+        month: 'long', 
+        year: 'numeric',
+        day: 'numeric'
+      };
+      return date.toLocaleDateString('en-US', options);
     }
-    return "—";
+    
+    return "Member";
+  };
+
+  // Get member since year only for stat
+  const getMemberSinceYear = () => {
+    let date = null;
+    
+    if (currentUser?.metadata?.creationTime) {
+      date = new Date(currentUser.metadata.creationTime);
+    } else if (currentUser?.createdAt) {
+      date = new Date(currentUser.createdAt);
+    }
+    
+    if (date && !isNaN(date.getTime())) {
+      return date.getFullYear();
+    }
+    
+    return "2024";
   };
 
   const meetingCount = getMeetingCount();
   const memberSince = getMemberSince();
+  const memberSinceYear = getMemberSinceYear();
 
-  // ✅ Handle profile update
+  // Handle profile update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSavedMessage("");
@@ -139,18 +165,15 @@ export default function Profile() {
         throw new Error("No user logged in");
       }
 
-      // ✅ Update display name in Firebase Auth
+      // Update display name in Firebase Auth
       if (trimmedName !== user.displayName) {
         await updateProfile(user, {
           displayName: trimmedName,
         });
       }
 
-      // ✅ Update email in Firebase Auth (requires reauthentication)
+      // Update email in Firebase Auth
       if (trimmedEmail !== user.email) {
-        // Note: For email change, user needs to reauthenticate
-        // For simplicity, we're updating Firestore but not Auth email
-        // In production, use reauthenticateWithCredential
         try {
           await updateEmail(user, trimmedEmail);
         } catch (emailError) {
@@ -165,7 +188,7 @@ export default function Profile() {
         }
       }
 
-      // ✅ Update Firestore user document
+      // Update Firestore user document
       const userRef = doc(db, "users", user.uid);
       await updateDoc(userRef, {
         name: trimmedName,
@@ -173,7 +196,7 @@ export default function Profile() {
         updatedAt: serverTimestamp(),
       });
 
-      // ✅ Update localStorage for app state
+      // Update localStorage for app state
       const userData = {
         uid: user.uid,
         name: trimmedName,
@@ -182,7 +205,7 @@ export default function Profile() {
       };
       localStorage.setItem("currentUser", JSON.stringify(userData));
 
-      // ✅ Update currentUser state
+      // Update currentUser state
       setCurrentUser((prev) => ({
         ...prev,
         name: trimmedName,
@@ -191,9 +214,11 @@ export default function Profile() {
       }));
 
       setSavedMessage("Profile updated successfully!");
+      setIsEditing(false);
+      
       setTimeout(() => {
-        navigate(-1);
-      }, 1000)
+        setSavedMessage("");
+      }, 3000);
     } catch (error) {
       console.error("Error updating profile:", error);
       let errorMessage = "Something went wrong. Please try again.";
@@ -208,6 +233,18 @@ export default function Profile() {
     }
   };
 
+  // Handle edit toggle
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+    if (isEditing) {
+      // Reset to original values if canceling
+      setName(currentUser?.name || currentUser?.displayName || "");
+      setEmail(currentUser?.email || "");
+      setErrors({});
+      setSavedMessage("");
+    }
+  };
+
   if (checkingAuth || loading) {
     return <div className="profile-loading">Loading...</div>;
   }
@@ -217,16 +254,18 @@ export default function Profile() {
 
   return (
     <div className="profile-page">
+      {/* Topbar */}
       <div className="profile-topbar">
         <button className="profile-back-btn" onClick={() => navigate("/calendar")}>
-          <FaArrowLeft /> Back to Calendar
+          <FaArrowLeft /> <span>Back to Calendar</span>
         </button>
         <h1>My Profile</h1>
       </div>
 
+      {/* Content */}
       <div className="profile-content">
         <div className="profile-card">
-
+          {/* Avatar Section */}
           <div className="profile-avatar-section">
             <div className="profile-avatar-big" style={{ backgroundColor: avatarColor }}>
               {initials}
@@ -234,68 +273,120 @@ export default function Profile() {
                 <FaCamera />
               </div>
             </div>
-            <div>
+            <div className="profile-user-info">
               <h2>{name || currentUser?.displayName || email?.split("@")[0] || "User"}</h2>
-              <span className="profile-subtext">{email || currentUser?.email}</span>
+              <span className="profile-subtext">
+                <FaEnvelope className="profile-subtext-icon" />
+                {email || currentUser?.email}
+              </span>
+              <span className="profile-subtext profile-subtext-joined">
+                <FaClock className="profile-subtext-icon" />
+                Joined {memberSince}
+              </span>
             </div>
           </div>
 
+          {/* Stats Row */}
           <div className="profile-stats-row">
             <div className="profile-stat">
-              <FaCalendarCheck className="profile-stat-icon" />
+              <div className="profile-stat-icon-wrapper meetings">
+                <FaCalendarCheck className="profile-stat-icon" />
+              </div>
               <div>
                 <strong>{meetingCount}</strong>
                 <span>Meetings</span>
               </div>
             </div>
             <div className="profile-stat">
-              <FaUser className="profile-stat-icon" />
+              <div className="profile-stat-icon-wrapper member">
+                <FaUser className="profile-stat-icon" />
+              </div>
               <div>
-                <strong>{memberSince}</strong>
+                <strong>{memberSinceYear}</strong>
                 <span>Member since</span>
+              </div>
+            </div>
+            <div className="profile-stat">
+              <div className="profile-stat-icon-wrapper growth">
+                <FaChartLine className="profile-stat-icon" />
+              </div>
+              <div>
+                <strong>Active</strong>
+                <span>Account status</span>
               </div>
             </div>
           </div>
 
-          <form className="profile-form" onSubmit={handleSubmit}>
-            <div className="profile-form-group">
-              <label>Full Name</label>
-              <div className="profile-input-icon">
-                <input
-                  type="text"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
-                  disabled={isSaving}
-                />
-                <FaUser />
-              </div>
-              {errors.name && <span className="profile-error-text">{errors.name}</span>}
-            </div>
-
-            <div className="profile-form-group">
-              <label>Email Address</label>
-              <div className="profile-input-icon">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Enter your email"
-                  className={errors.email ? "input-error" : ""}
-                  disabled={isSaving}
-                />
-                <FaEnvelope />
-              </div>
-              {errors.email && <span className="profile-error-text">{errors.email}</span>}
-            </div>
-
-            {savedMessage && <p className="profile-success-text">{savedMessage}</p>}
-
-            <button type="submit" className="profile-save-btn" disabled={isSaving}>
-              {isSaving ? "Saving..." : "Save Changes"}
+          {/* Edit Button */}
+          {!isEditing && (
+            <button className="profile-edit-btn" onClick={toggleEdit}>
+              <FaEdit /> Edit Profile
             </button>
-          </form>
+          )}
 
+          {/* Form */}
+          {isEditing && (
+            <form className="profile-form" onSubmit={handleSubmit}>
+              <div className="profile-form-group">
+                <label>Full Name</label>
+                <div className="profile-input-icon">
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Enter your name"
+                    disabled={isSaving}
+                    className={errors.name ? "input-error" : ""}
+                  />
+                  <FaUser />
+                </div>
+                {errors.name && <span className="profile-error-text">{errors.name}</span>}
+              </div>
+
+              <div className="profile-form-group">
+                <label>Email Address</label>
+                <div className="profile-input-icon">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Enter your email"
+                    className={errors.email ? "input-error" : ""}
+                    disabled={isSaving}
+                  />
+                  <FaEnvelope />
+                </div>
+                {errors.email && <span className="profile-error-text">{errors.email}</span>}
+              </div>
+
+              {savedMessage && (
+                <div className="profile-success-message">
+                  <FaCheckCircle className="profile-success-icon" />
+                  <span>{savedMessage}</span>
+                </div>
+              )}
+
+              <div className="profile-form-actions">
+                <button 
+                  type="button" 
+                  className="profile-cancel-btn" 
+                  onClick={toggleEdit}
+                  disabled={isSaving}
+                >
+                  Cancel
+                </button>
+                <button type="submit" className="profile-save-btn" disabled={isSaving}>
+                  {isSaving ? (
+                    <>
+                      <FaSpinner className="profile-spinner" /> Saving...
+                    </>
+                  ) : (
+                    "Save Changes"
+                  )}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
       </div>
     </div>

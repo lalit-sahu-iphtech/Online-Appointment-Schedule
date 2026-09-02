@@ -131,7 +131,7 @@ export default function Footer() {
         <div className="footer-column">
           <h3>Product</h3>
           <Link to="/features">Features</Link>
-          <Link to="/pricing-plans">Pricing</Link>
+          <Link to="/pricing">Pricing</Link>
         </div>
 
         {/* ================= RESOURCE ================= */}

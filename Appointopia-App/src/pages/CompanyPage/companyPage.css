@@ -1,152 +1,1012 @@
 /* src/pages/CompanyPage.css */
 
+/* =====================================================
+   COMPANY PAGE - PREMIUM DESIGN
+===================================================== */
+
 .company-page {
-    min-height: calc(100vh - 60px);
-    padding: 40px 20px;
-    background: linear-gradient(135deg, #fafafa 0%, #faf8ff 100%);
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+  min-height: 100vh;
+  background: #ffffff;
+  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
+}
+
+/* =====================================================
+   HERO SECTION
+===================================================== */
+
+.company-hero {
+  padding: 80px 60px 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.company-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #f3edfc, #ede6f8);
+  color: #8755d5;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  letter-spacing: 0.3px;
+  margin-bottom: 20px;
+}
+
+.company-hero h1 {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.15;
+  margin: 0 0 16px 0;
+}
+
+.company-highlight {
+  background: linear-gradient(135deg, #8755d5, #a87bdf);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.company-hero p {
+  font-size: 18px;
+  color: #6b7280;
+  line-height: 1.8;
+  max-width: 640px;
+  margin: 0 auto 32px;
+}
+
+.company-hero-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+}
+
+.company-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: linear-gradient(135deg, #8755d5, #7544c8);
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.company-btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 35px rgba(133, 85, 213, 0.35);
+}
+
+.company-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: transparent;
+  color: #1a1a2e;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.company-btn-secondary:hover {
+  border-color: #8755d5;
+  color: #8755d5;
+  background: #faf7fe;
+}
+
+/* =====================================================
+   MISSION SECTION
+===================================================== */
+
+.company-mission {
+  padding: 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+  background: #faf9fc;
+  border-radius: 30px;
+}
+
+.company-mission-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+
+.company-mission-text {
+  text-align: left;
+}
+
+.company-mission-badge {
+  display: inline-block;
+  background: #ede6f8;
+  color: #8755d5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.company-mission-text h2 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 12px 0 16px 0;
+}
+
+.company-mission-text p {
+  font-size: 17px;
+  color: #6b7280;
+  line-height: 1.8;
+  margin: 0 0 32px 0;
+}
+
+.company-mission-stats {
+  display: flex;
+  gap: 40px;
+}
+
+.company-mission-stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-mission-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.company-mission-label {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.company-mission-image {
+  display: flex;
+  justify-content: center;
+}
+
+.company-mission-card {
+  background: #ffffff;
+  padding: 32px 28px;
+  border-radius: 16px;
+  border: 1px solid #f0edf8;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.company-mission-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.company-mission-card-icon {
+  font-size: 28px;
+  color: #8755d5;
+}
+
+.company-mission-card-header h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+.company-mission-card p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.7;
+  margin: 0 0 16px 0;
+}
+
+.company-mission-card-features {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.company-mission-card-features span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #4b5563;
+}
+
+.company-mission-card-features span svg {
+  color: #8755d5;
+}
+
+/* =====================================================
+   VALUES SECTION
+===================================================== */
+
+.company-values {
+  padding: 80px 60px 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.company-values-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.company-values-badge {
+  display: inline-block;
+  background: #ede6f8;
+  color: #8755d5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.company-values-header h2 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 12px 0 8px 0;
+}
+
+.company-values-header p {
+  font-size: 17px;
+  color: #6b7280;
+}
+
+.company-values-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.company-value-card {
+  background: #ffffff;
+  padding: 32px 28px;
+  border-radius: 16px;
+  border: 1px solid #f0edf8;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.company-value-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+  border-color: #e5d9f5;
+}
+
+.company-value-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin: 0 auto 16px;
+}
+
+.company-value-icon.purple {
+  background: #f3edfc;
+  color: #8755d5;
+}
+.company-value-icon.blue {
+  background: #e8f0fe;
+  color: #2f80d7;
+}
+.company-value-icon.red {
+  background: #fde8e8;
+  color: #ef4444;
+}
+.company-value-icon.green {
+  background: #e6f7f1;
+  color: #27ae60;
+}
+.company-value-icon.orange {
+  background: #fef3e8;
+  color: #ff7800;
+}
+.company-value-icon.teal {
+  background: #e5f8fa;
+  color: #16a6ad;
+}
+
+.company-value-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 6px 0;
+}
+
+.company-value-card p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* =====================================================
+   TEAM SECTION
+===================================================== */
+
+.company-team {
+  padding: 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+  background: #faf9fc;
+  border-radius: 30px;
+}
+
+.company-team-header {
+  text-align: center;
+  margin-bottom: 48px;
+}
+
+.company-team-badge {
+  display: inline-block;
+  background: #ede6f8;
+  color: #8755d5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.company-team-header h2 {
+  font-size: 34px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 12px 0 8px 0;
+}
+
+.company-team-header p {
+  font-size: 17px;
+  color: #6b7280;
+}
+
+.company-team-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.company-team-card {
+  background: #ffffff;
+  padding: 32px 28px;
+  border-radius: 16px;
+  border: 1px solid #f0edf8;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.company-team-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+}
+
+.company-team-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #f3edfc, #ede6f8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.company-team-initials {
+  font-size: 24px;
+  font-weight: 700;
+  color: #8755d5;
+}
+
+.company-team-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 4px 0;
+}
+
+.company-team-role {
+  display: block;
+  font-size: 13px;
+  color: #8755d5;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.company-team-card p {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* =====================================================
+   CONTACT SECTION
+===================================================== */
+
+.company-contact {
+  padding: 80px 60px 60px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.company-contact-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid #f0edf8;
+  padding: 48px;
+}
+
+.company-contact-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-contact-badge {
+  display: inline-block;
+  background: #ede6f8;
+  color: #8755d5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  width: fit-content;
+}
+
+.company-contact-info h2 {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 12px 0 8px 0;
+}
+
+.company-contact-info > p {
+  font-size: 16px;
+  color: #6b7280;
+  line-height: 1.7;
+  margin: 0 0 24px 0;
+}
+
+.company-contact-details {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.company-contact-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.company-contact-icon {
+  width: 20px;
+  color: #8755d5;
+  font-size: 18px;
+}
+
+.company-contact-item div {
+  display: flex;
+  flex-direction: column;
+}
+
+.company-contact-label {
+  font-size: 12px;
+  color: #9ca3af;
+  font-weight: 500;
+}
+
+.company-contact-value {
+  font-size: 15px;
+  color: #1a1a2e;
+  font-weight: 500;
+}
+
+.company-social-links {
+  display: flex;
+  gap: 12px;
+}
+
+.company-social-link {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  font-size: 18px;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.company-social-link:hover {
+  background: #f3edfc;
+  color: #8755d5;
+  transform: translateY(-2px);
+}
+
+/* Contact Form */
+.company-contact-form {
+  background: #faf9fc;
+  padding: 32px 28px;
+  border-radius: 16px;
+}
+
+.company-contact-form h3 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0 0 20px 0;
+}
+
+.company-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.company-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.company-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.company-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.company-form-group input,
+.company-form-group textarea {
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  font-size: 14px;
+  font-family: "Poppins", sans-serif;
+  outline: none;
+  transition: all 0.3s ease;
+  background: #ffffff;
+}
+
+.company-form-group input:focus,
+.company-form-group textarea:focus {
+  border-color: #8755d5;
+  box-shadow: 0 0 0 4px rgba(133, 85, 213, 0.06);
+}
+
+.company-form-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 28px;
+  background: linear-gradient(135deg, #8755d5, #7544c8);
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+.company-form-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(133, 85, 213, 0.30);
+}
+
+/* =====================================================
+   CTA SECTION
+===================================================== */
+
+.company-cta {
+  padding: 80px 60px;
+  background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.company-cta-content {
+  text-align: center;
+  max-width: 640px;
+}
+
+.company-cta-content h2 {
+  font-size: 36px;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 12px 0;
+}
+
+.company-cta-content p {
+  font-size: 18px;
+  color: #a89fc0;
+  margin: 0 0 32px 0;
+  line-height: 1.7;
+}
+
+.company-cta-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.company-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 32px;
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.company-btn-outline:hover {
+  border-color: #a87bdf;
+  background: rgba(168, 123, 223, 0.10);
+}
+/* Add these styles to your existing companyPage.css */
+
+/* =====================================================
+   FORM VALIDATION STYLES
+===================================================== */
+
+.company-form-group .required-star {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.company-form-group input.input-error,
+.company-form-group textarea.input-error {
+  border-color: #ef4444;
+  background: #fef2f2;
+}
+
+.company-form-group input.input-error:focus,
+.company-form-group textarea.input-error:focus {
+  border-color: #ef4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.08);
+}
+
+.form-error-text {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #ef4444;
+  margin-top: 4px;
+}
+
+.form-error-text svg {
+  font-size: 12px;
+}
+
+/* =====================================================
+   SUCCESS MESSAGE
+===================================================== */
+
+.company-form-success {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #e6f7f1;
+  border: 1px solid #b8e6d6;
+  border-radius: 10px;
+  color: #0f7b4a;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 16px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
   }
-  
-  .company-container {
-    max-width: 1200px;
-    width: 100%;
-    background: #ffffff;
-    border-radius: 20px;
-    padding: 50px 60px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .company-header {
-    text-align: center;
-    margin-bottom: 48px;
+}
+
+.company-form-success-icon {
+  color: #27ae60;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* =====================================================
+   DISABLED BUTTON
+===================================================== */
+
+.company-form-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1024px) {
+  .company-hero {
+    padding: 60px 40px;
   }
-  
-  .company-header h1 {
-    font-size: 42px;
-    font-weight: 700;
-    color: #1a1a2e;
-    margin: 0 0 8px 0;
-  }
-  
-  .company-header h1::after {
-    content: "";
-    display: block;
-    width: 60px;
-    height: 4px;
-    background: linear-gradient(90deg, #8755d5, #a87bdf);
-    margin: 12px auto 0;
-    border-radius: 2px;
-  }
-  
-  .company-header p {
-    font-size: 18px;
-    color: #6b7280;
-    margin: 0;
-  }
-  
-  .company-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 24px;
-  }
-  
-  .company-card {
-    background: #f8f9fa;
-    padding: 28px 24px;
-    border-radius: 14px;
-    text-align: center;
-    transition: all 0.3s ease;
-    border: 1px solid transparent;
-  }
-  
-  .company-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 12px 35px rgba(133, 85, 213, 0.12);
-    border-color: #e5d9f5;
-    background: #ffffff;
-  }
-  
-  .company-icon {
+
+  .company-hero h1 {
     font-size: 38px;
-    margin-bottom: 12px;
   }
-  
-  .company-card h3 {
-    font-size: 18px;
-    font-weight: 600;
-    margin: 0 0 8px 0;
-    color: #1a1a2e;
+
+  .company-mission {
+    padding: 40px;
+    margin: 0 20px;
   }
-  
-  .company-card p {
+
+  .company-mission-content {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .company-values {
+    padding: 60px 40px;
+  }
+
+  .company-values-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .company-team {
+    padding: 40px;
+    margin: 0 20px;
+  }
+
+  .company-team-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .company-contact {
+    padding: 60px 40px;
+  }
+
+  .company-contact-content {
+    grid-template-columns: 1fr;
+    padding: 32px 24px;
+  }
+
+  .company-cta {
+    padding: 60px 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  .company-hero {
+    padding: 40px 24px;
+  }
+
+  .company-hero h1 {
+    font-size: 30px;
+  }
+
+  .company-hero p {
+    font-size: 16px;
+  }
+
+  .company-hero-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .company-btn-primary,
+  .company-btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .company-mission {
+    padding: 30px 20px;
+    border-radius: 20px;
+    margin: 0 12px;
+  }
+
+  .company-mission-text h2 {
+    font-size: 28px;
+  }
+
+  .company-mission-stats {
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .company-values {
+    padding: 40px 20px;
+  }
+
+  .company-values-header h2 {
+    font-size: 28px;
+  }
+
+  .company-values-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .company-team {
+    padding: 30px 20px;
+    border-radius: 20px;
+    margin: 0 12px;
+  }
+
+  .company-team-header h2 {
+    font-size: 28px;
+  }
+
+  .company-team-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .company-contact {
+    padding: 40px 20px;
+  }
+
+  .company-contact-content {
+    padding: 24px 16px;
+  }
+
+  .company-contact-info h2 {
+    font-size: 24px;
+  }
+
+  .company-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .company-cta-content h2 {
+    font-size: 28px;
+  }
+
+  .company-cta-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .company-cta {
+    padding: 40px 20px;
+  }
+
+  .company-btn-outline {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 500px) {
+  .company-hero {
+    padding: 24px 16px;
+  }
+
+  .company-hero h1 {
+    font-size: 24px;
+  }
+
+  .company-hero p {
     font-size: 14px;
-    color: #6b7280;
-    margin: 0;
-    line-height: 1.6;
   }
-  
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .company-grid {
-      grid-template-columns: repeat(2, 1fr);
-    }
+
+  .company-mission {
+    padding: 20px 16px;
+    margin: 0 8px;
+    border-radius: 16px;
   }
-  
-  @media (max-width: 768px) {
-    .company-container {
-      padding: 30px 24px;
-    }
-  
-    .company-header h1 {
-      font-size: 32px;
-    }
-  
-    .company-header p {
-      font-size: 16px;
-    }
-  
-    .company-grid {
-      grid-template-columns: 1fr;
-      gap: 16px;
-    }
-  
-    .company-card {
-      padding: 20px;
-    }
+
+  .company-mission-text h2 {
+    font-size: 22px;
   }
-  
-  @media (max-width: 500px) {
-    .company-page {
-      padding: 16px;
-    }
-  
-    .company-container {
-      padding: 20px 16px;
-    }
-  
-    .company-header h1 {
-      font-size: 26px;
-    }
-  
-    .company-header p {
-      font-size: 14px;
-    }
-  
-    .company-card {
-      padding: 16px;
-    }
-  
-    .company-icon {
-      font-size: 30px;
-    }
-  
-    .company-card h3 {
-      font-size: 16px;
-    }
-  
-    .company-card p {
-      font-size: 13px;
-    }
+
+  .company-mission-number {
+    font-size: 22px;
   }
+
+  .company-values-header h2 {
+    font-size: 22px;
+  }
+
+  .company-team-header h2 {
+    font-size: 22px;
+  }
+
+  .company-contact {
+    padding: 24px 16px;
+  }
+
+  .company-contact-content {
+    padding: 16px 12px;
+  }
+
+  .company-contact-info h2 {
+    font-size: 20px;
+  }
+
+  .company-cta-content h2 {
+    font-size: 22px;
+  }
+
+  .company-btn-primary,
+  .company-btn-outline {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+
+  .company-value-card {
+    padding: 24px 20px;
+  }
+
+  .company-team-card {
+    padding: 24px 20px;
+  }
+
+  .company-contact-form {
+    padding: 24px 16px;
+  }
+
+  .company-form-btn {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+}

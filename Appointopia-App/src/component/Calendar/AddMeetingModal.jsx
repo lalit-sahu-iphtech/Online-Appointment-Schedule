@@ -1,4 +1,6 @@
 // src/component/Calendar/AddMeetingModal.jsx
+// ✅ Bas yeh rakhna hai - Email ka kuch nahi
+
 import { useState, useEffect } from "react";
 import {
     FaTimes,
@@ -6,21 +8,11 @@ import {
     FaMapMarkerAlt,
     FaPlus,
     FaLink,
-    FaClock,
-    FaUserCircle,
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 import { useNavigate } from "react-router-dom";
-import emailjs from "@emailjs/browser";
 import AddInviteeModal from "./AddInviteeModal";
 import { useToast } from "../Toast";
-
-// Import workflow executor
-import { executeMatchingWorkflows } from "../../services/workflowExecutor";
-
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 
 const AVATAR_COLORS = [
     '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
@@ -33,8 +25,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     const getDefaultDate = () => {
         if (initialData?.date) return initialData.date;
         if (defaultDate && typeof defaultDate === 'string') return defaultDate;
-        const today = new Date();
-        return today.toISOString().split('T')[0];
+        return new Date().toISOString().split('T')[0];
     };
 
     const buildFormData = () => ({
@@ -50,7 +41,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     const [formData, setFormData] = useState(buildFormData);
     const [errors, setErrors] = useState({});
     const [showInviteeModal, setShowInviteeModal] = useState(false);
-    const [isSending, setIsSending] = useState(false);
 
     const navigate = useNavigate();
 
@@ -99,49 +89,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    const sendInviteEmails = async (data) => {
-        if (!data.invitees || data.invitees.length === 0) return;
-    
-        setIsSending(true);
-        const failed = [];
-        const currentUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-    
-        for (const person of data.invitees) {
-            try {
-                await emailjs.send(
-                    EMAILJS_SERVICE_ID,
-                    EMAILJS_TEMPLATE_ID,
-                    {
-                        to_name: person.name,
-                        to_email: person.email,
-                        meeting_name: data.meetingName,
-                        meeting_date: data.date,
-                        start_time: data.startTime,
-                        end_time: data.endTime,
-                        meeting_location: data.location || "N/A",
-                        online_link: data.onlineLink || "N/A",
-                        organizer_name: currentUser?.email?.split('@')[0] || "Organizer",
-                        organizer_email: currentUser?.email || "organizer@example.com",
-                        custom_message: "Looking forward to seeing you!"
-                    },
-                    EMAILJS_PUBLIC_KEY
-                );
-            } catch (err) {
-                console.error(`Failed to send invite to ${person.email}:`, err);
-                failed.push(person.name);
-            }
-        }
-    
-        setIsSending(false);
-    
-        if (failed.length > 0) {
-            toast.error('Email Failed', `Could not send to: ${failed.join(", ")}`);
-        } else if (data.invitees.length > 0) {
-            toast.success('Invitations Sent', `Sent to ${data.invitees.length} people!`);
-        }
-    };
-
-    //  UPDATED: handleSubmit with workflow execution
+    // ✅ SIRF SAVE - EMAIL NAHI BHEJNA
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -161,43 +109,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             return;
         }
 
-        //  Get current user
-        const userStr = localStorage.getItem("currentUser");
-        const user = userStr ? JSON.parse(userStr) : null;
-
-        // Prepare meeting data for workflows
-        const meetingData = {
-            meetingName: formData.meetingName,
-            date: formData.date,
-            startTime: formData.startTime,
-            endTime: formData.endTime,
-            location: formData.location || "Online",
-            onlineLink: formData.onlineLink || "",
-            invitees: formData.invitees || [],
-            organizerEmail: user?.email || "unknown",
-            organizerName: user?.email?.split('@')[0] || "User",
-            description: formData.description || "",
-            customMessage: "Looking forward to seeing you!"
-        };
-
-        //  Save meeting
+        // ✅ Sirf save karo - email Calendar.jsx bhejega
         onSave(formData);
-
-        //  Send invites
-        sendInviteEmails(formData);
-
-        //  Execute matching workflows
-        try {
-            const executedCount = await executeMatchingWorkflows(meetingData);
-            if (executedCount > 0) {
-                console.log(` ${executedCount} workflow(s) executed for this meeting`);
-                toast.success('Workflows Executed', `${executedCount} workflow(s) ran successfully.`);
-            }
-        } catch (error) {
-            console.error(" Error executing workflows:", error);
-            toast.error('Execution Failed', 'Workflows could not be executed.');
-        }
-
         onClose();
         
         if (isEditMode) {
@@ -207,29 +120,10 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    const getInitials = (name) => {
-        return name.split(' ').map(word => word[0]).join('').toUpperCase().slice(0, 2);
-    };
-
-    const getColorFromName = (name) => {
-        let hash = 0;
-        for (let i = 0; i < name.length; i++) {
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
-    };
-
-    const getTodayDate = () =>{
+    const getTodayDate = () => {
         const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        return `${year}-${month}-${day}`;
-    }
-
-    const getMinDate = () =>{
-        return getTodayDate();
-    }
+        return today.toISOString().split('T')[0];
+    };
 
     const handleAdvancedSettings = () => {
         onClose();
@@ -249,7 +143,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
                 <form onSubmit={handleSubmit}>
                     <div className="meeting-form-body">
-                        {/* Meeting Name */}
                         <div className="form-group full-width">
                             <label>Meeting Name <span className="required-star">*</span></label>
                             <input
@@ -263,7 +156,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             {errors.meetingName && <span className="error-text">{errors.meetingName}</span>}
                         </div>
 
-                        {/* DATE + TIME */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Date <span className="required-star">*</span></label>
@@ -273,7 +165,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                         name="date"
                                         value={formData.date}
                                         onChange={handleChange}
-                                        min={getMinDate()}
+                                        min={getTodayDate()}
                                     />
                                     <FaCalendarAlt className="calendar-icon" />
                                 </div>
@@ -304,7 +196,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
-                        {/* LOCATION + ONLINE LINK */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Location</label>
@@ -335,7 +226,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
-                        {/* INVITEES WITH AVATAR */}
                         <div className="invitees-section">
                             <label>Invitees</label>
                             <div className="invitee-list">
@@ -343,9 +233,9 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                     <div className="invitee-chip-with-avatar" key={person.id}>
                                         <div 
                                             className="invitee-avatar"
-                                            style={{ backgroundColor: person.avatarColor || getColorFromName(person.name) }}
+                                            style={{ backgroundColor: person.avatarColor }}
                                         >
-                                            {person.initials || getInitials(person.name)}
+                                            {person.initials}
                                         </div>
                                         <span className="invitee-name">{person.name}</span>
                                         <button
@@ -366,7 +256,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
-                        {/* Quick time suggestions */}
                         <div className="quick-times">
                             <span className="quick-times-label">Quick:</span>
                             {['30 min', '1 hour', '2 hours'].map((duration) => (
@@ -405,10 +294,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                         >
                             Advanced settings
                         </button>
-                        <button type="submit" className="save-meeting-btn" disabled={isSending}>
-                            {isSending
-                                ? "Sending invites..."
-                                : isEditMode ? "Update Meeting" : "Save Meeting"}
+                        <button type="submit" className="save-meeting-btn">
+                            {isEditMode ? "Update Meeting" : "Save Meeting"}
                         </button>
                     </div>
                 </form>
