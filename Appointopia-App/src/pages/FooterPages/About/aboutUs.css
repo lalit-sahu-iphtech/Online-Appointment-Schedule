@@ -1,0 +1,807 @@
+/* src/pages/About/aboutUs.css */
+
+/* =====================================================
+   ABOUT PAGE - PREMIUM DESIGN
+===================================================== */
+
+.about-page {
+    min-height: 100vh;
+    background: #ffffff;
+    font-family: "Poppins", sans-serif;
+    overflow-x: hidden;
+  }
+  
+  /* =====================================================
+     HERO SECTION
+  ===================================================== */
+  
+  .about-hero {
+    padding: 80px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .about-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f3edfc, #ede6f8);
+    color: #8755d5;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    margin-bottom: 20px;
+  }
+  
+  .about-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.15;
+    margin: 0 0 16px 0;
+  }
+  
+  .about-highlight {
+    background: linear-gradient(135deg, #8755d5, #a87bdf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .about-hero p {
+    font-size: 18px;
+    color: #6b7280;
+    line-height: 1.8;
+    max-width: 640px;
+    margin: 0 auto 32px;
+  }
+  
+  .about-hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .about-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #8755d5, #7544c8);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .about-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(133, 85, 213, 0.35);
+  }
+  
+  .about-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: transparent;
+    color: #1a1a2e;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .about-btn-secondary:hover {
+    border-color: #8755d5;
+    color: #8755d5;
+    background: #faf7fe;
+  }
+  
+  /* =====================================================
+     MISSION SECTION
+  ===================================================== */
+  
+  .about-mission {
+    padding: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #faf9fc;
+    border-radius: 30px;
+  }
+  
+  .about-mission-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  
+  .about-mission-text {
+    text-align: left;
+  }
+  
+  .about-mission-badge {
+    display: inline-block;
+    background: #ede6f8;
+    color: #8755d5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .about-mission-text h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 12px 0 16px 0;
+  }
+  
+  .about-mission-text p {
+    font-size: 17px;
+    color: #6b7280;
+    line-height: 1.8;
+    margin: 0 0 32px 0;
+  }
+  
+  .about-mission-stats {
+    display: flex;
+    gap: 40px;
+  }
+  
+  .about-mission-stat {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .about-mission-number {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+  }
+  
+  .about-mission-label {
+    font-size: 13px;
+    color: #9ca3af;
+  }
+  
+  .about-mission-image {
+    display: flex;
+    justify-content: center;
+  }
+  
+  .about-mission-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    width: 100%;
+    max-width: 380px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  }
+  
+  .about-mission-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .about-mission-card-icon {
+    font-size: 28px;
+    color: #8755d5;
+  }
+  
+  .about-mission-card-header h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0;
+  }
+  
+  .about-mission-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 16px 0;
+  }
+  
+  .about-mission-card-features {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .about-mission-card-features span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #4b5563;
+  }
+  
+  .about-mission-card-features span svg {
+    color: #8755d5;
+  }
+  
+  /* =====================================================
+     STORY SECTION
+  ===================================================== */
+  
+  .about-story {
+    padding: 80px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .about-story-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .about-story-badge {
+    display: inline-block;
+    background: #ede6f8;
+    color: #8755d5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .about-story-header h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 12px 0 8px 0;
+  }
+  
+  .about-story-header p {
+    font-size: 17px;
+    color: #6b7280;
+  }
+  
+  .about-story-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .about-story-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .about-story-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+    border-color: #e5d9f5;
+  }
+  
+  .about-story-number {
+    font-size: 14px;
+    font-weight: 700;
+    color: #8755d5;
+    margin-bottom: 12px;
+  }
+  
+  .about-story-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+  }
+  
+  .about-story-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0;
+  }
+  
+  /* =====================================================
+     VALUES SECTION
+  ===================================================== */
+  
+  .about-values {
+    padding: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #faf9fc;
+    border-radius: 30px;
+  }
+  
+  .about-values-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .about-values-badge {
+    display: inline-block;
+    background: #ede6f8;
+    color: #8755d5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .about-values-header h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 12px 0 8px 0;
+  }
+  
+  .about-values-header p {
+    font-size: 17px;
+    color: #6b7280;
+  }
+  
+  .about-values-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .about-value-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .about-value-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+    border-color: #e5d9f5;
+  }
+  
+  .about-value-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin: 0 auto 16px;
+  }
+  
+  .about-value-icon.purple {
+    background: #f3edfc;
+    color: #8755d5;
+  }
+  .about-value-icon.blue {
+    background: #e8f0fe;
+    color: #2f80d7;
+  }
+  .about-value-icon.red {
+    background: #fde8e8;
+    color: #ef4444;
+  }
+  .about-value-icon.green {
+    background: #e6f7f1;
+    color: #27ae60;
+  }
+  .about-value-icon.orange {
+    background: #fef3e8;
+    color: #ff7800;
+  }
+  .about-value-icon.teal {
+    background: #e5f8fa;
+    color: #16a6ad;
+  }
+  
+  .about-value-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 6px 0;
+  }
+  
+  .about-value-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0;
+  }
+  
+  /* =====================================================
+     TEAM SECTION
+  ===================================================== */
+  
+  .about-team {
+    padding: 80px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .about-team-header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  
+  .about-team-badge {
+    display: inline-block;
+    background: #ede6f8;
+    color: #8755d5;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 14px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  
+  .about-team-header h2 {
+    font-size: 34px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 12px 0 8px 0;
+  }
+  
+  .about-team-header p {
+    font-size: 17px;
+    color: #6b7280;
+  }
+  
+  .about-team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 30px;
+  }
+  
+  .about-team-card {
+    background: #ffffff;
+    padding: 32px 28px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .about-team-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+  }
+  
+  .about-team-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f3edfc, #ede6f8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+  }
+  
+  .about-team-initials {
+    font-size: 24px;
+    font-weight: 700;
+    color: #8755d5;
+  }
+  
+  .about-team-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+  }
+  
+  .about-team-role {
+    display: block;
+    font-size: 13px;
+    color: #8755d5;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+  
+  .about-team-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0;
+  }
+  
+  /* =====================================================
+     CTA SECTION
+  ===================================================== */
+  
+  .about-cta {
+    padding: 80px 60px;
+    background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .about-cta-content {
+    text-align: center;
+    max-width: 640px;
+  }
+  
+  .about-cta-content h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+  }
+  
+  .about-cta-content p {
+    font-size: 18px;
+    color: #a89fc0;
+    margin: 0 0 32px 0;
+    line-height: 1.7;
+  }
+  
+  .about-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .about-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .about-btn-outline:hover {
+    border-color: #a87bdf;
+    background: rgba(168, 123, 223, 0.10);
+  }
+  
+  /* =====================================================
+     RESPONSIVE
+  ===================================================== */
+  
+  @media (max-width: 1024px) {
+    .about-hero {
+      padding: 60px 40px;
+    }
+  
+    .about-hero h1 {
+      font-size: 38px;
+    }
+  
+    .about-mission {
+      padding: 40px;
+      margin: 0 20px;
+      border-radius: 20px;
+    }
+  
+    .about-mission-content {
+      grid-template-columns: 1fr;
+      gap: 40px;
+    }
+  
+    .about-story {
+      padding: 60px 40px;
+    }
+  
+    .about-story-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .about-values {
+      padding: 40px;
+      margin: 0 20px;
+    }
+  
+    .about-values-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .about-team {
+      padding: 60px 40px;
+    }
+  
+    .about-team-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .about-cta {
+      padding: 60px 40px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .about-hero {
+      padding: 40px 24px;
+    }
+  
+    .about-hero h1 {
+      font-size: 30px;
+    }
+  
+    .about-hero p {
+      font-size: 16px;
+    }
+  
+    .about-hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .about-btn-primary,
+    .about-btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .about-mission {
+      padding: 30px 20px;
+      margin: 0 12px;
+    }
+  
+    .about-mission-text h2 {
+      font-size: 28px;
+    }
+  
+    .about-mission-stats {
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+  
+    .about-story {
+      padding: 40px 20px;
+    }
+  
+    .about-story-header h2 {
+      font-size: 28px;
+    }
+  
+    .about-story-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .about-values {
+      padding: 30px 20px;
+      margin: 0 12px;
+    }
+  
+    .about-values-header h2 {
+      font-size: 28px;
+    }
+  
+    .about-values-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .about-team {
+      padding: 40px 20px;
+    }
+  
+    .about-team-header h2 {
+      font-size: 28px;
+    }
+  
+    .about-team-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  
+    .about-cta-content h2 {
+      font-size: 28px;
+    }
+  
+    .about-cta-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .about-cta {
+      padding: 40px 20px;
+    }
+  
+    .about-btn-outline {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .about-hero {
+      padding: 24px 16px;
+    }
+  
+    .about-hero h1 {
+      font-size: 24px;
+    }
+  
+    .about-hero p {
+      font-size: 14px;
+    }
+  
+    .about-mission {
+      padding: 20px 16px;
+      margin: 0 8px;
+    }
+  
+    .about-mission-text h2 {
+      font-size: 22px;
+    }
+  
+    .about-mission-number {
+      font-size: 22px;
+    }
+  
+    .about-story-header h2 {
+      font-size: 22px;
+    }
+  
+    .about-values-header h2 {
+      font-size: 22px;
+    }
+  
+    .about-team-header h2 {
+      font-size: 22px;
+    }
+  
+    .about-team-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .about-cta-content h2 {
+      font-size: 22px;
+    }
+  
+    .about-btn-primary,
+    .about-btn-secondary,
+    .about-btn-outline {
+      font-size: 14px;
+      padding: 12px 20px;
+    }
+  
+    .about-value-card {
+      padding: 24px 20px;
+    }
+  
+    .about-story-card {
+      padding: 24px 20px;
+    }
+  
+    .about-team-card {
+      padding: 24px 20px;
+    }
+  
+    .about-mission-card {
+      padding: 24px 20px;
+    }
+  }

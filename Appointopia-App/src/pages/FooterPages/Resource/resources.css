@@ -1,0 +1,803 @@
+/* src/pages/FooterPages/Resource/resources.css */
+
+/* =====================================================
+   RESOURCES PAGE - PREMIUM DESIGN
+===================================================== */
+
+.resources-page {
+    min-height: 100vh;
+    background: #ffffff;
+    font-family: "Poppins", sans-serif;
+    overflow-x: hidden;
+  }
+  
+  /* =====================================================
+     HERO SECTION
+  ===================================================== */
+  
+  .resources-hero {
+    padding: 80px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+  }
+  
+  .resources-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #f3edfc, #ede6f8);
+    color: #8755d5;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 20px;
+    letter-spacing: 0.3px;
+    margin-bottom: 20px;
+  }
+  
+  .resources-hero h1 {
+    font-size: 48px;
+    font-weight: 700;
+    color: #1a1a2e;
+    line-height: 1.15;
+    margin: 0 0 16px 0;
+  }
+  
+  .resources-highlight {
+    background: linear-gradient(135deg, #8755d5, #a87bdf);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .resources-hero p {
+    font-size: 18px;
+    color: #6b7280;
+    line-height: 1.8;
+    max-width: 640px;
+    margin: 0 auto 32px;
+  }
+  
+  .resources-hero-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .resources-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: linear-gradient(135deg, #8755d5, #7544c8);
+    color: #ffffff;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .resources-btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(133, 85, 213, 0.35);
+  }
+  
+  .resources-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 28px;
+    background: transparent;
+    color: #1a1a2e;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .resources-btn-secondary:hover {
+    border-color: #8755d5;
+    color: #8755d5;
+    background: #faf7fe;
+  }
+  
+  /* =====================================================
+     GUIDES SECTION
+  ===================================================== */
+  
+  .resources-guides {
+    padding: 40px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .resources-guides-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .resources-guides-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+  }
+  
+  .resources-guides-header p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  .resources-guides-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  
+  .resources-guide-card {
+    background: #ffffff;
+    padding: 28px 24px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .resources-guide-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 12px 40px rgba(133, 85, 213, 0.08);
+    border-color: #e5d9f5;
+  }
+  
+  .resources-guide-card.popular {
+    border: 2px solid #8755d5;
+    background: #faf8ff;
+  }
+  
+  .resources-guide-popular-badge {
+    position: absolute;
+    top: -10px;
+    right: 16px;
+    background: #8755d5;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 14px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .resources-guide-icon {
+    font-size: 28px;
+    color: #8755d5;
+    margin-bottom: 12px;
+  }
+  
+  .resources-guide-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+  }
+  
+  .resources-guide-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 16px 0;
+  }
+  
+  .resources-guide-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: #9ca3af;
+  }
+  
+  .resources-guide-level {
+    font-weight: 600;
+    color: #8755d5;
+  }
+  
+  .resources-guide-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .resources-guide-category {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6b7280;
+    background: #f3f4f6;
+    padding: 2px 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .resources-guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #8755d5;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+  }
+  
+  .resources-guide-link:hover {
+    gap: 12px;
+    color: #7544c8;
+  }
+  
+  /* =====================================================
+     QUICK LINKS
+  ===================================================== */
+  
+  .resources-quick-links {
+    padding: 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+    background: #faf9fc;
+    border-radius: 20px;
+  }
+  
+  .resources-quick-links-content {
+    text-align: center;
+  }
+  
+  .resources-quick-links-content h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 24px 0;
+  }
+  
+  .resources-quick-links-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .resources-quick-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    text-decoration: none;
+    color: #1a1a2e;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    font-size: 14px;
+  }
+  
+  .resources-quick-link:hover {
+    border-color: #8755d5;
+    color: #8755d5;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(133, 85, 213, 0.06);
+  }
+  
+  .resources-quick-icon {
+    font-size: 20px;
+    color: #8755d5;
+  }
+  
+  /* =====================================================
+     WEBINARS SECTION
+  ===================================================== */
+  
+  .resources-webinars {
+    padding: 40px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .resources-webinars-header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  
+  .resources-webinars-header h2 {
+    font-size: 32px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+  }
+  
+  .resources-webinars-header p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  .resources-webinars-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  
+  .resources-webinar-card {
+    background: #ffffff;
+    padding: 28px 24px;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    transition: all 0.3s ease;
+  }
+  
+  .resources-webinar-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(133, 85, 213, 0.06);
+  }
+  
+  .resources-webinar-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  
+  .resources-webinar-icon {
+    font-size: 24px;
+    color: #8755d5;
+  }
+  
+  .resources-webinar-category {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 12px;
+    text-transform: uppercase;
+  }
+  
+  .resources-webinar-category.beginner {
+    background: #e6f7f1;
+    color: #27ae60;
+  }
+  
+  .resources-webinar-category.intermediate {
+    background: #fef3e8;
+    color: #ff7800;
+  }
+  
+  .resources-webinar-category.advanced {
+    background: #fde8e8;
+    color: #ef4444;
+  }
+  
+  .resources-webinar-card h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 8px 0;
+  }
+  
+  .resources-webinar-card p {
+    font-size: 14px;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 16px 0;
+  }
+  
+  .resources-webinar-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 8px;
+  }
+  
+  .resources-webinar-date,
+  .resources-webinar-time {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .resources-webinar-speaker {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 8px;
+  }
+  
+  .resources-webinar-registered {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 16px;
+  }
+  
+  .resources-webinar-register-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #8755d5, #7544c8);
+    color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  
+  .resources-webinar-register-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(133, 85, 213, 0.30);
+  }
+  
+  /* =====================================================
+     RECORDED WEBINARS
+  ===================================================== */
+  
+  .resources-recorded {
+    padding: 40px 60px 60px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .resources-recorded-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  
+  .resources-recorded-header h2 {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 4px 0;
+  }
+  
+  .resources-recorded-header p {
+    font-size: 16px;
+    color: #6b7280;
+  }
+  
+  .resources-recorded-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  
+  .resources-recorded-card {
+    display: flex;
+    background: #ffffff;
+    border-radius: 16px;
+    border: 1px solid #f0edf8;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  
+  .resources-recorded-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 25px rgba(133, 85, 213, 0.06);
+  }
+  
+  .resources-recorded-thumbnail {
+    width: 160px;
+    background: linear-gradient(135deg, #f3edfc, #ede6f8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  
+  .resources-recorded-play {
+    font-size: 40px;
+    color: #8755d5;
+    opacity: 0.8;
+    transition: all 0.3s ease;
+  }
+  
+  .resources-recorded-card:hover .resources-recorded-play {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  
+  .resources-recorded-info {
+    padding: 20px 24px;
+    flex: 1;
+  }
+  
+  .resources-recorded-info h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a1a2e;
+    margin: 0 0 6px 0;
+  }
+  
+  .resources-recorded-info p {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0 0 12px 0;
+  }
+  
+  .resources-recorded-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+  }
+  
+  .resources-recorded-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .resources-recorded-watch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    background: transparent;
+    border: 1px solid #8755d5;
+    border-radius: 8px;
+    color: #8755d5;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .resources-recorded-watch-btn:hover {
+    background: #8755d5;
+    color: #ffffff;
+  }
+  
+  /* =====================================================
+     CTA SECTION
+  ===================================================== */
+  
+  .resources-cta {
+    padding: 80px 60px;
+    background: linear-gradient(135deg, #1a1a2e, #2d1b4e);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .resources-cta-content {
+    text-align: center;
+    max-width: 640px;
+  }
+  
+  .resources-cta-content h2 {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0 0 12px 0;
+  }
+  
+  .resources-cta-content p {
+    font-size: 18px;
+    color: #a89fc0;
+    margin: 0 0 32px 0;
+    line-height: 1.7;
+  }
+  
+  .resources-cta-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+  
+  .resources-btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 32px;
+    background: transparent;
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    font-family: "Poppins", sans-serif;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .resources-btn-outline:hover {
+    border-color: #a87bdf;
+    background: rgba(168, 123, 223, 0.10);
+  }
+  
+  /* =====================================================
+     RESPONSIVE
+  ===================================================== */
+  
+  @media (max-width: 1024px) {
+    .resources-hero {
+      padding: 60px 40px;
+    }
+  
+    .resources-hero h1 {
+      font-size: 38px;
+    }
+  
+    .resources-guides {
+      padding: 30px 40px 40px;
+    }
+  
+    .resources-guides-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .resources-webinars {
+      padding: 30px 40px 40px;
+    }
+  
+    .resources-recorded {
+      padding: 30px 40px 40px;
+    }
+  
+    .resources-recorded-grid {
+      grid-template-columns: 1fr;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+  
+    .resources-cta {
+      padding: 60px 40px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .resources-hero {
+      padding: 40px 24px;
+    }
+  
+    .resources-hero h1 {
+      font-size: 30px;
+    }
+  
+    .resources-hero p {
+      font-size: 16px;
+    }
+  
+    .resources-hero-actions {
+      flex-direction: column;
+      width: 100%;
+    }
+  
+    .resources-btn-primary,
+    .resources-btn-secondary {
+      width: 100%;
+      justify-content: center;
+    }
+  
+    .resources-guides {
+      padding: 20px 20px 30px;
+    }
+  
+    .resources-guides-grid {
+      grid-template-columns: 1fr;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+  
+    .resources-quick-links {
+      padding: 30px 20px;
+      margin: 0 12px;
+      border-radius: 16px;
+    }
+  
+    .resources-quick-links-grid {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+  
+    .resources-webinars {
+      padding: 20px 20px 30px;
+    }
+  
+    .resources-webinars-grid {
+      grid-template-columns: 1fr;
+      max-width: 420px;
+      margin: 0 auto;
+    }
+  
+    .resources-recorded {
+      padding: 20px 20px 30px;
+    }
+  
+    .resources-recorded-card {
+      flex-direction: column;
+    }
+  
+    .resources-recorded-thumbnail {
+      width: 100%;
+      height: 120px;
+    }
+  
+    .resources-cta-content h2 {
+      font-size: 28px;
+    }
+  
+    .resources-cta-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .resources-cta {
+      padding: 40px 20px;
+    }
+  
+    .resources-btn-outline {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+  
+  @media (max-width: 500px) {
+    .resources-hero {
+      padding: 24px 16px;
+    }
+  
+    .resources-hero h1 {
+      font-size: 24px;
+    }
+  
+    .resources-hero p {
+      font-size: 14px;
+    }
+  
+    .resources-guide-card {
+      padding: 20px 18px;
+    }
+  
+    .resources-webinar-card {
+      padding: 20px 18px;
+    }
+  
+    .resources-recorded-info {
+      padding: 16px 18px;
+    }
+  
+    .resources-cta-content h2 {
+      font-size: 22px;
+    }
+  
+    .resources-cta-content p {
+      font-size: 15px;
+    }
+  
+    .resources-btn-primary,
+    .resources-btn-secondary,
+    .resources-btn-outline {
+      font-size: 14px;
+      padding: 12px 20px;
+    }
+  }
