@@ -389,7 +389,9 @@ export default function CreateAppointment({ onClose, onSave }) {
 
       <aside className="create-appointment-drawer">
 
-        {/* HEADER */}
+        {/* =========================================
+            HEADER
+        ========================================= */}
         <div className="create-drawer-header">
 
           {step === 3 ? (
@@ -419,12 +421,16 @@ export default function CreateAppointment({ onClose, onSave }) {
 
         </div>
 
-        {/* BODY */}
+        {/* =========================================
+            BODY
+        ========================================= */}
         <div className="create-drawer-body">
 
+          {/* =========================================
+             STEP 1 — GENERAL INFORMATION
+          ========================================= */}
           {step === 1 ? (
 
-            /* STEP 1 — GENERAL INFORMATION */
             <div className="general-information">
 
               <div className="general-title">
@@ -546,7 +552,9 @@ export default function CreateAppointment({ onClose, onSave }) {
 
           ) : step === 2 ? (
 
-            /* STEP 2 — SCHEDULE */
+            /* =========================================
+               STEP 2 — SCHEDULE
+            ========================================= */
             <div className="schedule-step">
 
               {/* APPOINTMENT SUMMARY CHIP */}
@@ -686,7 +694,7 @@ export default function CreateAppointment({ onClose, onSave }) {
                 </div>
               </div>
 
-              {/* ✅ GENERAL AVAILABILITY - FIXED */}
+              {/* ✅ GENERAL AVAILABILITY */}
               <div className="availability-field">
                 <label className="section-label">
                   General availability <span className="required-star">*</span>
@@ -813,16 +821,165 @@ export default function CreateAppointment({ onClose, onSave }) {
 
           ) : (
 
-            /* STEP 3 — REVIEW INFORMATION */
+            /* =========================================
+               STEP 3 — REVIEW INFORMATION
+            ========================================= */
             <div className="review-step">
-              {/* ... review section code ... */}
+
+              {/* GENERAL INFORMATION RECAP */}
+              <div className="review-section">
+
+                <div className="review-title">
+                  <FaInfoCircle />
+                  <h3>General information</h3>
+                </div>
+
+                <div className="review-grid">
+
+                  {/* Location */}
+                  <div className="review-field">
+                    <label>
+                      <FaMapMarkerAlt />
+                      Location
+                    </label>
+                    <div className="review-value">
+                      {formData.location}
+                    </div>
+                  </div>
+
+                  {/* Online Link */}
+                  <div className="review-field">
+                    <label>
+                      <FaLink />
+                      Online Link
+                    </label>
+                    <div className="review-link-wrapper">
+                      <span className="review-value review-link">
+                        {formData.onlineLink}
+                      </span>
+                      <button
+                        className="review-copy-btn"
+                        onClick={() => handleCopyLink(formData.onlineLink)}
+                        aria-label="Copy link"
+                        type="button"
+                      >
+                        <FaRegCopy />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Max Invitees */}
+                  <div className="review-field">
+                    <label>
+                      <FaUsers />
+                      Max invitees
+                    </label>
+                    <div className="review-value">
+                      {formData.maxInvitees}
+                    </div>
+                  </div>
+
+                  {/* Event Color */}
+                  <div className="review-field">
+                    <label>
+                      <FaPalette />
+                      Event Color
+                    </label>
+                    <div
+                      className="review-color-dot"
+                      style={{ backgroundColor: selectedColorHex }}
+                    />
+                  </div>
+
+                </div>
+
+                {/* Description - Full Width */}
+                <div className="review-field review-full-field">
+                  <label>
+                    <FaAlignLeft />
+                    Description
+                  </label>
+                  <p className="review-value review-description">
+                    {formData.description}
+                  </p>
+                </div>
+
+              </div>
+
+              {/* SCHEDULE RECAP */}
+              <div className="review-section">
+
+                <div className="review-title">
+                  <FaCalendarAlt />
+                  <h3>Schedule</h3>
+                </div>
+
+                {/* Invitees can select */}
+                <div className="review-field review-full-field">
+                  <label className="ap-invitee">
+                    <FaUsers />
+                    Invitees can select
+                  </label>
+                  <div className="review-value">
+                    {scheduleData.selectMode === "days"
+                      ? `${scheduleData.daysCount} days into the future`
+                      : scheduleData.selectMode === "weeks"
+                      ? `${scheduleData.daysCount} weeks into the future`
+                      : scheduleData.selectMode === "months"
+                      ? `${scheduleData.daysCount} months into the future`
+                      : "Within a date range"}
+                  </div>
+                </div>
+
+                {/* General Availability */}
+                <div className="review-field review-full-field">
+                  <label>
+                    <FaRegClock />
+                    General availability
+                  </label>
+
+                  <div className="availability-review-list">
+                    {DAYS.map((day) => {
+                      const dayData = availability[day];
+                      const isAvailable = dayData.enabled && dayData.slots.length > 0;
+
+                      return (
+                        <div
+                          className={`availability-review-row ${isAvailable ? "has-slot" : ""}`}
+                          key={day}
+                        >
+                          <span className="review-day-label">{day}</span>
+
+                          {isAvailable ? (
+                            <div className="review-slots">
+                              {dayData.slots.map((slot, index) => (
+                                <span className="review-slot-time" key={index}>
+                                  <span className="review-slot-start">{slot.start}</span>
+                                  <FaArrowRight className="review-slot-arrow" />
+                                  <span className="review-slot-end">{slot.end}</span>
+                                </span>
+                              ))}
+                            </div>
+                          ) : (
+                            <span className="review-unavailable">Unavailable</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+              </div>
+
             </div>
 
           )}
 
         </div>
 
-        {/* FOOTER */}
+        {/* =========================================
+            FOOTER
+        ========================================= */}
         <div className="create-drawer-footer">
 
           {step === 2 && (
