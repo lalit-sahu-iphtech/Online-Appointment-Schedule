@@ -222,7 +222,7 @@
 }
 
 /* =========================================
-   STEP 1 — FORM (scoped to General Information)
+   STEP 1 — FORM
 ========================================= */
 
 .gi-field {
@@ -341,7 +341,7 @@
 }
 
 /* =========================================================
-   STEP 2 — SCHEDULE (Image Style)
+   STEP 2 — SCHEDULE
 ========================================================= */
 
 .schedule-step {
@@ -424,9 +424,16 @@
   margin-bottom: 12px;
 }
 
-/* =========================================
-   INVITEES CAN SELECT - IMAGE STYLE
-========================================= */
+/* =========================================================
+   INVITEES CAN SELECT
+   Row 1: radio-dot + days-count-input + unit-select + text
+           -> radio/input/select always stay on one line;
+              the label text is forced onto its own line
+              right after the select (adjacent-sibling rule
+              below), regardless of container width.
+   Row 2: radio-dot + text ("Within a date range")
+           -> stays inline as-is (no override needed).
+========================================================= */
 
 .invitees-select-field {
   margin-bottom: 28px;
@@ -435,12 +442,30 @@
 .invitees-option-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: 10px;
+  margin-bottom: 10px;
+  flex-wrap: wrap;
+  row-gap: 6px;
 }
 
 .invitees-option-row:last-child {
   margin-bottom: 0;
+}
+
+/* keep radio + input + select from ever wrapping among themselves */
+.invitees-option-row .radio-dot,
+.invitees-option-row .days-count-input,
+.invitees-option-row .unit-select {
+  flex-shrink: 0;
+}
+
+/* force the label text that follows the unit-select onto its
+   own full-width line (this only matches Row 1's text, since
+   Row 2's text follows a radio-dot directly, not a unit-select) */
+.unit-select + .into-future-text {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 2px;
 }
 
 /* Radio Button */
@@ -477,11 +502,11 @@
 .invitee-input-group {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
 .days-count-input {
-  width: 50px;
+  width: 46px;
   height: 32px;
   border: 1px solid #e2e8f0;
   outline: none;
@@ -505,10 +530,11 @@
   background: #f1f4f8;
 }
 
-/* Unit Select - Image Style */
+/* Unit Select */
 .unit-select {
-  width: 60px;
+  width: 92px;
   position: relative;
+  flex-shrink: 0;
 }
 
 .unit-select select {
@@ -547,10 +573,11 @@
   font-size: 13px;
   font-weight: 500;
   color: #4a5568;
+  white-space: nowrap;
 }
 
 /* =========================================
-   DURATION + TIMEZONE ROW - IMAGE STYLE
+   DURATION + TIMEZONE ROW
 ========================================= */
 
 .schedule-field {
@@ -574,7 +601,7 @@
   margin-bottom: 28px;
 }
 
-/* Select With Icon - Image Style */
+/* Select With Icon */
 .select-with-icon {
   position: relative;
   width: 100%;
@@ -657,9 +684,10 @@
 .availability-row {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   padding: 8px 0 12px;
   border-bottom: 1px solid #f0f2f5;
+  flex-wrap: nowrap;
 }
 
 .availability-row:last-child {
@@ -680,24 +708,38 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
+
+/* =========================================
+   SLOT ROW — width fix applied
+   (time-input-wrap no longer has a fixed
+   min-width so it can shrink inside narrow
+   containers; buttons stay flex-shrink: 0
+   so they never get pushed off-screen)
+========================================= */
 
 .slot-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
 }
 
 .time-input-wrap {
   position: relative;
-  flex: 1;
+  flex: 1 1 0;
   min-width: 0;
+  max-width: none;
 }
 
 .time-input-wrap input {
   width: 100%;
   height: 34px;
   box-sizing: border-box;
+  min-width: 0;
   border: 1px solid #e2e8f0;
   outline: none;
   background: #ffffff;
@@ -719,7 +761,6 @@
   box-shadow: 0 0 0 3px rgba(135, 85, 213, 0.1);
 }
 
-/* Hide the browser's native clock icon so only our custom icon shows */
 .time-input-wrap input::-webkit-calendar-picker-indicator {
   opacity: 0;
   -webkit-appearance: none;
@@ -749,14 +790,15 @@
 
 .slot-arrow {
   flex-shrink: 0;
-  font-size: 11px;
+  font-size: 10px;
   color: #a0aec0;
+  margin: 0 2px;
 }
 
 .remove-slot-btn,
 .add-slot-btn {
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
@@ -764,7 +806,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 11px;
+  font-size: 10px;
   transition: all 0.2s ease;
 }
 
@@ -793,7 +835,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-top: 4px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .unavailable-text {
@@ -1074,7 +1117,7 @@
 }
 
 /* =========================================
-   RESPONSIVE
+   RESPONSIVE - FULL DRAWER
 ========================================= */
 
 @media (max-width: 700px) {
@@ -1094,27 +1137,9 @@
     padding: 0 22px;
   }
 
-  .invitees-option-row {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
   .schedule-duration-row {
     grid-template-columns: 1fr;
     gap: 16px;
-  }
-
-  .availability-row {
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .day-label {
-    width: 100%;
-  }
-
-  .slot-row {
-    flex-wrap: wrap;
   }
 
   .add-workflow-box {
@@ -1125,6 +1150,10 @@
     row-gap: 16px;
   }
 }
+
+/* =========================================
+   RESPONSIVE - TABLET & MOBILE
+========================================= */
 
 @media (max-width: 520px) {
   .create-appointment-drawer {
@@ -1180,60 +1209,114 @@
     font-size: 13px;
   }
 
+  /* =====================================
+     INVITEES CAN SELECT - MOBILE FIX
+     radio + day input + select stay in
+     ONE row (nowrap on this trio); the
+     "Into the future" text always drops
+     to its own full-width line right
+     after the select via the sibling
+     rule defined in the base styles.
+  ===================================== */
   .invitees-option-row {
     flex-wrap: wrap;
-  }
-
-  .invitee-input-group {
-    flex-wrap: wrap;
+    gap: 6px;
+    row-gap: 4px;
   }
 
   .days-count-input {
-    width: 44px;
-    height: 28px;
+    width: 38px;
+    height: 30px;
     font-size: 12px;
   }
 
   .unit-select {
-    width: 55px;
+    width: 78px;
   }
 
   .unit-select select {
-    height: 28px;
+    height: 30px;
     font-size: 11px;
+    padding: 0 20px 0 8px;
   }
 
   .into-future-text {
     font-size: 12px;
+    white-space: nowrap;
   }
 
+  /* AVAILABILITY - MOBILE FIX */
   .availability-field {
     padding: 12px 12px 4px;
   }
 
   .availability-row {
     flex-direction: column;
-    gap: 8px;
+    align-items: stretch;
+    gap: 6px;
+    padding: 6px 0 10px;
   }
 
   .day-label {
-    padding-top: 0;
+    width: 100%;
+    padding-bottom: 2px;
   }
 
+  .slots-column {
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* time-input width fix: no fixed min/max-width,
+     so the input shrinks and the +/x buttons
+     always stay visible inside the row */
   .slot-row {
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
+    gap: 4px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .time-input-wrap {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: none;
   }
 
   .time-input-wrap input {
+    width: 100%;
     height: 30px;
-    font-size: 11px;
+    font-size: 10.5px;
+    padding: 0 22px 0 8px;
+    box-sizing: border-box;
+  }
+
+  .time-input-wrap svg {
+    font-size: 9px;
+    right: 6px;
+  }
+
+  .slot-arrow {
+    font-size: 8px;
+    margin: 0 1px;
+    flex-shrink: 0;
   }
 
   .remove-slot-btn,
   .add-slot-btn {
-    width: 24px;
-    height: 24px;
-    font-size: 10px;
+    width: 22px;
+    height: 22px;
+    font-size: 8px;
+    flex-shrink: 0;
+  }
+
+  .unavailable-row {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .unavailable-text {
+    font-size: 11px;
   }
 
   .add-workflow-box {
@@ -1275,25 +1358,29 @@
   }
 }
 
+/* =========================================
+   RESPONSIVE - EXTRA SMALL (400px)
+========================================= */
+
 @media (max-width: 400px) {
-  .invitees-option-row {
-    flex-direction: column;
-    align-items: flex-start;
+  .days-count-input {
+    width: 34px;
+    height: 28px;
+    font-size: 11px;
   }
 
-  .slot-row {
-    flex-direction: column;
-    align-items: stretch;
+  .unit-select {
+    width: 70px;
   }
 
-  .slot-arrow {
-    transform: rotate(90deg);
-    align-self: center;
+  .unit-select select {
+    height: 28px;
+    font-size: 10px;
+    padding: 0 18px 0 8px;
   }
 
-  .remove-slot-btn,
-  .add-slot-btn {
-    align-self: flex-end;
+  .into-future-text {
+    font-size: 11px;
   }
 
   .create-drawer-header {
@@ -1320,5 +1407,51 @@
     min-width: 70px;
     font-size: 12px;
     padding: 0 12px;
+  }
+
+  /* AVAILABILITY - EXTRA SMALL */
+  .slot-row {
+    gap: 3px;
+  }
+
+  .time-input-wrap {
+    min-width: 0;
+    max-width: none;
+    flex: 1 1 0;
+  }
+
+  .time-input-wrap input {
+    width: 100%;
+    height: 26px;
+    font-size: 9px;
+    padding: 0 18px 0 6px;
+  }
+
+  .time-input-wrap svg {
+    font-size: 8px;
+    right: 4px;
+  }
+
+  .slot-arrow {
+    font-size: 7px;
+  }
+
+  .remove-slot-btn,
+  .add-slot-btn {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+  }
+
+  .day-label {
+    font-size: 10px;
+  }
+
+  .unavailable-text {
+    font-size: 10px;
+  }
+
+  .availability-field {
+    padding: 8px 8px 4px;
   }
 }
