@@ -916,8 +916,12 @@
     ========================= */
 
     .next-event-card {
+        margin-top: 510px;
+
         margin-top: 20px;
         padding: 14px 12px;
+        max-width: 200px;
+
     }
 
     .event-title {
@@ -1029,8 +1033,12 @@
     }
 
     .next-event-card {
+        margin-top: 410px;
         padding: 12px 10px;
         border-radius: 10px;
+        min-width: 170px;
+
+
     }
 
     .event-title {
@@ -1133,8 +1141,11 @@
     }
 
     .next-event-card {
+        margin-top: 410px;
         padding: 10px 8px;
         border-radius: 8px;
+        min-width: 150px;
+
     }
 
     .event-title {
