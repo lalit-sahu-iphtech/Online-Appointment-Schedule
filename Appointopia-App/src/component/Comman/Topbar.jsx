@@ -1,4 +1,4 @@
-// src/component/Common/Topbar.jsx
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -91,7 +91,7 @@ export default function Topbar({
     displayTitle: `${item.sourceLabel}: ${item.title}`,
   }));
 
-  // ✅ Get user display name
+  //  Get user display name
   const getUserDisplayName = () => {
     if (currentUser?.name) return currentUser.name;
     if (currentUser?.displayName) return currentUser.displayName;
@@ -272,9 +272,9 @@ export default function Topbar({
                 <div className="topbar-profile-dropdown-header">
                   <FaUserCircle className="topbar-profile-avatar" />
                   <div>
-                    {/* ✅ Show current user name */}
+                    {/*  Show current user name */}
                     <h4>{getUserDisplayName()}</h4>
-                    {/* ✅ Show current user email */}
+                    {/* Show current user email */}
                     <span>{getUserEmail()}</span>
                   </div>
                 </div>

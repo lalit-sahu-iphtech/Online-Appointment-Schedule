@@ -1,5 +1,4 @@
-// src/component/Calendar/AddMeetingModal.jsx
-// ✅ Bas yeh rakhna hai - Email ka kuch nahi
+
 
 import { useState, useEffect } from "react";
 import {
@@ -89,7 +88,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    // ✅ SIRF SAVE - EMAIL NAHI BHEJNA
+    //  SIRF SAVE - EMAIL NAHI BHEJNA
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -109,7 +108,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             return;
         }
 
-        // ✅ Sirf save karo - email Calendar.jsx bhejega
+        //  Sirf save karo - email Calendar.jsx bhejega
         onSave(formData);
         onClose();
         

@@ -93,7 +93,7 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
   const isFirstRender = useRef(true);
   const prevDateRef = useRef(null);
   
-  // ✅ Notify parent when date changes (currentWeekStart or currentYear)
+  //  Notify parent when date changes (currentWeekStart or currentYear)
   useEffect(() => {
     // Skip first render to avoid unnecessary calls
     if (isFirstRender.current) {
@@ -104,7 +104,7 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
     if (onDateChange) {
       const dateToSend = view === "week" ? currentWeekStart : new Date(currentYear, 0, 1);
       
-      // ✅ Check if date actually changed
+      //  Check if date actually changed
       const dateStr = dateToSend.toDateString();
       if (prevDateRef.current !== dateStr) {
         prevDateRef.current = dateStr;
@@ -200,7 +200,7 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       });
       setExpandedMonths(state);
       
-      // ✅ Sync appointments to context for Sidebar
+      //  Sync appointments to context for Sidebar
       if (onAppointmentsSync) {
         onAppointmentsSync(formattedData);
       }

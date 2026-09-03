@@ -2,9 +2,7 @@
 import emailjs from "@emailjs/browser";
 import { getWorkflows } from "./firestoreService";
 
-// ============================================
 // EVENT -> WORKFLOW MATCHING
-// ============================================
 
 const EVENT_KEYWORDS = {
   cancelled: ["cancel", "cancellation", "cancelled"],
@@ -18,7 +16,7 @@ const DEFAULT_MESSAGES = {
   completed: (name) => `Thank you for attending "${name}"! We hope you enjoyed it.`,
 };
 
-// ✅ SINGLE SOURCE OF TRUTH for sent emails
+//  SINGLE SOURCE OF TRUTH for sent emails
 const SENT_EMAILS_KEY = "workflow_sent_emails_v2";
 
 const getSentEmails = () => {
@@ -38,7 +36,7 @@ const isEmailAlreadySent = (meetingId, eventType) => {
     const key = `${meetingId}_${eventType}`;
     const status = !!sent[key];
     if (status) {
-        console.log(`⏭️ [${eventType}] Already sent for ${meetingId} at ${sent[key]}`);
+        console.log(` [${eventType}] Already sent for ${meetingId} at ${sent[key]}`);
     }
     return status;
 };
@@ -48,7 +46,7 @@ const markEmailSent = (meetingId, eventType) => {
     const key = `${meetingId}_${eventType}`;
     sent[key] = new Date().toISOString();
     saveSentEmails(sent);
-    console.log(`✅ [${eventType}] Marked as sent for ${meetingId}`);
+    console.log(` [${eventType}] Marked as sent for ${meetingId}`);
 };
 
 export const clearSentStatus = (meetingId) => {
@@ -59,7 +57,7 @@ export const clearSentStatus = (meetingId) => {
         }
     });
     saveSentEmails(sent);
-    console.log(`🗑️ Cleared sent status for ${meetingId}`);
+    console.log(` Cleared sent status for ${meetingId}`);
 };
 
 const getWorkflowsForEvent = (workflows, eventType) => {
@@ -83,20 +81,20 @@ const getWorkflowsForEvent = (workflows, eventType) => {
     return matched;
 };
 
-// ✅ MAIN FUNCTION
+//  MAIN FUNCTION
 export const executeWorkflowsForEvent = async (meetingData, eventType) => {
     try {
         if (!meetingData || !meetingData.id) {
-            console.error(`❌ No meeting ID for ${eventType}`);
+            console.error(` No meeting ID for ${eventType}`);
             return 0;
         }
 
         if (isEmailAlreadySent(meetingData.id, eventType)) {
-            console.log(`⏭️ [${eventType}] Skipping - already sent for ${meetingData.id}`);
+            console.log(` [${eventType}] Skipping - already sent for ${meetingData.id}`);
             return 0;
         }
 
-        console.log(`🔄 [${eventType}] Starting workflow for ${meetingData.id}`);
+        console.log(` [${eventType}] Starting workflow for ${meetingData.id}`);
 
         const workflows = await getWorkflows();
         const matchingWorkflows = getWorkflowsForEvent(workflows, eventType);
@@ -111,28 +109,28 @@ export const executeWorkflowsForEvent = async (meetingData, eventType) => {
         }
 
         markEmailSent(meetingData.id, eventType);
-        console.log(`✅ [${eventType}] Completed for ${meetingData.id}`);
+        console.log(` [${eventType}] Completed for ${meetingData.id}`);
 
         return matchingWorkflows.length;
     } catch (error) {
-        console.error(`❌ [${eventType}] Error:`, error);
+        console.error(`[${eventType}] Error:`, error);
         return 0;
     }
 };
 
 // Convenience wrappers
 export const executeCancellationWorkflows = (meetingData) => {
-    console.log(`🔴 Cancellation requested for ${meetingData?.id}`);
+    console.log(` Cancellation requested for ${meetingData?.id}`);
     return executeWorkflowsForEvent(meetingData, "cancelled");
 };
 
 export const executeReminderWorkflows = (meetingData) => {
-    console.log(`🔵 Reminder requested for ${meetingData?.id}`);
+    console.log(` Reminder requested for ${meetingData?.id}`);
     return executeWorkflowsForEvent(meetingData, "reminder");
 };
 
 export const executeThankYouWorkflows = (meetingData) => {
-    console.log(`🟢 Thank You requested for ${meetingData?.id}`);
+    console.log(` Thank You requested for ${meetingData?.id}`);
     return executeWorkflowsForEvent(meetingData, "completed");
 };
 
@@ -144,18 +142,16 @@ export const executeWorkflow = async (workflow, eventData, eventType) => {
         try {
             const result = await executeAction(action, eventData, eventType);
             results.push({ action, success: true, result });
-            console.log(`✅ Action executed: ${action.label}`);
+            console.log(` Action executed: ${action.label}`);
         } catch (error) {
-            console.error(`❌ Action failed: ${action.label}`, error);
+            console.error(` Action failed: ${action.label}`, error);
             results.push({ action, success: false, error: error.message });
         }
     }
     return results;
 };
 
-// ============================================
-// ✅ SEND EMAIL ACTION - Account 1 + Account 2 Support
-// ============================================
+//  SEND EMAIL ACTION - Account 1 + Account 2 Support
 const executeAction = async (action, eventData, eventType) => {
     switch (action.type) {
         case "email":
@@ -177,11 +173,9 @@ const executeAction = async (action, eventData, eventType) => {
     }
 };
 
-// ============================================
-// ✅ SEND EMAIL ACTION - COMPLETE (All 4 Templates)
-// ============================================
+//  SEND EMAIL ACTION - COMPLETE (All 4 Templates)
 const executeEmailAction = async (action, eventData, eventType) => {
-    console.log(`📧 Sending ${eventType} email...`);
+    console.log(` Sending ${eventType} email...`);
 
     let invitees = eventData.invitees || [];
     
@@ -194,7 +188,7 @@ const executeEmailAction = async (action, eventData, eventType) => {
                 name: user.email.split('@')[0] || "Guest",
                 email: user.email
             }];
-            console.log(`📧 Using current user as fallback: ${user.email}`);
+            console.log(` Using current user as fallback: ${user.email}`);
         } else {
             throw new Error("No invitees and no current user found");
         }
@@ -205,15 +199,15 @@ const executeEmailAction = async (action, eventData, eventType) => {
     const userStr = localStorage.getItem("currentUser");
     const user = userStr ? JSON.parse(userStr) : null;
 
-    // ✅ Build subject
+    //  Build subject
     let emailSubject = action.config?.subject || "";
     if (!emailSubject) {
         switch (eventType) {
             case "cancelled":
-                emailSubject = `❌ Cancelled: ${meetingName}`;
+                emailSubject = ` Cancelled: ${meetingName}`;
                 break;
             case "reminder":
-                emailSubject = `⏰ Reminder: ${meetingName}`;
+                emailSubject = ` Reminder: ${meetingName}`;
                 break;
             case "completed":
                 emailSubject = `🙏 Thank You: ${meetingName}`;
@@ -223,7 +217,7 @@ const executeEmailAction = async (action, eventData, eventType) => {
         }
     }
 
-    // ✅ Build custom message
+    //  Build custom message
     let customMessage = action.config?.message || "";
     if (!customMessage) {
         switch (eventType) {
@@ -241,70 +235,68 @@ const executeEmailAction = async (action, eventData, eventType) => {
         }
     }
 
-    // ============================================
-    // ✅ ACCOUNT SELECTION BASED ON EVENT TYPE
-    // ============================================
+    //  ACCOUNT SELECTION BASED ON EVENT TYPE
     let serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;      // Account 1 (Default)
     let publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;      // Account 1 (Default)
     let templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;    // Account 1 (Default)
 
     // 🔍 DEBUG: Check all env values first
-    console.log('🔍 ===== ENVIRONMENT VARIABLES CHECK =====');
-    console.log('📧 ACCOUNT 1:');
+    console.log(' ===== ENVIRONMENT VARIABLES CHECK =====');
+    console.log(' ACCOUNT 1:');
     console.log('  Service ID:', import.meta.env.VITE_EMAILJS_SERVICE_ID);
     console.log('  Public Key:', import.meta.env.VITE_EMAILJS_PUBLIC_KEY);
     console.log('  Template ID:', import.meta.env.VITE_EMAILJS_TEMPLATE_ID);
     console.log('  Cancel Template:', import.meta.env.VITE_EMAILJS_CANCELLATION_TEMPLATE_ID);
-    console.log('📧 ACCOUNT 2:');
+    console.log(' ACCOUNT 2:');
     console.log('  Service ID:', import.meta.env.VITE_EMAILJS_REMINDER_SERVICE_ID);
     console.log('  Public Key:', import.meta.env.VITE_EMAILJS_REMINDER_PUBLIC_KEY);
     console.log('  Reminder Template:', import.meta.env.VITE_EMAILJS_REMINDER_TEMPLATE_ID);
     console.log('  Thank You Template:', import.meta.env.VITE_EMAILJS_THANKYOU_TEMPLATE_ID);
-    console.log('🔍 ========================================');
+    console.log(' ========================================');
 
     switch (eventType) {
         case "cancelled":
-            // ✅ Account 1 - Cancellation
+            //  Account 1 - Cancellation
             serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_CANCELLATION_TEMPLATE_ID;
-            console.log(`📧 Using Account 1 for Cancellation`);
+            console.log(` Using Account 1 for Cancellation`);
             break;
 
         case "reminder":
-            // ✅ Account 2 - Reminder
+            //  Account 2 - Reminder
             serviceId = import.meta.env.VITE_EMAILJS_REMINDER_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_REMINDER_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_REMINDER_TEMPLATE_ID;
-            console.log(`📧 Using Account 2 for Reminder`);
+            console.log(` Using Account 2 for Reminder`);
             break;
 
         case "completed":
-            // ✅ Account 2 - Thank You
+            //  Account 2 - Thank You
             serviceId = import.meta.env.VITE_EMAILJS_REMINDER_SERVICE_ID;  // Same as Account 2
             publicKey = import.meta.env.VITE_EMAILJS_REMINDER_PUBLIC_KEY;  // Same as Account 2
             templateId = import.meta.env.VITE_EMAILJS_THANKYOU_TEMPLATE_ID;
-            console.log(`📧 Using Account 2 for Thank You`);
+            console.log(`Using Account 2 for Thank You`);
             break;
 
         default:
-            // ✅ Account 1 - Invite (default)
+            //  Account 1 - Invite (default)
             serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
-            console.log(`📧 Using Account 1 for Invite`);
+            console.log(` Using Account 1 for Invite`);
     }
 
-    // ✅ Check if any value is undefined
+    //  Check if any value is undefined
     const missingValues = [];
     if (!serviceId) missingValues.push('Service ID');
     if (!publicKey) missingValues.push('Public Key');
     if (!templateId) missingValues.push('Template ID');
 
     if (missingValues.length > 0) {
-        console.error(`❌ MISSING EMAILJS VALUES for ${eventType}:`, missingValues.join(', '));
-        console.error('❌ Please check your .env file!');
-        console.error('❌ Required values:');
+        console.error(` MISSING EMAILJS VALUES for ${eventType}:`, missingValues.join(', '));
+        console.error(' Please check your .env file!');
+        console.error(' Required values:');
         console.error(`   - VITE_EMAILJS_REMINDER_SERVICE_ID (for reminder/thankyou)`);
         console.error(`   - VITE_EMAILJS_REMINDER_PUBLIC_KEY (for reminder/thankyou)`);
         console.error(`   - VITE_EMAILJS_REMINDER_TEMPLATE_ID (for reminder)`);
@@ -312,11 +304,11 @@ const executeEmailAction = async (action, eventData, eventType) => {
         throw new Error(`Missing EmailJS credentials for ${eventType}: ${missingValues.join(', ')}`);
     }
 
-    console.log(`📧 Service ID: ${serviceId}`);
-    console.log(`📧 Template ID: ${templateId}`);
-    console.log(`📧 Sending to ${invitees.length} recipients`);
+    console.log(`Service ID: ${serviceId}`);
+    console.log(` Template ID: ${templateId}`);
+    console.log(` Sending to ${invitees.length} recipients`);
 
-    // ✅ Send to each invitee
+    //  Send to each invitee
     const emailPromises = invitees.map(async (invitee, index) => {
         try {
             const templateParams = {
@@ -339,34 +331,32 @@ const executeEmailAction = async (action, eventData, eventType) => {
                 templateParams.cancellation_message = "We apologize for any inconvenience caused.";
             }
 
-            console.log(`📤 [${index+1}/${invitees.length}] Sending ${eventType} to ${invitee.email}`);
+            console.log(` [${index+1}/${invitees.length}] Sending ${eventType} to ${invitee.email}`);
 
             const response = await emailjs.send(
-                serviceId,     // ✅ Account 1 or Account 2 based on eventType
-                templateId,    // ✅ Account 1 or Account 2 based on eventType
+                serviceId,     
+                templateId,   
                 templateParams,
-                publicKey      // ✅ Account 1 or Account 2 based on eventType
+                publicKey      
             );
 
-            console.log(`✅ [${index+1}/${invitees.length}] ${eventType} sent to ${invitee.email}`);
+            console.log(` [${index+1}/${invitees.length}] ${eventType} sent to ${invitee.email}`);
             return response;
         } catch (error) {
-            console.error(`❌ Failed to send ${eventType} to ${invitee.email}:`, error);
+            console.error(`Failed to send ${eventType} to ${invitee.email}:`, error);
             throw error;
         }
     });
 
     await Promise.all(emailPromises);
-    console.log(`✅ All ${invitees.length} ${eventType} emails sent`);
+    console.log(` All ${invitees.length} ${eventType} emails sent`);
     return { sent: invitees.length, eventType, subject: emailSubject };
 };
 
-// ============================================
 // OTHER ACTIONS (unchanged)
-// ============================================
 
 const executeNotificationAction = async (action, eventData) => {
-    console.log("🔔 Notification:", action.label);
+    console.log(" Notification:", action.label);
     const title = action.config?.title || "Meeting Reminder";
     const message = `Meeting "${eventData.meetingName || eventData.title}" is starting soon!`;
 
@@ -382,14 +372,14 @@ const executeNotificationAction = async (action, eventData) => {
 };
 
 const executeSmsAction = async (action, eventData) => {
-    console.log("📱 SMS:", action.label);
+    console.log(" SMS:", action.label);
     const message = `Meeting Reminder: ${eventData.meetingName || eventData.title} at ${eventData.startTime}`;
     alert("SMS Sent:\n" + message);
     return { sent: true };
 };
 
 const executeWebhookAction = async (action, eventData) => {
-    console.log("🌐 Webhook:", action.label);
+    console.log(" Webhook:", action.label);
     const webhookUrl = action.config?.url;
     if (!webhookUrl) {
         throw new Error("Webhook URL is required");
@@ -415,7 +405,7 @@ const executeWebhookAction = async (action, eventData) => {
 };
 
 const executeCalendarAction = async (action, eventData) => {
-    console.log("📅 Calendar:", action.label);
+    console.log(" Calendar:", action.label);
     const startTime = new Date(eventData.date + "T" + eventData.startTime);
     const endTime = new Date(eventData.date + "T" + eventData.endTime);
 
@@ -432,14 +422,14 @@ const executeCalendarAction = async (action, eventData) => {
 };
 
 const executeTaskAction = async (action, eventData) => {
-    console.log("✅ Task:", action.label);
+    console.log(" Task:", action.label);
     const taskTitle = action.config?.title || "Follow-up: " + (eventData.meetingName || eventData.title);
     alert("Task Created:\n" + taskTitle);
     return { taskTitle };
 };
 
 const executeMessageAction = async (action, eventData) => {
-    console.log("💬 Message:", action.label);
+    console.log(" Message:", action.label);
     const message =
         "Meeting: " + (eventData.meetingName || eventData.title) + "\n" +
         "Date: " + eventData.date + "\n" +

@@ -49,7 +49,7 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
     if (onDismiss) {
       onDismiss(eventId);
     }
-    toast.info('🔕 Reminder Dismissed', 'You have dismissed this reminder.');
+    toast.info(' Reminder Dismissed', 'You have dismissed this reminder.');
   };
 
   const handleJoin = (event) => {

@@ -17,10 +17,10 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
     
     const toast = useToast();
     
-    // ✅ Edit mode state
+    //  Edit mode state
     const [isEditing, setIsEditing] = useState(externalEditing || false);
     
-    // ✅ Edit form state
+    //  Edit form state
     const [editedTitle, setEditedTitle] = useState(appointment.title);
     const [editedLocation, setEditedLocation] = useState(appointment.location || "");
     const [editedDuration, setEditedDuration] = useState(appointment.duration);
@@ -44,7 +44,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         { name: 'brown', bg: '#8B5E3C', text: '#ffffff' }
     ];
 
-    // ✅ Share handler with toast
+    //  Share handler with toast
     const handleShare = async () => {
         const shareData = {
             title: appointment.title,
@@ -72,7 +72,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         }
     };
 
-    // ✅ Delete handler with toast - FIXED with async/await
+    //  Delete handler with toast - FIXED with async/await
     const handleDelete = async () => {
         // ✅ Confirmation first
         // if (!window.confirm(`Are you sure you want to delete "${appointment.title}"?`)) {
@@ -82,7 +82,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         const loadingToast = toast.loading(' Deleting...', 'Please wait');
         
         try {
-            // ✅ Wait for onDelete to complete
+            //  Wait for onDelete to complete
             await onDelete(appointment.id);
             loadingToast.success(
                 ' Deleted!',
@@ -97,10 +97,10 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         }
     };
 
-    // ✅ Edit toggle function - FIXED with async/await
+    //  Edit toggle function - FIXED with async/await
     const handleEditToggle = async () => {
         if (isEditing) {
-            // ✅ Validate before saving
+            //  Validate before saving
             if (!editedTitle.trim()) {
                 toast.warning('⚠️ Missing Title', 'Please enter an appointment title.');
                 return;
@@ -123,14 +123,14 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                     updatedAt: new Date().toISOString()
                 };
                 
-                // ✅ Wait for onUpdate to complete
+                //  Wait for onUpdate to complete
                 await onUpdate(updatedData);
                 loadingToast.success(
                     ' Updated!',
                     `"${editedTitle}" has been updated successfully.`
                 );
                 
-                // ✅ Exit edit mode after successful save
+                //  Exit edit mode after successful save
                 setIsEditing(false);
                 return;
             } catch (error) {
@@ -143,14 +143,14 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
             }
         }
         
-        // ✅ Toggle edit mode
+        // Toggle edit mode
         setIsEditing(true);
         if (onEdit) {
             onEdit();
         }
     };
 
-    // ✅ Cancel edit
+    //  Cancel edit
     const handleCancelEdit = () => {
         setEditedTitle(appointment.title);
         setEditedLocation(appointment.location || "");
@@ -164,7 +164,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
         toast.info(' Edit Cancelled', 'Changes have been discarded.');
     };
 
-    // ✅ Color change handler
+    //  Color change handler
     const handleColorChange = (colorName) => {
         setEditedColor(colorName);
         toast.info(' Color Changed', `Event color set to ${colorName}`);
@@ -285,7 +285,7 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                                 />
                             </div>
 
-                            {/* ✅ Color Picker with toast on change */}
+                            {/*  Color Picker with toast on change */}
                             <div className="color-picker-container">
                                 <span className="color-picker-label">Color:</span>
                                 {colors.map(color => (

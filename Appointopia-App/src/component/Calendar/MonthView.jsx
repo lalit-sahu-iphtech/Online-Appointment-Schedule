@@ -23,7 +23,7 @@ export default function MonthView({
 
   const [expandedDate, setExpandedDate] = useState(null);
   const [popoverPos, setPopoverPos] = useState(null);
-  const popoverRef = useRef(null); // ✅ Ref for popover element
+  const popoverRef = useRef(null); 
 
   const dayCellRefs = useRef({});
 
@@ -62,17 +62,17 @@ export default function MonthView({
     setPopoverPos(null);
   };
 
-  // ✅ Fixed scroll detection - properly handles scroll inside popover
+  //  Fixed scroll detection - properly handles scroll inside popover
   useEffect(() => {
     if (!expandedDate) return;
     
     const handleKey = (e) => e.key === "Escape" && closePopover();
     
     const handleScroll = (e) => {
-      // ✅ Get the element that was scrolled
+      //  Get the element that was scrolled
       const target = e.target;
       
-      // ✅ Check if popover exists and if scroll happened inside it
+      // Check if popover exists and if scroll happened inside it
       const popoverElement = popoverRef.current;
       
       // If popover doesn't exist yet, close it
@@ -81,7 +81,7 @@ export default function MonthView({
         return;
       }
       
-      // ✅ Check if the scroll target is the popover itself or inside it
+      //  Check if the scroll target is the popover itself or inside it
       let isInsidePopover = false;
       
       // If the scroll target is the popover element itself
@@ -97,7 +97,7 @@ export default function MonthView({
         isInsidePopover = false;
       }
       
-      // ✅ Only close if scroll happened OUTSIDE the popover
+      //  Only close if scroll happened OUTSIDE the popover
       if (!isInsidePopover) {
         closePopover();
       }
@@ -214,7 +214,7 @@ export default function MonthView({
         <>
           <div className="month-popover-backdrop" onClick={closePopover} />
           <div
-            ref={popoverRef} // ✅ Attach ref to popover
+            ref={popoverRef} 
             className="month-popover"
             style={{ 
               top: `${popoverPos.top}px`, 

@@ -16,7 +16,7 @@ export default function DayView({
   const dateStr = formatDate(currentDate);
   const dayEvents = meeting.filter(item => item.date === dateStr);
   
-  // ✅ State to track expanded meetings
+  //  State to track expanded meetings
   const [expandedMeetings, setExpandedMeetings] = useState({});
 
   const toggleExpand = (timeKey) => {
@@ -26,7 +26,7 @@ export default function DayView({
     }));
   };
 
-  // ✅ Group events by start time
+  //  Group events by start time
   const groupEventsByTime = () => {
     const groups = {};
     dayEvents.forEach(event => {
@@ -61,9 +61,7 @@ export default function DayView({
     const visibleEvents = isExpanded ? events : events.slice(0, 1);
     const hiddenCount = events.length - 1;
 
-    // ✅ Position of the first event in this group — used to anchor the
-    // "+X more" / "Show less" pill to the bottom-right corner of the
-    // relevant event box instead of the whole day column.
+  
     const firstPos = getEventPosition(events[0].startTime, events[0].endTime);
     const lastIndex = visibleEvents.length - 1;
     const lastTop = firstPos.top + (isExpanded ? lastIndex * 28 : 0);
@@ -72,23 +70,18 @@ export default function DayView({
       : firstPos.height;
 
     return (
-      // ✅ FIX: must be position:absolute (not relative/normal-flow).
-      // Previously this div sat in normal document flow AFTER all 24
-      // grid-line rows (1392px tall), which pushed every event group
-      // below the visible grid and made it "escape" to the bottom of
-      // the page. Making it absolute + inset:0 overlays it on the
-      // grid instead, matching how WeekView positions its events.
+    
       <div
         key={timeKey}
         className="day-event-group"
         style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }}
       >
         {visibleEvents.map((item, index) => {
-          // ✅ Get event position
+          //  Get event position
           const { top, height } = getEventPosition(item.startTime, item.endTime);
           const color = getEventColor(item);
           
-          // ✅ Adjust position for stacked events
+          //  Adjust position for stacked events
           const offsetTop = isExpanded ? index * 28 : 0;
           const eventHeight = isExpanded ? Math.max(height - (index * 28), 28) : height;
           
@@ -138,7 +131,7 @@ export default function DayView({
           );
         })}
 
-        {/* ✅ "+X more" pill — sits in the bottom-right corner of the event box */}
+        {/*  "+X more" pill — sits in the bottom-right corner of the event box */}
         {!isExpanded && hiddenCount > 0 && (
           <button
             className="more-events-btn"
@@ -168,7 +161,7 @@ export default function DayView({
           </button>
         )}
 
-        {/* ✅ "Show less" pill — sits in the bottom-right corner of the last expanded event */}
+        {/*  "Show less" pill — sits in the bottom-right corner of the last expanded event */}
         {isExpanded && hiddenCount > 0 && (
           <button
             className="show-less-btn"
@@ -220,7 +213,7 @@ export default function DayView({
           ></div>
         ))}
 
-        {/* ✅ Render events grouped by start time */}
+        {/*  Render events grouped by start time */}
         {Object.keys(timeGroups).map((timeKey) => {
           const events = timeGroups[timeKey];
           return renderEventWithMore(events, timeKey);
