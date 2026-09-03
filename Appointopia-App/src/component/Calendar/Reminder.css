@@ -12,6 +12,7 @@
     z-index: 999;
     max-width: 380px;
     width: 100%;
+    box-sizing: border-box;
     pointer-events: none;
 }
 
@@ -28,6 +29,7 @@
     border-left: 4px solid #8555d5;
     animation: slideIn 0.3s ease;
     transition: all 0.3s ease;
+    box-sizing: border-box;
 }
 
 .reminder-card.active {
@@ -85,6 +87,7 @@
     align-items: center;
     justify-content: center;
     transition: 0.2s;
+    flex-shrink: 0;
 }
 
 .reminder-dismiss:hover {
@@ -109,6 +112,7 @@
     gap: 6px;
     font-size: 13px;
     color: #667085;
+    flex-wrap: wrap;
 }
 
 .time-icon {
@@ -134,6 +138,7 @@
     font-size: 12px;
     color: #667085;
     margin-top: 2px;
+    overflow-wrap: break-word;
 }
 
 .reminder-urgency {
@@ -249,26 +254,32 @@
 
 @media (max-width: 600px) {
     .reminder-container {
-        bottom: 16px;
-        right: 16px;
-        left: 16px;
-        max-width: 100%;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        right: 26px;
+        left: 90px;
+        width: auto;
+        max-width: none;
     }
-    
+
     .reminder-card {
         padding: 14px 16px;
     }
-    
+
     .reminder-name {
         font-size: 13px;
     }
-    
+
     .reminder-footer {
         flex-direction: column;
     }
-    
+
     .reminder-join-btn,
     .reminder-snooze-btn {
         padding: 10px 14px;
+    }
+
+    .reminder-dismiss {
+        width: 32px;
+        height: 32px;
     }
 }
