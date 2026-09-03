@@ -57,16 +57,19 @@
   margin: 0 auto 32px;
 }
 
+/* ✅ BUTTON FIX - Hero Buttons */
 .company-hero-actions {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .company-btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 32px;
   background: linear-gradient(135deg, #8755d5, #7544c8);
@@ -79,6 +82,9 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .company-btn-primary:hover {
@@ -89,6 +95,7 @@
 .company-btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 28px;
   background: transparent;
@@ -101,6 +108,9 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .company-btn-secondary:hover {
@@ -161,6 +171,7 @@
 .company-mission-stats {
   display: flex;
   gap: 40px;
+  flex-wrap: wrap;
 }
 
 .company-mission-stat {
@@ -192,6 +203,7 @@
   width: 100%;
   max-width: 380px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
 }
 
 .company-mission-card-header {
@@ -466,6 +478,7 @@
   border-radius: 20px;
   border: 1px solid #f0edf8;
   padding: 48px;
+  box-sizing: border-box;
 }
 
 .company-contact-info {
@@ -539,6 +552,7 @@
 .company-social-links {
   display: flex;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .company-social-link {
@@ -609,6 +623,8 @@
   outline: none;
   transition: all 0.3s ease;
   background: #ffffff;
+  box-sizing: border-box;
+  width: 100%;
 }
 
 .company-form-group input:focus,
@@ -617,6 +633,7 @@
   box-shadow: 0 0 0 4px rgba(133, 85, 213, 0.06);
 }
 
+/* ✅ BUTTON FIX - Form Button */
 .company-form-btn {
   display: inline-flex;
   align-items: center;
@@ -633,11 +650,19 @@
   cursor: pointer;
   transition: all 0.3s ease;
   margin-top: 8px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .company-form-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 8px 25px rgba(133, 85, 213, 0.30);
+}
+
+.company-form-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
 }
 
 /* =====================================================
@@ -655,6 +680,7 @@
 .company-cta-content {
   text-align: center;
   max-width: 640px;
+  width: 100%;
 }
 
 .company-cta-content h2 {
@@ -671,15 +697,18 @@
   line-height: 1.7;
 }
 
+/* ✅ BUTTON FIX - CTA Buttons */
 .company-cta-actions {
   display: flex;
   justify-content: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .company-btn-outline {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 32px;
   background: transparent;
@@ -692,13 +721,20 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .company-btn-outline:hover {
   border-color: #a87bdf;
   background: rgba(168, 123, 223, 0.10);
 }
-/* Add these styles to your existing companyPage.css */
+
+.company-cta-actions .company-btn-primary,
+.company-cta-actions .company-btn-outline {
+  min-width: 180px;
+}
 
 /* =====================================================
    FORM VALIDATION STYLES
@@ -771,17 +807,7 @@
 }
 
 /* =====================================================
-   DISABLED BUTTON
-===================================================== */
-
-.company-form-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-}
-
-/* =====================================================
-   RESPONSIVE
+   ✅ RESPONSIVE - TABLET (1024px)
 ===================================================== */
 
 @media (max-width: 1024px) {
@@ -834,6 +860,10 @@
   }
 }
 
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (768px)
+===================================================== */
+
 @media (max-width: 768px) {
   .company-hero {
     padding: 40px 24px;
@@ -847,6 +877,7 @@
     font-size: 16px;
   }
 
+  /* ✅ BUTTON FIX - Hero */
   .company-hero-actions {
     flex-direction: column;
     width: 100%;
@@ -856,6 +887,9 @@
   .company-btn-secondary {
     width: 100%;
     justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    white-space: normal;
   }
 
   .company-mission {
@@ -917,6 +951,7 @@
     grid-template-columns: 1fr;
   }
 
+  /* ✅ BUTTON FIX - CTA */
   .company-cta-content h2 {
     font-size: 28px;
   }
@@ -924,17 +959,27 @@
   .company-cta-actions {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+  }
+
+  .company-cta-actions .company-btn-primary,
+  .company-cta-actions .company-btn-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    min-width: 0;
+    white-space: normal;
   }
 
   .company-cta {
     padding: 40px 20px;
   }
-
-  .company-btn-outline {
-    width: 100%;
-    justify-content: center;
-  }
 }
+
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (500px)
+===================================================== */
 
 @media (max-width: 500px) {
   .company-hero {
@@ -947,6 +992,18 @@
 
   .company-hero p {
     font-size: 14px;
+  }
+
+  .company-badge {
+    font-size: 11px;
+    padding: 4px 14px;
+  }
+
+  .company-btn-primary,
+  .company-btn-secondary {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 10px;
   }
 
   .company-mission {
@@ -963,12 +1020,77 @@
     font-size: 22px;
   }
 
+  .company-mission-label {
+    font-size: 11px;
+  }
+
+  .company-mission-card {
+    padding: 24px 20px;
+  }
+
+  .company-mission-card-header h3 {
+    font-size: 16px;
+  }
+
+  .company-values {
+    padding: 30px 16px;
+  }
+
   .company-values-header h2 {
     font-size: 22px;
   }
 
+  .company-values-header p {
+    font-size: 14px;
+  }
+
+  .company-value-card {
+    padding: 24px 20px;
+  }
+
+  .company-value-card h3 {
+    font-size: 16px;
+  }
+
+  .company-value-card p {
+    font-size: 13px;
+  }
+
+  .company-value-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
+  }
+
+  .company-team {
+    padding: 20px 16px;
+    margin: 0 8px;
+    border-radius: 16px;
+  }
+
   .company-team-header h2 {
     font-size: 22px;
+  }
+
+  .company-team-header p {
+    font-size: 14px;
+  }
+
+  .company-team-card {
+    padding: 24px 20px;
+  }
+
+  .company-team-avatar {
+    width: 64px;
+    height: 64px;
+  }
+
+  .company-team-initials {
+    font-size: 20px;
+  }
+
+  .company-team-card h3 {
+    font-size: 16px;
   }
 
   .company-contact {
@@ -977,36 +1099,230 @@
 
   .company-contact-content {
     padding: 16px 12px;
+    border-radius: 16px;
   }
 
   .company-contact-info h2 {
     font-size: 20px;
   }
 
+  .company-contact-info > p {
+    font-size: 14px;
+  }
+
+  .company-contact-item {
+    gap: 10px;
+  }
+
+  .company-contact-value {
+    font-size: 13px;
+  }
+
+  .company-social-link {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+  }
+
+  .company-contact-form {
+    padding: 20px 16px;
+  }
+
+  .company-contact-form h3 {
+    font-size: 16px;
+  }
+
+  .company-form-group label {
+    font-size: 12px;
+  }
+
+  .company-form-group input,
+  .company-form-group textarea {
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+
+  /* ✅ BUTTON FIX - Form Button */
+  .company-form-btn {
+    padding: 10px 20px;
+    font-size: 13px;
+    border-radius: 8px;
+  }
+
+  /* ✅ BUTTON FIX - CTA */
   .company-cta-content h2 {
     font-size: 22px;
   }
 
+  .company-cta-content p {
+    font-size: 15px;
+  }
+
+  .company-cta-actions .company-btn-primary,
+  .company-cta-actions .company-btn-outline {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
+  .company-cta {
+    padding: 30px 16px;
+  }
+}
+
+/* =====================================================
+   ✅ RESPONSIVE - VERY SMALL (375px)
+===================================================== */
+
+@media (max-width: 375px) {
+  .company-hero {
+    padding: 20px 12px;
+  }
+
+  .company-hero h1 {
+    font-size: 20px;
+  }
+
+  .company-hero p {
+    font-size: 13px;
+  }
+
+  .company-badge {
+    font-size: 10px;
+    padding: 3px 12px;
+  }
+
   .company-btn-primary,
-  .company-btn-outline {
-    font-size: 14px;
-    padding: 12px 20px;
+  .company-btn-secondary {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .company-mission {
+    padding: 16px 12px;
+  }
+
+  .company-mission-text h2 {
+    font-size: 18px;
+  }
+
+  .company-mission-number {
+    font-size: 18px;
+  }
+
+  .company-mission-label {
+    font-size: 10px;
+  }
+
+  .company-mission-card {
+    padding: 20px 16px;
+  }
+
+  .company-mission-card-header h3 {
+    font-size: 15px;
+  }
+
+  .company-values {
+    padding: 24px 12px;
+  }
+
+  .company-values-header h2 {
+    font-size: 18px;
   }
 
   .company-value-card {
-    padding: 24px 20px;
+    padding: 20px 16px;
+  }
+
+  .company-value-card h3 {
+    font-size: 15px;
+  }
+
+  .company-value-card p {
+    font-size: 12px;
+  }
+
+  .company-value-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .company-team {
+    padding: 16px 12px;
+  }
+
+  .company-team-header h2 {
+    font-size: 18px;
   }
 
   .company-team-card {
-    padding: 24px 20px;
+    padding: 20px 16px;
+  }
+
+  .company-team-avatar {
+    width: 56px;
+    height: 56px;
+  }
+
+  .company-team-initials {
+    font-size: 18px;
+  }
+
+  .company-contact {
+    padding: 20px 12px;
+  }
+
+  .company-contact-content {
+    padding: 12px 10px;
+  }
+
+  .company-contact-info h2 {
+    font-size: 18px;
+  }
+
+  .company-contact-value {
+    font-size: 12px;
   }
 
   .company-contact-form {
-    padding: 24px 16px;
+    padding: 16px 12px;
+  }
+
+  .company-form-group input,
+  .company-form-group textarea {
+    padding: 8px 12px;
+    font-size: 12px;
   }
 
   .company-form-btn {
-    font-size: 14px;
-    padding: 12px 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+  }
+
+  .company-cta-content h2 {
+    font-size: 18px;
+  }
+
+  .company-cta-content p {
+    font-size: 13px;
+  }
+
+  .company-cta-actions .company-btn-primary,
+  .company-cta-actions .company-btn-outline {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .company-cta {
+    padding: 24px 12px;
+  }
+
+  .company-social-link {
+    width: 30px;
+    height: 30px;
+    font-size: 13px;
   }
 }

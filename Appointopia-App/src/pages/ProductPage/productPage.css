@@ -1,5 +1,3 @@
-
-
 /* =====================================================
    PRODUCT PAGE - PREMIUM DESIGN
 ===================================================== */
@@ -71,11 +69,14 @@
   align-items: center;
   gap: 16px;
   margin-bottom: 48px;
+  flex-wrap: wrap;
 }
 
+/* ✅ BUTTON FIX - Hero Buttons */
 .product-btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 32px;
   background: linear-gradient(135deg, #8755d5, #7544c8);
@@ -88,6 +89,9 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .product-btn-primary:hover {
@@ -98,6 +102,7 @@
 .product-btn-secondary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 28px;
   background: transparent;
@@ -109,6 +114,10 @@
   font-family: "Poppins", sans-serif;
   cursor: pointer;
   transition: all 0.3s ease;
+  text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .product-btn-secondary:hover {
@@ -123,6 +132,7 @@
   gap: 24px;
   padding-top: 24px;
   border-top: 1px solid #f0f0f0;
+  flex-wrap: wrap;
 }
 
 .product-stat {
@@ -163,6 +173,7 @@
   padding: 24px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
   border: 1px solid #f0edf8;
+  box-sizing: border-box;
 }
 
 .product-hero-card-header {
@@ -402,6 +413,7 @@
 .product-cta-content {
   text-align: center;
   max-width: 640px;
+  width: 100%;
 }
 
 .product-cta-content h2 {
@@ -422,11 +434,14 @@
   display: flex;
   justify-content: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
+/* ✅ BUTTON FIX - CTA Buttons */
 .product-btn-outline {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
   padding: 14px 32px;
   background: transparent;
@@ -439,6 +454,9 @@
   cursor: pointer;
   transition: all 0.3s ease;
   text-decoration: none;
+  white-space: nowrap;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .product-btn-outline:hover {
@@ -446,8 +464,13 @@
   background: rgba(168, 123, 223, 0.10);
 }
 
+.product-cta-actions .product-btn-primary,
+.product-cta-actions .product-btn-outline {
+  min-width: 180px;
+}
+
 /* =====================================================
-   RESPONSIVE
+   ✅ RESPONSIVE - TABLET (1024px)
 ===================================================== */
 
 @media (max-width: 1024px) {
@@ -473,12 +496,17 @@
   }
 }
 
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (768px)
+===================================================== */
+
 @media (max-width: 768px) {
   .product-hero {
     flex-direction: column;
     padding: 40px 24px;
     text-align: center;
     min-height: auto;
+    gap: 30px;
   }
 
   .product-hero-content {
@@ -489,13 +517,30 @@
     font-size: 32px;
   }
 
+  .product-hero-content p {
+    font-size: 16px;
+  }
+
   .product-hero-actions {
     justify-content: center;
     flex-wrap: wrap;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  /* ✅ MOBILE BUTTON FIX - Hero */
+  .product-btn-primary,
+  .product-btn-secondary {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    white-space: normal;
   }
 
   .product-hero-stats {
     justify-content: center;
+    flex-wrap: wrap;
   }
 
   .product-hero-visual {
@@ -504,6 +549,7 @@
 
   .product-hero-card {
     max-width: 100%;
+    padding: 20px;
   }
 
   .product-features-header h2 {
@@ -526,6 +572,18 @@
   .product-cta-actions {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+  }
+
+  /* ✅ MOBILE BUTTON FIX - CTA */
+  .product-cta-actions .product-btn-primary,
+  .product-cta-actions .product-btn-outline {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 14px;
+    min-width: 0;
+    white-space: normal;
   }
 
   .product-cta {
@@ -537,9 +595,14 @@
   }
 }
 
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (500px)
+===================================================== */
+
 @media (max-width: 500px) {
   .product-hero {
     padding: 24px 16px;
+    gap: 24px;
   }
 
   .product-hero-content h1 {
@@ -550,12 +613,26 @@
     font-size: 15px;
   }
 
+  .product-badge {
+    font-size: 11px;
+    padding: 4px 14px;
+  }
+
+  /* ✅ BUTTON FIX - Small screens */
+  .product-btn-primary,
+  .product-btn-secondary {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 10px;
+  }
+
   .product-features-grid {
     grid-template-columns: 1fr;
+    gap: 16px;
   }
 
   .product-feature-card {
-    padding: 24px 20px;
+    padding: 20px 18px;
   }
 
   .product-features-header h2 {
@@ -566,6 +643,10 @@
     font-size: 15px;
   }
 
+  .product-features-section {
+    padding: 30px 16px;
+  }
+
   .product-cta-content h2 {
     font-size: 22px;
   }
@@ -574,22 +655,20 @@
     font-size: 15px;
   }
 
-  .product-btn-primary,
-  .product-btn-outline,
-  .product-btn-secondary {
+  .product-cta-actions .product-btn-primary,
+  .product-cta-actions .product-btn-outline {
+    padding: 10px 16px;
+    font-size: 13px;
+    border-radius: 10px;
     width: 100%;
-    justify-content: center;
-    font-size: 14px;
-    padding: 12px 20px;
+    min-width: 0;
   }
 
-  .product-hero-actions {
-    flex-direction: column;
-    width: 100%;
+  .product-cta {
+    padding: 30px 16px;
   }
 
   .product-hero-stats {
-    flex-wrap: wrap;
     gap: 16px;
   }
 
@@ -599,10 +678,132 @@
 
   .product-stat {
     flex: 1;
-    min-width: 80px;
+    min-width: 70px;
+  }
+
+  .product-stat-number {
+    font-size: 20px;
+  }
+
+  .product-stat-label {
+    font-size: 11px;
   }
 
   .product-hero-card {
     padding: 16px;
+    border-radius: 16px;
+  }
+
+  .product-hero-event {
+    padding: 10px 12px;
+  }
+
+  .product-hero-event h4 {
+    font-size: 13px;
+  }
+
+  .product-hero-event p {
+    font-size: 11px;
+  }
+}
+
+/* =====================================================
+   ✅ RESPONSIVE - VERY SMALL (375px)
+===================================================== */
+
+@media (max-width: 375px) {
+  .product-hero {
+    padding: 20px 12px;
+    gap: 20px;
+  }
+
+  .product-hero-content h1 {
+    font-size: 22px;
+  }
+
+  .product-hero-content p {
+    font-size: 14px;
+  }
+
+  .product-hero-actions {
+    gap: 10px;
+  }
+
+  /* ✅ BUTTON FIX - Very small */
+  .product-btn-primary,
+  .product-btn-secondary {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .product-features-header h2 {
+    font-size: 20px;
+  }
+
+  .product-features-header p {
+    font-size: 14px;
+  }
+
+  .product-feature-card {
+    padding: 16px 14px;
+  }
+
+  .product-feature-card h3 {
+    font-size: 16px;
+  }
+
+  .product-feature-card p {
+    font-size: 13px;
+  }
+
+  .product-feature-icon {
+    width: 44px;
+    height: 44px;
+    font-size: 20px;
+  }
+
+  .product-cta-content h2 {
+    font-size: 20px;
+  }
+
+  .product-cta-content p {
+    font-size: 14px;
+    margin-bottom: 20px;
+  }
+
+  .product-cta-actions .product-btn-primary,
+  .product-cta-actions .product-btn-outline {
+    padding: 8px 14px;
+    font-size: 12px;
+    border-radius: 8px;
+  }
+
+  .product-cta {
+    padding: 24px 12px;
+  }
+
+  .product-stat-number {
+    font-size: 18px;
+  }
+
+  .product-stat-label {
+    font-size: 10px;
+  }
+
+  .product-hero-card {
+    padding: 12px;
+  }
+
+  .product-hero-event {
+    padding: 8px 10px;
+  }
+
+  .product-hero-event h4 {
+    font-size: 12px;
+  }
+
+  .product-hero-event p {
+    font-size: 10px;
   }
 }

@@ -64,6 +64,8 @@
   padding: 6px;
   background: #f3f4f6;
   border-radius: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .pricing-toggle-btn {
@@ -121,6 +123,10 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .pricing-card:hover {
@@ -207,12 +213,12 @@
 
 .pricing-period {
   font-size: 14px;
-  color: #000;
+  color: #6b7280;
 }
 
 .pricing-card-description {
   font-size: 14px;
-  color: #000;
+  color: #6b7280;
   margin: 0;
 }
 
@@ -251,12 +257,13 @@
   color: #d1d5db;
 }
 
+/* ✅ BUTTON FIX - Full width within card */
 .pricing-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 14px 10px;
+  padding: 14px 20px;
   border: 2px solid #8755d5;
   border-radius: 12px;
   background: transparent;
@@ -268,6 +275,9 @@
   transition: all 0.3s ease;
   text-decoration: none;
   width: 100%;
+  box-sizing: border-box;
+  min-width: 0;
+  white-space: nowrap;
 }
 
 .pricing-btn:hover {
@@ -290,6 +300,8 @@
 .pricing-btn.large {
   padding: 16px 40px;
   font-size: 17px;
+  width: auto;
+  min-width: 200px;
 }
 
 .pricing-btn.outline {
@@ -334,10 +346,12 @@
 
 .pricing-comparison-table {
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .pricing-comparison-table table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   background: #ffffff;
   border-radius: 16px;
@@ -467,6 +481,7 @@
 .pricing-cta-content {
   text-align: center;
   max-width: 640px;
+  width: 100%;
 }
 
 .pricing-cta-content h2 {
@@ -487,10 +502,17 @@
   display: flex;
   justify-content: center;
   gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* ✅ CTA BUTTON FIX */
+.pricing-cta-actions .pricing-btn {
+  width: auto;
+  min-width: 180px;
 }
 
 /* =====================================================
-   RESPONSIVE
+   ✅ RESPONSIVE - TABLET (1024px)
 ===================================================== */
 
 @media (max-width: 1024px) {
@@ -523,9 +545,13 @@
   }
 }
 
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (768px)
+===================================================== */
+
 @media (max-width: 768px) {
   .pricing-hero {
-    padding: 40px 24px;
+    padding: 40px 24px 30px;
   }
 
   .pricing-hero h1 {
@@ -539,6 +565,17 @@
   .pricing-toggle {
     flex-wrap: wrap;
     justify-content: center;
+    gap: 8px;
+  }
+
+  .pricing-toggle-btn {
+    padding: 8px 18px;
+    font-size: 13px;
+  }
+
+  .pricing-toggle-save {
+    font-size: 11px;
+    padding: 3px 10px;
   }
 
   .pricing-cards {
@@ -546,10 +583,38 @@
     max-width: 420px;
     margin: 0 auto;
     padding: 30px 16px;
+    gap: 24px;
   }
 
   .pricing-card.popular {
     order: -1;
+  }
+
+  .pricing-card {
+    padding: 28px 20px;
+  }
+
+  .pricing-amount {
+    font-size: 40px;
+  }
+
+  .pricing-card h3 {
+    font-size: 18px;
+  }
+
+  /* ✅ MOBILE BUTTON FIX */
+  .pricing-btn {
+    padding: 12px 16px;
+    font-size: 14px;
+    white-space: normal;
+    min-width: 0;
+  }
+
+  .pricing-btn.large {
+    padding: 14px 24px;
+    font-size: 15px;
+    width: 100%;
+    min-width: 0;
   }
 
   .pricing-comparison {
@@ -562,8 +627,12 @@
     font-size: 28px;
   }
 
+  .pricing-comparison-table table {
+    min-width: 500px;
+  }
+
   .pricing-faq {
-    padding: 40px 20px;
+    padding: 40px 20px 30px;
   }
 
   .pricing-faq-header h2 {
@@ -579,25 +648,33 @@
     font-size: 28px;
   }
 
+  .pricing-cta-content p {
+    font-size: 16px;
+  }
+
   .pricing-cta-actions {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+  }
+
+  .pricing-cta-actions .pricing-btn {
+    width: 100%;
+    min-width: 0;
   }
 
   .pricing-cta {
     padding: 40px 20px;
   }
-
-  .pricing-btn.large,
-  .pricing-btn.outline {
-    width: 100%;
-    justify-content: center;
-  }
 }
+
+/* =====================================================
+   ✅ RESPONSIVE - MOBILE (500px)
+===================================================== */
 
 @media (max-width: 500px) {
   .pricing-hero {
-    padding: 24px 16px;
+    padding: 24px 16px 20px;
   }
 
   .pricing-hero h1 {
@@ -610,18 +687,98 @@
 
   .pricing-cards {
     padding: 20px 12px;
+    gap: 20px;
   }
 
   .pricing-card {
-    padding: 24px 18px;
+    padding: 22px 16px;
+    border-radius: 16px;
+  }
+
+  .pricing-card-popular-badge {
+    font-size: 10px;
+    padding: 3px 14px;
+    top: -10px;
+  }
+
+  .pricing-card-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 20px;
   }
 
   .pricing-amount {
-    font-size: 36px;
+    font-size: 34px;
+  }
+
+  .pricing-currency {
+    font-size: 17px;
+  }
+
+  .pricing-period {
+    font-size: 12px;
   }
 
   .pricing-card h3 {
-    font-size: 18px;
+    font-size: 17px;
+  }
+
+  .pricing-card-description {
+    font-size: 13px;
+  }
+
+  .pricing-features li {
+    font-size: 13px;
+    padding: 6px 0;
+    gap: 8px;
+  }
+
+  .pricing-feature-icon {
+    font-size: 14px;
+  }
+
+  /* ✅ MOBILE BUTTON FIX */
+  .pricing-btn {
+    font-size: 13px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    white-space: normal;
+  }
+
+  .pricing-btn.large {
+    padding: 12px 16px;
+    font-size: 14px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pricing-cta-actions .pricing-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pricing-comparison {
+    padding: 20px 12px;
+    margin: 0 8px;
+    border-radius: 14px;
+  }
+
+  .pricing-comparison-header h2 {
+    font-size: 22px;
+  }
+
+  .pricing-comparison-table table {
+    min-width: 400px;
+  }
+
+  .pricing-comparison-table th,
+  .pricing-comparison-table td {
+    padding: 10px 10px;
+    font-size: 12px;
+  }
+
+  .pricing-faq {
+    padding: 30px 16px 20px;
   }
 
   .pricing-faq-header h2 {
@@ -629,11 +786,15 @@
   }
 
   .pricing-faq-item {
-    padding: 18px 20px;
+    padding: 16px 18px;
   }
 
   .pricing-faq-item h3 {
-    font-size: 15px;
+    font-size: 14px;
+  }
+
+  .pricing-cta {
+    padding: 30px 16px;
   }
 
   .pricing-cta-content h2 {
@@ -641,17 +802,155 @@
   }
 
   .pricing-cta-content p {
+    font-size: 14px;
+  }
+
+  .pricing-cta-actions {
+    gap: 12px;
+  }
+}
+
+/* =====================================================
+   ✅ RESPONSIVE - VERY SMALL (375px)
+===================================================== */
+
+@media (max-width: 375px) {
+  .pricing-hero {
+    padding: 20px 12px 16px;
+  }
+
+  .pricing-hero h1 {
+    font-size: 20px;
+  }
+
+  .pricing-hero p {
+    font-size: 13px;
+  }
+
+  .pricing-cards {
+    padding: 16px 8px;
+    gap: 16px;
+  }
+
+  .pricing-card {
+    padding: 18px 14px;
+    border-radius: 14px;
+  }
+
+  .pricing-card-popular-badge {
+    font-size: 9px;
+    padding: 2px 12px;
+    top: -9px;
+  }
+
+  .pricing-card-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  .pricing-amount {
+    font-size: 28px;
+  }
+
+  .pricing-currency {
     font-size: 15px;
+  }
+
+  .pricing-period {
+    font-size: 11px;
+  }
+
+  .pricing-card h3 {
+    font-size: 15px;
+  }
+
+  .pricing-card-description {
+    font-size: 12px;
+  }
+
+  .pricing-features li {
+    font-size: 12px;
+    padding: 5px 0;
+    gap: 6px;
+  }
+
+  .pricing-feature-icon {
+    font-size: 12px;
+  }
+
+  /* ✅ BUTTON FIX - Smallest screens */
+  .pricing-btn {
+    font-size: 12px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .pricing-btn.large {
+    padding: 10px 14px;
+    font-size: 13px;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pricing-cta-actions .pricing-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .pricing-comparison {
+    padding: 16px 10px;
+    margin: 0 4px;
+    border-radius: 12px;
+  }
+
+  .pricing-comparison-header h2 {
+    font-size: 18px;
+  }
+
+  .pricing-comparison-table table {
+    min-width: 320px;
   }
 
   .pricing-comparison-table th,
   .pricing-comparison-table td {
-    padding: 10px 12px;
-    font-size: 12px;
+    padding: 8px 8px;
+    font-size: 11px;
   }
 
-  .pricing-btn {
-    font-size: 14px;
-    padding: 12px 20px;
+  .pricing-faq {
+    padding: 24px 12px 16px;
+  }
+
+  .pricing-faq-header h2 {
+    font-size: 18px;
+  }
+
+  .pricing-faq-item {
+    padding: 14px 14px;
+    border-radius: 12px;
+  }
+
+  .pricing-faq-item h3 {
+    font-size: 13px;
+  }
+
+  .pricing-cta {
+    padding: 24px 12px;
+  }
+
+  .pricing-cta-content h2 {
+    font-size: 18px;
+  }
+
+  .pricing-cta-content p {
+    font-size: 13px;
+    margin-bottom: 20px;
+  }
+
+  .pricing-cta-actions {
+    gap: 10px;
   }
 }
