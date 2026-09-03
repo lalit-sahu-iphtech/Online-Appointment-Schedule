@@ -2,8 +2,17 @@
 import emailjs from "@emailjs/browser";
 import { getWorkflows } from "./firestoreService";
 
-// EVENT -> WORKFLOW MATCHING
+// ✅ Helper function to get user settings
+const getUserSettings = () => {
+  try {
+    const settings = JSON.parse(localStorage.getItem("app_settings"));
+    return settings || {};
+  } catch {
+    return {};
+  }
+};
 
+// EVENT -> WORKFLOW MATCHING
 const EVENT_KEYWORDS = {
   cancelled: ["cancel", "cancellation", "cancelled"],
   reminder: ["remind", "reminder"],
@@ -16,7 +25,7 @@ const DEFAULT_MESSAGES = {
   completed: (name) => `Thank you for attending "${name}"! We hope you enjoyed it.`,
 };
 
-//  SINGLE SOURCE OF TRUTH for sent emails
+// SINGLE SOURCE OF TRUTH for sent emails
 const SENT_EMAILS_KEY = "workflow_sent_emails_v2";
 
 const getSentEmails = () => {
@@ -35,8 +44,6 @@ const isEmailAlreadySent = (meetingId, eventType) => {
     const sent = getSentEmails();
     const key = `${meetingId}_${eventType}`;
     const status = !!sent[key];
-    if (status) {
-    }
     return status;
 };
 
@@ -63,7 +70,6 @@ const getWorkflowsForEvent = (workflows, eventType) => {
         return [];
     }
 
-
     const matched = workflows.filter((workflow) => {
         if (!workflow.actions || workflow.actions.length === 0) return false;
         if (workflow.isActive === false) return false;
@@ -75,17 +81,17 @@ const getWorkflowsForEvent = (workflows, eventType) => {
     return matched;
 };
 
-//  MAIN FUNCTION
+// MAIN FUNCTION
 export const executeWorkflowsForEvent = async (meetingData, eventType) => {
     try {
         if (!meetingData || !meetingData.id) {
             return 0;
         }
 
+        // ✅ Check if already sent
         if (isEmailAlreadySent(meetingData.id, eventType)) {
             return 0;
         }
-
 
         const workflows = await getWorkflows();
         const matchingWorkflows = getWorkflowsForEvent(workflows, eventType);
@@ -121,7 +127,6 @@ export const executeThankYouWorkflows = (meetingData) => {
 };
 
 export const executeWorkflow = async (workflow, eventData, eventType) => {
-
     const results = [];
     for (const action of workflow.actions) {
         try {
@@ -134,7 +139,7 @@ export const executeWorkflow = async (workflow, eventData, eventType) => {
     return results;
 };
 
-//  SEND EMAIL ACTION - Account 1 + Account 2 Support
+// SEND EMAIL ACTION - Account 1 + Account 2 Support
 const executeAction = async (action, eventData, eventType) => {
     switch (action.type) {
         case "email":
@@ -156,8 +161,40 @@ const executeAction = async (action, eventData, eventType) => {
     }
 };
 
-//  SEND EMAIL ACTION - COMPLETE (All 4 Templates)
+// ============================================
+// ✅ SEND EMAIL ACTION - WITH SETTINGS CHECK
+// ============================================
 const executeEmailAction = async (action, eventData, eventType) => {
+    console.log(`📧 Sending ${eventType} email...`);
+
+    // ✅ Get user settings
+    const userSettings = getUserSettings();
+
+    // ✅ Check if email notifications are enabled
+    const emailNotificationsEnabled = userSettings.emailNotifications !== false;
+    
+    if (!emailNotificationsEnabled) {
+        console.log(`⏭️ Email notifications disabled in settings, skipping ${eventType} email`);
+        return { sent: 0, eventType, skipped: true, reason: "Email notifications disabled" };
+    }
+
+    // ✅ For email reminders specifically (reminder and thank you)
+    if (eventType === "reminder" || eventType === "completed") {
+        const emailRemindersEnabled = userSettings.emailReminders !== false;
+        if (!emailRemindersEnabled) {
+            console.log(`⏭️ Email reminders disabled in settings, skipping ${eventType} email`);
+            return { sent: 0, eventType, skipped: true, reason: "Email reminders disabled" };
+        }
+    }
+
+    // ✅ For meeting reminders (reminder emails)
+    if (eventType === "reminder") {
+        const meetingRemindersEnabled = userSettings.meetingReminders !== false;
+        if (!meetingRemindersEnabled) {
+            console.log(`⏭️ Meeting reminders disabled in settings, skipping ${eventType} email`);
+            return { sent: 0, eventType, skipped: true, reason: "Meeting reminders disabled" };
+        }
+    }
 
     let invitees = eventData.invitees || [];
     
@@ -179,7 +216,7 @@ const executeEmailAction = async (action, eventData, eventType) => {
     const userStr = localStorage.getItem("currentUser");
     const user = userStr ? JSON.parse(userStr) : null;
 
-    //  Build subject
+    // Build subject
     let emailSubject = action.config?.subject || "";
     if (!emailSubject) {
         switch (eventType) {
@@ -197,7 +234,7 @@ const executeEmailAction = async (action, eventData, eventType) => {
         }
     }
 
-    //  Build custom message
+    // Build custom message
     let customMessage = action.config?.message || "";
     if (!customMessage) {
         switch (eventType) {
@@ -215,57 +252,51 @@ const executeEmailAction = async (action, eventData, eventType) => {
         }
     }
 
-    //  ACCOUNT SELECTION BASED ON EVENT TYPE
+    // ACCOUNT SELECTION BASED ON EVENT TYPE
     let serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;      // Account 1 (Default)
     let publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;      // Account 1 (Default)
     let templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;    // Account 1 (Default)
 
-  
-  
-
     switch (eventType) {
         case "cancelled":
-            //  Account 1 - Cancellation
+            // Account 1 - Cancellation
             serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_CANCELLATION_TEMPLATE_ID;
             break;
 
         case "reminder":
-            //  Account 2 - Reminder
+            // Account 2 - Reminder
             serviceId = import.meta.env.VITE_EMAILJS_REMINDER_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_REMINDER_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_REMINDER_TEMPLATE_ID;
             break;
 
         case "completed":
-            //  Account 2 - Thank You
+            // Account 2 - Thank You
             serviceId = import.meta.env.VITE_EMAILJS_REMINDER_SERVICE_ID;  // Same as Account 2
             publicKey = import.meta.env.VITE_EMAILJS_REMINDER_PUBLIC_KEY;  // Same as Account 2
             templateId = import.meta.env.VITE_EMAILJS_THANKYOU_TEMPLATE_ID;
             break;
 
         default:
-            //  Account 1 - Invite (default)
+            // Account 1 - Invite (default)
             serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID;
             publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
             templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
     }
 
-    //  Check if any value is undefined
+    // Check if any value is undefined
     const missingValues = [];
     if (!serviceId) missingValues.push('Service ID');
     if (!publicKey) missingValues.push('Public Key');
     if (!templateId) missingValues.push('Template ID');
 
     if (missingValues.length > 0) {
-       
         throw new Error(`Missing EmailJS credentials for ${eventType}: ${missingValues.join(', ')}`);
     }
 
-   
-
-    //  Send to each invitee
+    // Send to each invitee
     const emailPromises = invitees.map(async (invitee, index) => {
         try {
             const templateParams = {
@@ -288,7 +319,6 @@ const executeEmailAction = async (action, eventData, eventType) => {
                 templateParams.cancellation_message = "We apologize for any inconvenience caused.";
             }
 
-
             const response = await emailjs.send(
                 serviceId,     
                 templateId,   
@@ -307,9 +337,20 @@ const executeEmailAction = async (action, eventData, eventType) => {
     return { sent: invitees.length, eventType, subject: emailSubject };
 };
 
-// OTHER ACTIONS (unchanged)
+// ============================================
+// OTHER ACTIONS
+// ============================================
 
 const executeNotificationAction = async (action, eventData) => {
+    // ✅ Check if push notifications are enabled
+    const userSettings = getUserSettings();
+    const pushNotificationsEnabled = userSettings.pushNotifications !== false;
+    
+    if (!pushNotificationsEnabled) {
+        console.log(`⏭️ Push notifications disabled in settings, skipping notification`);
+        return { skipped: true, reason: "Push notifications disabled" };
+    }
+
     const title = action.config?.title || "Meeting Reminder";
     const message = `Meeting "${eventData.meetingName || eventData.title}" is starting soon!`;
 

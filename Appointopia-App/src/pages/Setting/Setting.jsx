@@ -1,6 +1,6 @@
 // src/component/Settings/Settings.jsx
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate }  from "react-router-dom";
 import {
   FaArrowLeft,
   FaBell,
@@ -13,6 +13,7 @@ import {
   FaEnvelope,
   FaCheckCircle,
   FaSpinner,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { auth, db } from "../../firebase/firebase";
 import {
@@ -73,7 +74,7 @@ export default function Settings() {
     return () => unsubscribe();
   }, [navigate]);
 
-  // ✅ Load settings from Firestore
+  // Load settings from Firestore
   useEffect(() => {
     const loadSettings = async () => {
       if (!currentUser?.uid) return;
@@ -123,10 +124,25 @@ export default function Settings() {
         setDarkModeActive(false);
       }
     }
+
+    // ✅ Show notification when toggling notifications
+    if (key === "emailReminders" || key === "meetingReminders" || key === "pushNotifications") {
+      const label = {
+        emailReminders: "Email reminders",
+        meetingReminders: "Meeting reminders",
+        pushNotifications: "Push notifications"
+      }[key];
+      setSavedMessage(`${label} ${newValue ? 'enabled' : 'disabled'} successfully!`);
+      setTimeout(() => setSavedMessage(""), 3000);
+    }
   };
+
 
   const handleViewChange = (view) => {
     setSettings((prev) => ({ ...prev, defaultView: view }));
+    localStorage.setItem("defaultView", view);
+    setSavedMessage(`Calendar view set to ${view.charAt(0).toUpperCase() + view.slice(1)}`);
+    setTimeout(() => setSavedMessage(""), 3000);
   };
 
   // Save settings to Firestore
@@ -144,19 +160,20 @@ export default function Settings() {
       // Save to localStorage
       localStorage.setItem("app_settings", JSON.stringify(settings));
       localStorage.setItem("darkMode", String(settings.darkMode));
+      localStorage.setItem("defaultView", settings.defaultView);
       
-      setSavedMessage("Settings saved successfully!");
+      setSavedMessage("✅ Settings saved successfully!");
       setTimeout(() => setSavedMessage(""), 3000);
     } catch (error) {
       console.error("Error saving settings:", error);
-      setSavedMessage(" Failed to save settings. Please try again.");
+      setSavedMessage("❌ Failed to save settings. Please try again.");
       setTimeout(() => setSavedMessage(""), 3000);
     } finally {
       setSaving(false);
     }
   };
 
-  //  Logout with Firebase
+  // Logout with Firebase
   const handleLogout = async () => {
     try {
       await signOut(auth);
@@ -167,7 +184,7 @@ export default function Settings() {
       navigate("/signin");
     } catch (error) {
       console.error("Logout error:", error);
-      setSavedMessage(" Failed to logout. Please try again.");
+      setSavedMessage("❌ Failed to logout. Please try again.");
       setTimeout(() => setSavedMessage(""), 3000);
     }
   };
@@ -210,7 +227,7 @@ export default function Settings() {
         setSavedMessage("⚠️ For security, please sign out and sign in again before deleting your account.");
         setTimeout(() => setSavedMessage(""), 5000);
       } else {
-        setSavedMessage(`Failed to delete account: ${error.message || "Please try again."}`);
+        setSavedMessage(`❌ Failed to delete account: ${error.message || "Please try again."}`);
         setTimeout(() => setSavedMessage(""), 5000);
       }
     } finally {
@@ -241,7 +258,7 @@ export default function Settings() {
 
       <div className="settings-content">
 
-        {/* ✅ PROFILE SECTION */}
+        {/* PROFILE SECTION */}
         <div className="settings-card">
           <div className="settings-card-header">
             <FaUser className="settings-card-icon" />
@@ -267,7 +284,7 @@ export default function Settings() {
 
           <div className="settings-row">
             <div>
-              <strong> Meeting reminders</strong>
+              <strong>Meeting reminders</strong>
               <span>Get notified before a meeting starts</span>
             </div>
             <button
@@ -337,7 +354,7 @@ export default function Settings() {
             </div>
           </div>
 
-          <div className="settings-row settings-row-column">
+          {/* <div className="settings-row settings-row-column">
             <div>
               <strong>Timezone</strong>
               <span>Your current timezone</span>
@@ -356,7 +373,8 @@ export default function Settings() {
               <option value="Asia/Singapore">Asia/Singapore (UTC +8:00)</option>
               <option value="Australia/Sydney">Australia/Sydney (UTC +11:00)</option>
             </select>
-          </div>
+          </div> */}
+
         </div>
 
         {/* APPEARANCE */}
@@ -381,7 +399,7 @@ export default function Settings() {
             </button>
           </div>
 
-          <div className="settings-row settings-row-column">
+          {/* <div className="settings-row settings-row-column">
             <div>
               <strong>Language</strong>
               <span>Choose your preferred language</span>
@@ -399,10 +417,10 @@ export default function Settings() {
               <option value="zh">Chinese</option>
               <option value="ja">Japanese</option>
             </select>
-          </div>
+          </div> */}
         </div>
 
-        {/* ✅ SAVE STATUS */}
+        {/* SAVE STATUS */}
         {savedMessage && (
           <div className={`settings-status-message ${savedMessage.includes("✅") ? "success" : savedMessage.includes("❌") ? "error" : "warning"}`}>
             {savedMessage}
@@ -425,16 +443,16 @@ export default function Settings() {
           )}
         </button>
 
-        {/* ACCOUNT ACTIONS */}
+        {/* ACCOUNT ACTIONS - ✅ Danger Zone Text Removed */}
         <div className="settings-card settings-danger-card">
           <div className="settings-card-header">
-            <FaTrashAlt className="settings-card-icon settings-danger-icon" />
-            <h3> Danger Zone</h3>
+            <FaExclamationTriangle className="settings-card-icon settings-danger-icon" />
+            <h3>Account</h3>
           </div>
 
           <div className="settings-row">
             <div>
-              <strong> Sign out</strong>
+              <strong>Sign out</strong>
               <span>Log out of your Appointopia account</span>
             </div>
             <button type="button" className="settings-logout-btn" onClick={handleLogout}>
@@ -444,7 +462,7 @@ export default function Settings() {
 
           <div className="settings-row">
             <div>
-              <strong> Delete account</strong>
+              <strong>Delete account</strong>
               <span className={confirmDelete ? "settings-delete-warning" : ""}>
                 {confirmDelete
                   ? "⚠️ Click again to permanently delete your account and all data"

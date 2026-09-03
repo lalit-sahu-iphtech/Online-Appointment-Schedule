@@ -4,6 +4,16 @@ import { FaBell, FaVideo, FaTimes, FaClock } from "react-icons/fa";
 import "./Reminder.css";
 import { useToast } from "../Toast";
 
+// ✅ Helper function to get user settings
+const getUserSettings = () => {
+  try {
+    const settings = JSON.parse(localStorage.getItem("app_settings"));
+    return settings || {};
+  } catch {
+    return {};
+  }
+};
+
 export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
   const toast = useToast();
   const [upcomingEvents, setUpcomingEvents] = useState([]);
@@ -17,8 +27,19 @@ export default function Reminder({ events = [], onJoinMeeting, onDismiss }) {
     return () => clearInterval(timer);
   }, []);
 
-  // Check upcoming events (next 60 minutes)
+  // Check upcoming events (next 60 minutes) - WITH SETTINGS CHECK
   useEffect(() => {
+    // ✅ Get user settings
+    const userSettings = getUserSettings();
+    const meetingRemindersEnabled = userSettings.meetingReminders !== false;
+
+    // ✅ If meeting reminders are disabled, don't show any reminders
+    if (!meetingRemindersEnabled) {
+      console.log("⏭️ Meeting reminders disabled in settings, hiding reminder cards");
+      setUpcomingEvents([]);
+      return;
+    }
+
     const now = new Date();
     const upcoming = events
       .map((event) => {

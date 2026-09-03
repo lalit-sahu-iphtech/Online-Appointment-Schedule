@@ -15,6 +15,16 @@ import "./Topbar.css";
 import { useNotificationsContext } from "../../context/NotificationContext";
 import { getNotificationLabel } from "../../utils/notificationService";
 
+// ✅ Helper function to get user settings
+const getUserSettings = () => {
+  try {
+    const settings = JSON.parse(localStorage.getItem("app_settings"));
+    return settings || {};
+  } catch {
+    return {};
+  }
+};
+
 export default function Topbar({
   title,
   createButtonLabel = "Create",
@@ -78,7 +88,23 @@ export default function Topbar({
     return getNotificationLabel(diffMinutes);
   };
 
-  const notificationsWithTime = allNotifications.map((item) => ({
+  // ✅ Filter notifications based on settings
+  const getFilteredNotifications = () => {
+    const userSettings = getUserSettings();
+    const meetingRemindersEnabled = userSettings.meetingReminders !== false;
+    
+    if (!meetingRemindersEnabled) {
+      // If meeting reminders are disabled, only show non-calendar notifications
+      return allNotifications.filter(n => n.source !== "calendar");
+    }
+    
+    return allNotifications;
+  };
+
+  const filteredNotifications = getFilteredNotifications();
+  const filteredCount = filteredNotifications.length;
+
+  const notificationsWithTime = filteredNotifications.map((item) => ({
     ...item,
     label: getLabel(item.diffMinutes),
     displayTitle: `${item.sourceLabel}: ${item.title}`,
@@ -167,14 +193,14 @@ export default function Topbar({
               aria-label="Notifications"
             >
               <FaRegBell />
-              {notificationsWithTime.length > 0 && (
+              {filteredNotifications.length > 0 && (
                 <span className="topbar-icon-badge"></span>
               )}
             </button>
 
             {activePanel === "notifications" && (
               <div className="topbar-dropdown topbar-notification-dropdown">
-                <h4>Notifications ({notificationCount})</h4>
+                <h4>Notifications ({filteredCount})</h4>
                 {notificationsWithTime.length === 0 ? (
                   <div className="topbar-dropdown-empty">No notifications</div>
                 ) : (

@@ -1,4 +1,4 @@
-
+// src/component/Calendar/Calendar.jsx
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import emailjs from "@emailjs/browser";
@@ -27,18 +27,28 @@ import {
   deleteMeeting as firebaseDeleteMeeting
 } from "../../services/firestoreService";
 
-//  Import workflow functions for Reminder + Thank You
+// Import workflow functions for Reminder + Thank You
 import {
   executeReminderWorkflows,
   executeThankYouWorkflows
 } from "../../services/workflowExecutor";
 
-//  SIMPLE TRACKING
+// ✅ Helper function to get user settings
+const getUserSettings = () => {
+  try {
+    const settings = JSON.parse(localStorage.getItem("app_settings"));
+    return settings || {};
+  } catch {
+    return {};
+  }
+};
+
+// SIMPLE TRACKING
 const SENT_KEY = "meeting_emails_sent";
 const REMINDER_SENT_KEY = "reminder_sent_ids";
 const THANKYOU_SENT_KEY = "thankyou_sent_ids";
 
-//  Simple functions
+// Simple functions
 const getSent = () => JSON.parse(localStorage.getItem(SENT_KEY) || "{}");
 const setSent = (data) => localStorage.setItem(SENT_KEY, JSON.stringify(data));
 const isSent = (id, type) => {
@@ -51,7 +61,7 @@ const markSent = (id, type) => {
   setSent(sent);
 };
 
-//  Reminder/Thank You tracking functions
+// Reminder/Thank You tracking functions
 const getSentIds = (key) => {
   try {
     return JSON.parse(localStorage.getItem(key) || "[]");
@@ -76,7 +86,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [selectedEvent, setSelectedEvent] = useState(null);
-  const [view, setView] = useState("week");
+ 
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showMeetingModal, setShowMeetingModal] = useState(false);
@@ -85,8 +95,16 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [now, setNow] = useState(new Date());
   const [loading, setLoading] = useState(true);
-  
-  //  Refs
+  const [view, setView] = useState(() => {
+    const savedView = localStorage.getItem("defaultView");
+    const validViews = ["day", "week", "month"];
+    if (savedView && validViews.includes(savedView)) {
+      return savedView;
+    }
+    return "week";
+  });
+
+  // Refs
   const isSendingRef = useRef(false);
   const isDeletingRef = useRef(false);
   const isProcessingWorkflowsRef = useRef(false);
@@ -137,9 +155,54 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
+  // ============================================
+  // ✅ NOTIFICATIONS - With Settings Check
+  // ============================================
+  const {
+    notifications: upcomingNotifications,
+    count: notificationCount,
+    getLabel,
+  } = useNotifications(meeting, 60);
 
-  //  SEND EMAIL - Invite + Cancel
- 
+  // ✅ Add notifications to context with settings check
+  useEffect(() => {
+    // Get user settings
+    const userSettings = getUserSettings();
+    const meetingRemindersEnabled = userSettings.meetingReminders !== false;
+
+    console.log("🔔 Meeting reminders enabled:", meetingRemindersEnabled);
+
+    // If meeting reminders are disabled, clear notifications and return
+    if (!meetingRemindersEnabled) {
+      console.log("⏭️ Meeting reminders disabled, clearing notifications");
+      addNotifications("calendar", []);
+      return;
+    }
+
+    console.log("🔔 Calendar notifications check:", upcomingNotifications.length);
+    
+    if (upcomingNotifications.length === 0) {
+      addNotifications("calendar", []);
+      return;
+    }
+    
+    const formattedNotifications = upcomingNotifications.map(n => ({
+      id: n.id,
+      title: n.title || n.meetingName || "Meeting",
+      diffMinutes: n.diffMinutes,
+      date: n.date,
+      time: n.startTime,
+      location: n.location,
+      source: "calendar",
+      sourceLabel: "Calendar",
+      meetingName: n.meetingName || n.title,
+    }));
+    
+    console.log("📢 Adding calendar notifications:", formattedNotifications.length);
+    addNotifications("calendar", formattedNotifications);
+  }, [upcomingNotifications, addNotifications]);
+
+  // SEND EMAIL - Invite + Cancel
   const sendEmail = async (meetingData, type) => {
     const id = meetingData.id;
     
@@ -161,7 +224,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     if (invitees.length === 0) {
       return false;
     }
-
 
     let failed = 0;
 
@@ -202,15 +264,22 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
-
-  // ✅ REMINDER + THANK YOU - Workflow Based
-
+  // REMINDER + THANK YOU - Workflow Based
   useEffect(() => {
     if (meeting.length === 0) {
       return;
     }
 
     if (isProcessingWorkflowsRef.current) {
+      return;
+    }
+
+    // ✅ Check if meeting reminders are enabled
+    const userSettings = getUserSettings();
+    const meetingRemindersEnabled = userSettings.meetingReminders !== false;
+
+    if (!meetingRemindersEnabled) {
+      console.log("⏭️ Meeting reminders disabled, skipping workflow execution");
       return;
     }
 
@@ -234,9 +303,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
         const hoursUntilStart = (startDateTime - now) / (1000 * 60 * 60);
 
-       
-
-        //  REMINDER: Within 24 hours AND not started AND not already sent
+        // REMINDER: Within 24 hours AND not started AND not already sent
         if (hoursUntilStart > 0 && hoursUntilStart <= 24 && !remindedIds.includes(item.id)) {
           try {
             await executeReminderWorkflows(item);
@@ -267,9 +334,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   }, [now, meeting]);
 
-
   // SAVE MEETING
-
   const handleSaveMeeting = async (data) => {
     if (isSendingRef.current) {
       return;
@@ -317,9 +382,7 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     }
   };
 
- 
   // DELETE MEETING
- 
   const handleDeleteMeeting = async (id) => {
     if (isDeletingRef.current) {
       return;
@@ -353,29 +416,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       isDeletingRef.current = false;
     }
   };
-
-
-  // NOTIFICATIONS
-
-  const {
-    notifications: upcomingNotifications,
-    count: notificationCount,
-    getLabel,
-  } = useNotifications(meeting, 60);
-
-  useEffect(() => {
-    if (upcomingNotifications.length === 0) return;
-    const formattedNotifications = upcomingNotifications.map(n => ({
-      id: n.id,
-      title: n.title,
-      diffMinutes: n.diffMinutes,
-      date: n.date,
-      time: n.startTime,
-      location: n.location,
-      source: "calendar",
-    }));
-    addNotifications("calendar", formattedNotifications);
-  }, [upcomingNotifications, addNotifications]);
 
   // Comments
   const meetingsWithComments = meeting.filter(item => item.comments && item.comments.length > 0);
@@ -540,7 +580,11 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   const handleViewChange = (newView) => {
     setView(newView);
-    toast.info(`${newView.charAt(0).toUpperCase() + newView.slice(1)} View`, `Switched to ${newView} view.`);
+    localStorage.setItem("defaultView", newView);
+    toast.info(
+      `${newView.charAt(0).toUpperCase() + newView.slice(1)} View`,
+      `Switched to ${newView} view.`
+    );
   };
 
   if (checkingAuth) return null;
