@@ -17,7 +17,6 @@ export const ToastProvider = ({ children }) => {
   const timeoutRefs = useRef({}); //  Store timeouts
 
   const removeToast = useCallback((id) => {
-    console.log('🗑️ Removing toast:', id);
     
     //  Clear timeout if exists
     if (timeoutRefs.current[id]) {
@@ -44,7 +43,6 @@ export const ToastProvider = ({ children }) => {
     };
 
     setToasts((prev) => {
-      console.log('📊 Current toasts before add:', prev.length);
       return [...prev, newToast];
     });
 

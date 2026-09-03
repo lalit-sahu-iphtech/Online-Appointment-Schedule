@@ -1,6 +1,5 @@
-// src/utils/dateTimeHelper.js
 
-// ✅ FIXED: Changed from 'formateDateToYYYYMMDD' to 'formatDateToYYYYMMDD'
+//  FIXED: Changed from 'formateDateToYYYYMMDD' to 'formatDateToYYYYMMDD'
 export const formatDateToYYYYMMDD = (date) => {
     if(!date) return '';
     const d = new Date(date);
@@ -22,7 +21,7 @@ export const formatTimeDisplay = (timeStr) => {
 // Convert time string to minutes (for comparison)
 // "08:00" -> 480, "14:30" -> 870
 export const timeToMinutes = (timeStr) => {
-    if(!timeStr) return 0; // ✅ FIXED: return 0 instead of ''
+    if(!timeStr) return 0; 
     const [hours, minutes] = timeStr.split(':').map(Number);
     return hours * 60 + minutes;
 }

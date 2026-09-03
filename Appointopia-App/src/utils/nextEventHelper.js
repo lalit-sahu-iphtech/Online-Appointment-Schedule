@@ -1,4 +1,3 @@
-// src/utils/nextEventHelper.js (Clean Version - No Console Logs)
 import { 
     formatDateToYYYYMMDD,
     timeToMinutes,
@@ -7,12 +6,12 @@ import {
 } from "./dateTimeHelper";
 
 export const getNextEvent = (events, selectedDate) => {
-    // 🛡️ GUARD CLAUSE: Check if events is valid
+    //  GUARD CLAUSE: Check if events is valid
     if (!events || !Array.isArray(events) || events.length === 0) {
         return null;
     }
 
-    // 🛡️ GUARD CLAUSE: Check if selectedDate is valid
+    //  GUARD CLAUSE: Check if selectedDate is valid
     if (!selectedDate) {
         return null;
     }

@@ -1,8 +1,5 @@
-// src/utils/dateUtils.js
 
-// =============================================
 // GET WEEK DAYS (Monday to Sunday)
-// =============================================
 export const getWeekDays = (date) => {
   const start = new Date(date);
   const day = start.getDay();
@@ -16,9 +13,7 @@ export const getWeekDays = (date) => {
   });
 };
 
-// =============================================
 // GET MONTH DAYS (For Month View Calendar)
-// =============================================
 export const getMonthDays = (date) => {
   const year = date.getFullYear();
   const month = date.getMonth();
@@ -27,7 +22,7 @@ export const getMonthDays = (date) => {
   const lastDay = new Date(year, month + 1, 0);
   const daysInMonth = lastDay.getDate();
   
-  // ✅ FIXED: Get day of week (0 = Sunday, 1 = Monday, etc.)
+  //  FIXED: Get day of week (0 = Sunday, 1 = Monday, etc.)
   let startDayOfWeek = firstDay.getDay();
   // Convert to Monday-based week (Monday = 0, Sunday = 6)
   if (startDayOfWeek === 0) {
@@ -67,9 +62,7 @@ export const getMonthDays = (date) => {
   return days;
 };
 
-// =============================================
-// ✅ FIXED: FORMAT DATE TO YYYY-MM-DD
-// =============================================
+//  FIXED: FORMAT DATE TO YYYY-MM-DD
 export const formatDate = (date) => {
   if (!date) return '';
   const d = new Date(date);
@@ -79,9 +72,7 @@ export const formatDate = (date) => {
   return `${year}-${month}-${day}`;
 };
 
-// =============================================
 // CHECK IF DATE IS TODAY
-// =============================================
 export const isToday = (date) => {
   if (!date) return false;
   const today = new Date();
@@ -91,9 +82,7 @@ export const isToday = (date) => {
       d.getFullYear() === today.getFullYear();
 };
 
-// =============================================
 // GET MONTH YEAR (e.g., "August, 2026")
-// =============================================
 export const getMonthYear = (date) => {
   if (!date) return '';
   const months = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -101,9 +90,7 @@ export const getMonthYear = (date) => {
   return `${months[date.getMonth()]}, ${date.getFullYear()}`;
 };
 
-// =============================================
 // GET DAY DATE (e.g., "Wed, August 19, 2026")
-// =============================================
 export const getDayDate = (date) => {
   if (!date) return '';
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
