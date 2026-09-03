@@ -19,7 +19,6 @@ function AppointmentPageContent() {
 
   // Handle date change from AppointmentSchedule
   const handleDateChange = (date) => {
-    console.log(" Appointment date changed:", date);
     setSelectedDate(date);
   };
 
@@ -61,7 +60,6 @@ function AppointmentPageContent() {
       });
     });
     
-    console.log("📋 Appointment sidebar events:", events.length);
     return events;
   }, [appointments]);
 

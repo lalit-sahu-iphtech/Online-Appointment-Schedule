@@ -89,7 +89,6 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                 `"${appointment.title}" has been removed successfully.`
             );
         } catch (error) {
-            console.error('Delete error:', error);
             loadingToast.error(
                 ' Delete Failed',
                 error.message || 'Something went wrong. Please try again.'
@@ -134,7 +133,6 @@ export default function AppointmentCard({ appointment, onDelete, onUpdate, onEdi
                 setIsEditing(false);
                 return;
             } catch (error) {
-                console.error('Update error:', error);
                 loadingToast.error(
                     ' Update Failed',
                     error.message || 'Something went wrong. Please try again.'

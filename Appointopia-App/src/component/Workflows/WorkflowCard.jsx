@@ -63,7 +63,7 @@ export default function WorkflowCard({
                 {title}
                 {isReadOnly && (
                   <span className="workflow-card-lock" title="Default template - Read only">
-                    🔒
+                    
                   </span>
                 )}
               </h3>
@@ -90,7 +90,7 @@ export default function WorkflowCard({
             <p className="workflow-card-description">{description}</p>
             
             <span className="workflow-card-badge">
-              {isTemplate ? "📋 Template" : "⚡ My Workflow"}
+              {isTemplate ? " Template" : "⚡ My Workflow"}
             </span>
           </div>
 

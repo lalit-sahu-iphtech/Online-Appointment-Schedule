@@ -27,13 +27,11 @@ export const ToastProvider = ({ children }) => {
     
     setToasts((prev) => {
       const newToasts = prev.filter((toast) => toast.id !== id);
-      console.log('📊 Remaining toasts:', newToasts.length);
       return newToasts;
     });
   }, []);
 
   const addToast = useCallback(({ type = 'info', title, message, duration = 4000 }) => {
-    console.log('📢 Adding toast:', { type, title, message, duration });
     
     const id = Date.now() + Math.random();
     const newToast = {
@@ -52,9 +50,7 @@ export const ToastProvider = ({ children }) => {
 
     // ✅ Set timeout for auto-remove
     if (duration > 0) {
-      console.log(`⏰ Setting timeout for ${duration}ms`);
       const timeoutId = setTimeout(() => {
-        console.log('⏰ Timeout triggered for toast:', id);
         removeToast(id);
       }, duration);
       

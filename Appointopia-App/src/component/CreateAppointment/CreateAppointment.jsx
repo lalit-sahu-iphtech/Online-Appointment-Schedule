@@ -222,10 +222,7 @@ export default function CreateAppointment({ onClose, onSave }) {
       return;
     }
     
-    console.log("Appointment Data:", {
-      ...formData,
-      color: selectedColor,
-    });
+ 
     setStep(2);
     toast.info('Step 2', 'Now configure your schedule settings.');
   };

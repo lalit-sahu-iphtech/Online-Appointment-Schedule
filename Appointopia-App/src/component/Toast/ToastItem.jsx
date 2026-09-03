@@ -23,7 +23,6 @@ const ToastItem = ({ toast, onRemove }) => {
   };
 
   const handleClose = () => {
-    console.log('❌ Manual close toast:', toast.id);
     setIsRemoving(true);
     setTimeout(onRemove, 300);
   };
@@ -31,7 +30,6 @@ const ToastItem = ({ toast, onRemove }) => {
   // Progress bar animation
   useEffect(() => {
     if (toast.duration > 0 && toast.type !== 'loading') {
-      console.log(`📊 Progress started for toast: ${toast.id}, duration: ${toast.duration}ms`);
       const startTime = Date.now();
       const interval = setInterval(() => {
         const elapsed = Date.now() - startTime;

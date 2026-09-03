@@ -16,7 +16,6 @@ export default function CalendarPage() {
       try {
         const parsed = JSON.parse(saved);
         setEvents(parsed);
-        console.log("📂 Loaded events from localStorage:", parsed);
       } catch (error) {
         console.error('Error loading events:', error);
       }
@@ -25,13 +24,11 @@ export default function CalendarPage() {
 
   // This function will be called from Calendar component
   const handleEventsChange = (newEvents) => {
-    console.log("📤 Events changed in Calendar:", newEvents);
     setEvents(newEvents);
   };
 
   // Update selected date when calendar changes
   const handleDateChange = (date) => {
-    console.log("📅 Date changed in Calendar:", date);
     setSelectedDate(date);
   };
 

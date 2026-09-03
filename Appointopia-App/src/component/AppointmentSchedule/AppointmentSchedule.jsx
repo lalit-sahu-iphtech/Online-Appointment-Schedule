@@ -141,7 +141,6 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       const user = JSON.parse(stored);
       setCurrentUser(user);
     } catch (error) {
-      console.log("Invalid currentUser in storage:", error);
       localStorage.removeItem("currentUser");
       navigate("/signin");
       return;
@@ -206,7 +205,6 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       }
       
     } catch (error) {
-      console.error("Error loading appointments:", error);
       setAppointments([]);
       toast.error('Load Failed', 'Failed to load appointments. Please refresh.');
     } finally {
@@ -308,7 +306,6 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       await loadAppointments();
       loadingToast.success('Appointment Created!', `"${newAppointment.title}" has been scheduled successfully.`);
     } catch (error) {
-      console.error("Error adding appointment:", error);
       loadingToast.error('Creation Failed', error.message || 'Something went wrong. Please try again.');
     }
   };
@@ -338,7 +335,6 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       
       loadingToast.success('Appointment Updated!', 'Changes saved successfully.');
     } catch (error) {
-      console.error("Error updating appointment:", error);
       loadingToast.error('Update Failed', error.message || 'Something went wrong.');
       await loadAppointments();
     }
@@ -361,7 +357,6 @@ export default function AppointmentSchedule({ onAppointmentsSync, onDateChange }
       
       loadingToast.success('Appointment Deleted!', 'Removed successfully.');
     } catch (error) {
-      console.error("Error deleting appointment:", error);
       loadingToast.error('Delete Failed', error.message || 'Something went wrong.');
       await loadAppointments();
     }

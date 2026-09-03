@@ -10,7 +10,6 @@ import { useToast } from "../Toast";
 export default function SignIn() {
   const navigate = useNavigate();
   const toast = useToast();
-  console.log(' SignIn component mounted, toast:', toast);
 
   const [formData, setFormData] = useState({
     email: "",

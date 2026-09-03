@@ -49,7 +49,6 @@ const markSent = (id, type) => {
   const sent = getSent();
   sent[`${id}_${type}`] = new Date().toISOString();
   setSent(sent);
-  console.log(`✅ Marked ${type} sent for ${id}`);
 };
 
 //  Reminder/Thank You tracking functions
@@ -66,7 +65,6 @@ const addSentId = (key, id) => {
   if (!ids.includes(id)) {
     ids.push(id);
     localStorage.setItem(key, JSON.stringify(ids));
-    console.log(`✅ Added ${id} to ${key}`);
   }
 };
 
@@ -133,7 +131,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
       setMeeting(formattedData);
       if (onEventsChange) onEventsChange(formattedData);
     } catch (error) {
-      console.error("Error loading meetings:", error);
       toast.error('Load Failed', 'Failed to load meetings.');
     } finally {
       setLoading(false);
@@ -147,7 +144,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     const id = meetingData.id;
     
     if (isSent(id, type)) {
-      console.log(`⏭️ ${type} already sent for ${id}`);
       return false;
     }
 
@@ -163,11 +159,9 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     const invitees = meetingData.invitees || [];
     
     if (invitees.length === 0) {
-      console.log(`⚠️ No invitees for ${type}`);
       return false;
     }
 
-    console.log(` Sending ${type} to ${invitees.length} people...`);
 
     let failed = 0;
 
@@ -191,11 +185,8 @@ export default function Calendar({ onEventsChange, onDateChange }) {
           params.cancellation_message = "We apologize for any inconvenience.";
         }
 
-        console.log(` Sending to ${person.email}`);
         await emailjs.send(SERVICE_ID, TEMPLATE_ID, params, PUBLIC_KEY);
-        console.log(` Sent to ${person.email}`);
       } catch (err) {
-        console.error(`Failed to send to ${person.email}:`, err);
         failed++;
       }
     }
@@ -216,16 +207,13 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   useEffect(() => {
     if (meeting.length === 0) {
-      console.log(' No meetings to check for reminders');
       return;
     }
 
     if (isProcessingWorkflowsRef.current) {
-      console.log(" Workflow already processing, skipping...");
       return;
     }
 
-    console.log(` Checking reminders for ${meeting.length} meetings...`);
     isProcessingWorkflowsRef.current = true;
 
     const remindedIds = getSentIds(REMINDER_SENT_KEY);
@@ -233,7 +221,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
     const processMeeting = async (item) => {
       if (!item.date || !item.startTime) {
-        console.log(` Skipping - missing date/time for ${item.meetingName}`);
         return;
       }
 
@@ -247,49 +234,27 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
         const hoursUntilStart = (startDateTime - now) / (1000 * 60 * 60);
 
-        console.log(` Meeting: ${item.meetingName}`);
-        console.log(`   - ID: ${item.id}`);
-        console.log(`   - Hours until start: ${hoursUntilStart.toFixed(2)}`);
-        console.log(`   - Already reminded: ${remindedIds.includes(item.id)}`);
-        console.log(`   - Already thanked: ${thankedIds.includes(item.id)}`);
+       
 
         //  REMINDER: Within 24 hours AND not started AND not already sent
         if (hoursUntilStart > 0 && hoursUntilStart <= 24 && !remindedIds.includes(item.id)) {
-          console.log(` TRIGGERING REMINDER for ${item.id}: ${item.meetingName}`);
           try {
             await executeReminderWorkflows(item);
             addSentId(REMINDER_SENT_KEY, item.id);
-            console.log(` Reminder sent for ${item.id}: ${item.meetingName}`);
           } catch (error) {
-            console.error(` Error sending reminder for ${item.id}:`, error);
+            console.log(error);
           }
-        } else {
-          if (hoursUntilStart <= 0) {
-            console.log(` Reminder skipped: Meeting already started/past`);
-          } else if (hoursUntilStart > 24) {
-            console.log(`Reminder skipped: Too far in future (>24 hrs)`);
-          } else if (remindedIds.includes(item.id)) {
-            console.log(`Reminder skipped: Already sent`);
-          }
-        }
+        } 
 
         // THANK YOU: Meeting finished AND not already sent
         if (now > endDateTime && !thankedIds.includes(item.id)) {
-          console.log(`TRIGGERING THANK YOU for ${item.id}: ${item.meetingName}`);
           try {
             await executeThankYouWorkflows(item);
             addSentId(THANKYOU_SENT_KEY, item.id);
-            console.log(`Thank You sent for ${item.id}: ${item.meetingName}`);
           } catch (error) {
             console.error(`Error sending thank you for ${item.id}:`, error);
           }
-        } else {
-          if (now <= endDateTime) {
-            console.log(`Thank You skipped: Meeting not finished yet`);
-          } else if (thankedIds.includes(item.id)) {
-            console.log(`Thank You skipped: Already sent`);
-          }
-        }
+        } 
       } catch (error) {
         console.error(`Error processing meeting ${item.id}:`, error);
       }
@@ -298,7 +263,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
     const promises = meeting.map(item => processMeeting(item));
     Promise.all(promises).finally(() => {
       isProcessingWorkflowsRef.current = false;
-      console.log('Reminder/Thank You check complete');
     });
 
   }, [now, meeting]);
@@ -308,7 +272,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
 
   const handleSaveMeeting = async (data) => {
     if (isSendingRef.current) {
-      console.log("Already sending...");
       return;
     }
 
@@ -359,7 +322,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
  
   const handleDeleteMeeting = async (id) => {
     if (isDeletingRef.current) {
-      console.log(" Already deleting...");
       return;
     }
 
@@ -542,7 +504,6 @@ export default function Calendar({ onEventsChange, onDateChange }) {
   };
 
   const handleDismissReminder = (eventId) => {
-    console.log("Reminder dismissed:", eventId);
     toast.info('Reminder Dismissed', 'You have dismissed this reminder.');
   };
 
