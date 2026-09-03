@@ -4,7 +4,6 @@ import ToastItem from './ToastItem';
 import './toast.css';
 
 const ToastContainer = ({ toasts, removeToast }) => {
-  console.log('📦 ToastContainer - toasts count:', toasts.length);
   
   if (toasts.length === 0) return null;
 
@@ -15,7 +14,6 @@ const ToastContainer = ({ toasts, removeToast }) => {
           key={toast.id}
           toast={toast}
           onRemove={() => {
-            console.log('🗑️ Removing toast from container:', toast.id);
             removeToast(toast.id);
           }}
         />

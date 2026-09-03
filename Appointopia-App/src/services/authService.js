@@ -1,4 +1,3 @@
-// src/services/authService.js
 import { auth, db } from "../firebase/firebase";
 import {
     createUserWithEmailAndPassword,
@@ -12,15 +11,15 @@ import {
 } from "firebase/auth";
 import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
 
-// ✅ Set persistence (user stays logged in)
+//  Set persistence (user stays logged in)
 export const setAuthPersistence = () => {
     return setPersistence(auth, browserLocalPersistence);
 };
 
-// ✅ Sign Up with Firebase
-// src/services/authService.js
+//  Sign Up with Firebase
 
-// ✅ Sign Up with Firebase
+
+//  Sign Up with Firebase
 export const signUp = async (email, password, displayName) => {
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
@@ -40,45 +39,42 @@ export const signUp = async (email, password, displayName) => {
             photoURL: user.photoURL || null,
         });
 
-        console.log("✅ User created:", user.uid);
         return user;
     } catch (error) {
-        console.error("❌ Sign up error:", error);
-        // ✅ Throw error so component can handle it
+        console.error(" Sign up error:", error);
+        //  Throw error so component can handle it
         throw error;
     }
 };
 
-// ✅ Sign In with Firebase
+//  Sign In with Firebase
 export const signIn = async (email, password) => {
     try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        console.log("✅ User signed in:", userCredential.user.uid);
         return userCredential.user;
     } catch (error) {
-        console.error("❌ Sign in error:", error);
+        console.error(" Sign in error:", error);
         throw error;
     }
 };
 
-// ✅ Sign Out
+//  Sign Out
 export const logOut = async () => {
     try {
         await signOut(auth);
         localStorage.removeItem("currentUser");
-        console.log("✅ User signed out");
     } catch (error) {
-        console.error("❌ Sign out error:", error);
+        console.error(" Sign out error:", error);
         throw error;
     }
 };
 
-// ✅ Get Current User (Sync)
+//  Get Current User (Sync)
 export const getCurrentUser = () => {
     return auth.currentUser;
 };
 
-// ✅ Get Current User (Async with Firestore data)
+//  Get Current User (Async with Firestore data)
 export const getCurrentUserData = async () => {
     const user = auth.currentUser;
     if (!user) return null;
@@ -95,12 +91,12 @@ export const getCurrentUserData = async () => {
             name: user.displayName || user.email?.split('@')[0] || "User",
         };
     } catch (error) {
-        console.error("❌ Error fetching user data:", error);
+        console.error(" Error fetching user data:", error);
         return null;
     }
 };
 
-// ✅ Auth State Observer
+//  Auth State Observer
 export const onAuthStateChange = (callback) => {
     return onAuthStateChanged(auth, async (user) => {
         if (user) {
@@ -114,13 +110,12 @@ export const onAuthStateChange = (callback) => {
     });
 };
 
-// ✅ Reset Password
+//  Reset Password
 export const resetPassword = async (email) => {
     try {
         await sendPasswordResetEmail(auth, email);
-        console.log("✅ Password reset email sent to:", email);
     } catch (error) {
-        console.error("❌ Reset password error:", error);
+        console.error(" Reset password error:", error);
         throw error;
     }
 };

@@ -18,8 +18,6 @@ export const auth = getAuth(app);
 
 export const db = getFirestore(app);
 
-console.log("firebase app connected:", app);
-console.log("Firebase Auth connected:", auth);
-console.log("firebase connected:", db);
+
 
 export default app;

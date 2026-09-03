@@ -9,9 +9,9 @@ export default function WorkflowsPage() {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [sidebarKey, setSidebarKey] = useState(0);
 
-    //  Handle date change from Workflows
+    // Handle date change from Workflows
     const handleDateChange = (date) => {
-        console.log(" Workflow date changed:", date);
+        console.log("Workflow date changed:", date);
         setSelectedDate(date);
     };
 
@@ -45,13 +45,13 @@ export default function WorkflowsPage() {
             });
         });
         
-        console.log(" Workflow sidebar events:", events.length);
+        console.log("Workflow sidebar events:", events.length);
         return events;
     }, [workflows]);
 
     // Handle workflow changes
     const handleWorkflowsChange = (newWorkflows) => {
-        console.log(" Workflows updated:", newWorkflows.length);
+        console.log("Workflows updated:", newWorkflows.length);
         setWorkflows(newWorkflows);
         setSidebarKey(prev => prev + 1);
     };

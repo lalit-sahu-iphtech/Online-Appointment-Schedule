@@ -1,4 +1,3 @@
-// src/component/Profile/Profile.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -56,8 +55,14 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+  //  Display values (jo UI mein dikhte hain)
+  const [displayName, setDisplayName] = useState("");
+  const [displayEmail, setDisplayEmail] = useState("");
+
+  //  Form values (jo edit kar rahe hain)
+  const [formName, setFormName] = useState("");
+  const [formEmail, setFormEmail] = useState("");
+
   const [errors, setErrors] = useState({});
   const [savedMessage, setSavedMessage] = useState("");
   const [isSaving, setIsSaving] = useState(false);
@@ -70,9 +75,19 @@ export default function Profile() {
         navigate("/signin");
         return;
       }
+      const userName = user.name || user.displayName || "";
+      const userEmail = user.email || "";
+      
       setCurrentUser(user);
-      setName(user.name || user.displayName || "");
-      setEmail(user.email || "");
+      
+      //  Display values set karo
+      setDisplayName(userName);
+      setDisplayEmail(userEmail);
+      
+      //  Form values bhi same rakho
+      setFormName(userName);
+      setFormEmail(userEmail);
+      
       setCheckingAuth(false);
       setLoading(false);
     });
@@ -132,14 +147,14 @@ export default function Profile() {
   const memberSince = getMemberSince();
   const memberSinceYear = getMemberSinceYear();
 
-  // Handle profile update
+  //  Handle profile update
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSavedMessage("");
     setIsSaving(true);
 
-    const trimmedEmail = email.trim().toLowerCase();
-    const trimmedName = name.trim();
+    const trimmedEmail = formEmail.trim().toLowerCase();
+    const trimmedName = formName.trim();
 
     // Validation
     const newErrors = {};
@@ -205,13 +220,21 @@ export default function Profile() {
       };
       localStorage.setItem("currentUser", JSON.stringify(userData));
 
-      // Update currentUser state
+      //  CRITICAL: Display values update karo (UI update)
+      setDisplayName(trimmedName);
+      setDisplayEmail(trimmedEmail);
+
+      //  CurrentUser bhi update karo
       setCurrentUser((prev) => ({
         ...prev,
         name: trimmedName,
         email: trimmedEmail,
         displayName: trimmedName,
       }));
+
+      //  Form values bhi update karo (taaki edit mode mein bhi sahi rahe)
+      setFormName(trimmedName);
+      setFormEmail(trimmedEmail);
 
       setSavedMessage("Profile updated successfully!");
       setIsEditing(false);
@@ -233,24 +256,31 @@ export default function Profile() {
     }
   };
 
-  // Handle edit toggle
+  //  Handle edit toggle
   const toggleEdit = () => {
-    setIsEditing(!isEditing);
     if (isEditing) {
-      // Reset to original values if canceling
-      setName(currentUser?.name || currentUser?.displayName || "");
-      setEmail(currentUser?.email || "");
+      //  Cancel: Form values ko display values pe reset karo
+      setFormName(displayName);
+      setFormEmail(displayEmail);
+      setErrors({});
+      setSavedMessage("");
+    } else {
+      //  Edit mode: Form values ko current display values se fill karo
+      setFormName(displayName);
+      setFormEmail(displayEmail);
       setErrors({});
       setSavedMessage("");
     }
+    setIsEditing(!isEditing);
   };
 
   if (checkingAuth || loading) {
     return <div className="profile-loading">Loading...</div>;
   }
 
-  const initials = getInitials(name || email || currentUser?.displayName || "User");
-  const avatarColor = getColorFromText(email || currentUser?.email || "user");
+  //  Display ke liye initials aur color (displayName se)
+  const displayInitials = getInitials(displayName || displayEmail || currentUser?.displayName || "User");
+  const displayAvatarColor = getColorFromText(displayEmail || currentUser?.email || "user");
 
   return (
     <div className="profile-page">
@@ -265,19 +295,19 @@ export default function Profile() {
       {/* Content */}
       <div className="profile-content">
         <div className="profile-card">
-          {/* Avatar Section */}
+          {/* Avatar Section -  Display values se show ho raha hai */}
           <div className="profile-avatar-section">
-            <div className="profile-avatar-big" style={{ backgroundColor: avatarColor }}>
-              {initials}
+            <div className="profile-avatar-big" style={{ backgroundColor: displayAvatarColor }}>
+              {displayInitials}
               <div className="profile-avatar-badge">
                 <FaCamera />
               </div>
             </div>
             <div className="profile-user-info">
-              <h2>{name || currentUser?.displayName || email?.split("@")[0] || "User"}</h2>
+              <h2>{displayName || displayEmail?.split("@")[0] || "User"}</h2>
               <span className="profile-subtext">
                 <FaEnvelope className="profile-subtext-icon" />
-                {email || currentUser?.email}
+                {displayEmail || currentUser?.email}
               </span>
               <span className="profile-subtext profile-subtext-joined">
                 <FaClock className="profile-subtext-icon" />
@@ -324,7 +354,7 @@ export default function Profile() {
             </button>
           )}
 
-          {/* Form */}
+          {/* Form -  Form values se show ho raha hai */}
           {isEditing && (
             <form className="profile-form" onSubmit={handleSubmit}>
               <div className="profile-form-group">
@@ -332,8 +362,8 @@ export default function Profile() {
                 <div className="profile-input-icon">
                   <input
                     type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
+                    value={formName}
+                    onChange={(e) => setFormName(e.target.value)}
                     placeholder="Enter your name"
                     disabled={isSaving}
                     className={errors.name ? "input-error" : ""}
@@ -348,8 +378,8 @@ export default function Profile() {
                 <div className="profile-input-icon">
                   <input
                     type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    value={formEmail}
+                    onChange={(e) => setFormEmail(e.target.value)}
                     placeholder="Enter your email"
                     className={errors.email ? "input-error" : ""}
                     disabled={isSaving}
