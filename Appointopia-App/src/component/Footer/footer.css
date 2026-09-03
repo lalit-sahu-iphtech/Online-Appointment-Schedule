@@ -12,6 +12,10 @@
 
 /* =========================
    FOOTER CONTAINER
+   (footer-brand + footer-grid are the
+   ONLY two direct children — layout is
+   handled as a simple flex row on desktop
+   and a stacked column on smaller screens)
 ========================= */
 
 .footer-container {
@@ -22,6 +26,19 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 40px;
+  box-sizing: border-box;
+}
+
+/* footer-grid holds the 4 link columns.
+   Using CSS grid here (instead of the old
+   flex + space-around) gives predictable,
+   equal-width columns at every breakpoint. */
+.footer-grid {
+  flex: 1;
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(100px, 1fr));
+  gap: 40px 30px;
 }
 
 
@@ -31,7 +48,9 @@
 
 .footer-brand {
   flex: 1;
+  width: 100%;
   max-width: 380px;
+  box-sizing: border-box;
 }
 
 .footer-logo {
@@ -71,6 +90,7 @@
   align-items: center;
   gap: 16px;
   margin-top: 25px;
+  flex-wrap: wrap;
 }
 
 .footer-social a {
@@ -142,7 +162,7 @@
 ========================= */
 
 .footer-column {
-  min-width: 120px;
+  min-width: 0;
   display: flex;
   flex-direction: column;
 }
@@ -202,6 +222,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 20px;
+  box-sizing: border-box;
 }
 
 
@@ -282,7 +303,7 @@
 .language-dropdown {
   position: absolute;
   bottom: calc(100% + 8px);
-  /* 👈 Opens upward */
+  /* Opens upward */
   left: 0;
   min-width: 200px;
   background: #ffffff;
@@ -387,7 +408,7 @@
 
 
 /* =====================================================
-   TABLET
+   TABLET (large)
 ===================================================== */
 
 @media (max-width: 1000px) {
@@ -395,19 +416,22 @@
     padding: 50px 5% 0;
   }
 
+  /* Stack brand above the link grid instead of the
+     old (mismatched) 4-column grid on footer-container */
   .footer-container {
-    display: grid;
-    grid-template-columns: 1.5fr 1fr 1fr 1fr;
-    gap: 40px 30px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 40px;
   }
 
   .footer-brand {
-    grid-column: 1 / -1;
     max-width: 500px;
   }
 
-  .footer-column {
-    min-width: auto;
+  .footer-grid {
+    width: 100%;
+    grid-template-columns: repeat(4, minmax(100px, 1fr));
+    gap: 30px 24px;
   }
 
   .footer-bottom {
@@ -430,13 +454,17 @@
   }
 
   .footer-container {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 40px 30px;
+    gap: 35px;
   }
 
   .footer-brand {
-    grid-column: 1 / -1;
     max-width: 500px;
+  }
+
+  /* 4 link columns collapse into a clean 2x2 grid */
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px 24px;
   }
 
   .footer-logo img {
@@ -510,13 +538,18 @@
   }
 
   .footer-container {
-    grid-template-columns: 1fr 1fr;
-    gap: 35px 20px;
+    gap: 30px;
   }
 
   .footer-brand {
-    grid-column: 1 / -1;
     max-width: 100%;
+  }
+
+  /* keep a 2-column grid for the link columns on
+     phones — reads cleanly without feeling cramped */
+  .footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px 18px;
   }
 
   .footer-logo {
@@ -604,12 +637,11 @@
     padding-right: 15px;
   }
 
-  .footer-container {
+  /* below this width even 2 columns feel tight —
+     drop the link columns to a single column */
+  .footer-grid {
     grid-template-columns: 1fr;
-  }
-
-  .footer-brand {
-    grid-column: auto;
+    gap: 20px;
   }
 
   .footer-column {
@@ -695,7 +727,7 @@
     background: #ffffff;
     padding: 20px 5% 0;
   }
-  
+
   .footer-social a,
   .language-btn,
   .language-dropdown {

@@ -127,6 +127,8 @@ export default function Footer() {
           </div>
         </div>
 
+      <div className="footer-grid">
+
         {/* ================= PRODUCT ================= */}
         <div className="footer-column">
           <h3>Product</h3>
@@ -157,7 +159,7 @@ export default function Footer() {
           <Link to="/blog/organization">Organization</Link>
         </div>
       </div>
-
+    </div>
       {/* ================= BOTTOM ================= */}
       <div className="footer-bottom">
         {/* Language Dropdown - Opens Upward */}
