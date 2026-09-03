@@ -60,49 +60,6 @@ A modern, full-featured appointment scheduling application built with React. Man
 
 ---
 
-## Screenshots
-
-### Landing Page
-![Landing Page](./screenshots/landing-page.png)
-
-### Landing Page - Stats & Features
-![Landing Page Stats and Features](./screenshots/landing-features-stats.png)
-
-### Landing Page - Get Started & FAQ
-![Landing Page Get Started and FAQ](./screenshots/landing-getstarted-faq.png)
-
-### Landing Page - What's New & Footer
-![Landing Page Whats New and Footer](./screenshots/landing-whatsnew-footer.png)
-
-### Sign Up
-![Sign Up](./screenshots/sign-up.png)
-
-### Calendar - Add New Meeting
-![Add New Meeting](./screenshots/add-new-meeting.png)
-
-### Calendar - Week View
-![Calendar Week View](./screenshots/calendar-week-view.png)
-
-### Create Appointment - General Information
-![Create Appointment - General Information](./screenshots/create-appointment-general.png)
-
-### Create Appointment - Schedule
-![Create Appointment - Schedule](./screenshots/create-appointment-schedule.png)
-
-### Appointment Details
-![Appointment Details](./screenshots/appointment-details.png)
-
-### Appointment Schedule List
-![Appointment Schedule List](./screenshots/appointment-schedule-list.png)
-
-### Workflows - Templates
-![Workflows Templates](./screenshots/workflows-templates.png)
-
-### Workflows - Create Workflow
-![Create Workflow](./screenshots/create-workflow.png)
-
----
-
 ## Tech Stack
 
 ### Frontend
@@ -289,6 +246,11 @@ Appointopia-App/
 | `VITE_EMAILJS_PUBLIC_KEY` | EmailJS Public Key | Yes |
 
 ---
+
+## Demo
+
+<img width="1686" height="853" alt="ezgif com-gif-maker" src="https://github.com/user-attachments/assets/d9396ec1-52de-407f-bb66-65360fb63ad0" />
+
 
 
 
