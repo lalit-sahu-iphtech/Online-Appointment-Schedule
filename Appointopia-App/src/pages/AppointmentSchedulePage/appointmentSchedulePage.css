@@ -1,375 +1,472 @@
+/* src/pages/appointmentSchedulePage.css */
 
 /* =====================================================
    APPOINTMENT SCHEDULE PAGE
 ===================================================== */
 
 .appointment-page {
-    width: 100%;
-    height: 100vh;
-  
-    display: flex;
-  
-    background: #ffffff;
-  
-    font-family: "Poppins", sans-serif;
-  
-    overflow: hidden;
-  }
-  
-  /* Sidebar */
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  background: #ffffff;
+  font-family: "Poppins", sans-serif;
+  overflow: hidden;
+}
+
+/* Sidebar - Let Sidebar component handle positioning */
+.appointment-page > .sidebar {
+  width: 208px;
+  min-width: 208px;
+  height: 100vh;
+  flex-shrink: 0;
+}
+
+/* Main */
+.appointment-page .appointment-main {
+  flex: 1;
+  min-width: 0;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Appointment Content */
+.appointment-page .appointment-content {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  padding: 20px 24px 24px 24px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* =====================================================
+   APPOINTMENT TOPBAR (Same as Calendar)
+===================================================== */
+
+.appointment-content .appointment-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+  flex-shrink: 0;
+}
+
+.appointment-content .appointment-topbar h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #171A1F;
+}
+
+.appointment-content .appointment-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+/* Create Button - Same as Calendar */
+.appointment-content .appointment-create-btn {
+  height: 42px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  border-radius: 10px;
+  background-color: #8659D3;
+  color: white;
+  font-family: "Poppins", sans-serif;
+  font-size: 14px;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.appointment-content .appointment-create-btn span {
+  font-size: 25px;
+  font-weight: 300;
+  line-height: 1;
+}
+
+.appointment-content .appointment-create-btn:hover {
+  background-color: #7544c8;
+}
+
+/* Icons - Same as Calendar */
+.appointment-content .appointment-topbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appointment-content .appointment-icon-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 50%;
+  background-color: #F3F4F6;
+  color: #667085;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+}
+
+.appointment-content .appointment-icon-btn:hover {
+  background-color: #e7e8eb;
+}
+
+/* Notification Dot */
+.appointment-content .appointment-notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #F3F4F6;
+}
+
+/* Avatar - Same as Calendar */
+.appointment-content .appointment-avatar-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  margin-left: 4px;
+}
+
+.appointment-content .appointment-avatar-icon {
+  width: 36px;
+  height: 36px;
+  color: #8659D3;
+}
+
+.appointment-content .appointment-avatar-chevron {
+  font-size: 11px;
+  color: #667085;
+}
+
+/* Search Bar */
+.appointment-content .appointment-search-bar {
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.appointment-content .appointment-search-bar input {
+  width: 100%;
+  max-width: 350px;
+  height: 38px;
+  padding: 0 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  outline: none;
+  font-size: 13px;
+  background: #f9fafb;
+  font-family: "Poppins", sans-serif;
+  transition: 0.2s ease;
+}
+
+.appointment-content .appointment-search-bar input:focus {
+  border-color: #8659D3;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(134, 89, 211, 0.1);
+}
+
+.appointment-content .appointment-search-bar input::placeholder {
+  color: #a8adb7;
+}
+
+/* =====================================================
+   APPOINTMENT SCHEDULE CONTAINER
+===================================================== */
+
+.appointment-content .schedule-container {
+  flex: 1;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 15px 24px 25px;
+  min-height: 0;
+  box-sizing: border-box;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Schedule container scrollbar */
+.appointment-content .schedule-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appointment-content .schedule-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.appointment-content .schedule-container::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.appointment-content .schedule-container::-webkit-scrollbar-thumb:hover {
+  background: #b8bbc1;
+}
+
+/* =====================================================
+   SCROLLBAR STYLING
+===================================================== */
+
+.appointment-page .appointment-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.appointment-page .appointment-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.appointment-page .appointment-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.appointment-page .appointment-content::-webkit-scrollbar-thumb:hover {
+  background: #b8bbc1;
+}
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
+
+@media (max-width: 1000px) {
   .appointment-page > .sidebar {
-    width: 208px;
-    height: 100vh;
-  
-    flex-shrink: 0;
+    width: 200px;
+    min-width: 200px;
   }
-  
-  /* Main */
+
+  .appointment-page .appointment-content {
+    padding: 20px;
+  }
+
+  .appointment-content .appointment-topbar h1 {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 768px) {
+  .appointment-page > .sidebar {
+    width: 280px;
+    max-width: 85vw;
+  }
+
+  .appointment-page .appointment-content {
+    padding: 15px;
+  }
+
   .appointment-page .appointment-main {
     flex: 1;
-  
-    min-width: 0;
-  
-    height: 100vh;
-  
-    box-sizing: border-box;
-  
-    overflow: hidden;
-  }
-  
-  /* Appointment Content */
-  .appointment-page .appointment-content {
     width: 100%;
-    height: 100%;
-  
-    padding: 20px 24px;
-  
-    box-sizing: border-box;
-  
-    overflow-y: auto;
-    overflow-x: hidden;
   }
-  
-  /* =====================================================
-     APPOINTMENT TOPBAR (Same as Calendar)
-  ===================================================== */
-  
+
   .appointment-content .appointment-topbar {
-    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .appointment-content .appointment-topbar h1 {
+    font-size: 24px;
+  }
+
+  .appointment-content .appointment-topbar-right {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .appointment-content .appointment-create-btn {
+    height: 38px;
+    padding: 0 14px;
+    font-size: 13px;
+  }
+
+  .appointment-content .appointment-create-btn span {
+    font-size: 20px;
+  }
+
+  .appointment-content .appointment-icon-btn {
+    width: 34px;
+    height: 34px;
+    font-size: 13px;
+  }
+
+  .appointment-content .appointment-avatar-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(3) {
+    display: none;
+  }
+
+  .appointment-content .schedule-container {
+    padding: 12px 16px 20px;
+    min-height: calc(100vh - 260px);
+  }
+
+  .appointment-content .appointment-search-bar input {
+    max-width: 100%;
+    height: 36px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 500px) {
+  .appointment-page > .sidebar {
+    width: 280px;
+    max-width: 85vw;
+  }
+
+  .appointment-page .appointment-content {
+    padding: 10px;
+  }
+
+  .appointment-page .appointment-main {
+    flex: 1;
+    width: 100%;
+  }
+
+  .appointment-content .appointment-topbar {
+    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 18px;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
-  
+
   .appointment-content .appointment-topbar h1 {
+    font-size: 20px;
     margin: 0;
-    font-size: 32px;
-    font-weight: 700;
-    color: #171A1F;
+    flex-shrink: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 35%;
   }
-  
+
   .appointment-content .appointment-topbar-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 6px;
+    flex-shrink: 0;
+    flex-wrap: nowrap;
+    width: auto;
+    justify-content: flex-end;
   }
-  
-  /* Create Button - Same as Calendar */
+
   .appointment-content .appointment-create-btn {
-    height: 42px;
-    padding: 0 20px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    border: none;
-    border-radius: 10px;
-    background-color: #8659D3;
-    color: white;
-    font-family: "Poppins", sans-serif;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.2s ease;
+    height: 34px;
+    padding: 0 10px;
+    font-size: 12px;
+    border-radius: 8px;
   }
-  
+
   .appointment-content .appointment-create-btn span {
-    font-size: 25px;
-    font-weight: 300;
-    line-height: 1;
+    font-size: 18px;
   }
-  
-  .appointment-content .appointment-create-btn:hover {
-    background-color: #7544c8;
-  }
-  
-  /* Icons - Same as Calendar */
-  .appointment-content .appointment-topbar-icons {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  
+
   .appointment-content .appointment-icon-btn {
-    width: 38px;
-    height: 38px;
-    border: none;
-    border-radius: 50%;
-    background-color: #F3F4F6;
-    color: #667085;
-    font-size: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: 0.2s ease;
-    position: relative;
-  }
-  
-  .appointment-content .appointment-icon-btn:hover {
-    background-color: #e7e8eb;
-  }
-  
-  /* Notification Dot */
-  .appointment-content .appointment-notification-dot {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    width: 8px;
-    height: 8px;
-    background: #ef4444;
-    border-radius: 50%;
-    border: 2px solid #F3F4F6;
-  }
-  
-  /* Avatar - Same as Calendar */
-  .appointment-content .appointment-avatar-wrap {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    margin-left: 4px;
-  }
-  
-  .appointment-content .appointment-avatar-icon {
-    width: 36px;
-    height: 36px;
-    color: #8659D3;
-  }
-  
-  .appointment-content .appointment-avatar-chevron {
-    font-size: 11px;
-    color: #667085;
-  }
-  
-  /* Search Bar */
-  .appointment-content .appointment-search-bar {
-    margin-bottom: 16px;
-  }
-  
-  .appointment-content .appointment-search-bar input {
-    width: 100%;
-    max-width: 350px;
-    height: 38px;
-    padding: 0 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 10px;
-    outline: none;
+    width: 32px;
+    height: 32px;
     font-size: 13px;
-    background: #f9fafb;
-    font-family: "Poppins", sans-serif;
-    transition: 0.2s ease;
   }
-  
-  .appointment-content .appointment-search-bar input:focus {
-    border-color: #8659D3;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(134, 89, 211, 0.1);
+
+  .appointment-content .appointment-avatar-icon {
+    width: 28px;
+    height: 28px;
   }
-  
-  .appointment-content .appointment-search-bar input::placeholder {
-    color: #a8adb7;
+
+  .appointment-content .appointment-avatar-chevron {
+    font-size: 9px;
   }
-  
-  /* =====================================================
-     APPOINTMENT SCHEDULE CONTAINER
-  ===================================================== */
-  
-  /* This styles the main container inside AppointmentSchedule component */
-  .appointment-content .schedule-container {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    padding: 15px 24px 25px;
-    min-height: calc(100vh - 200px);
-    box-sizing: border-box;
-  }
-  
-  /* =====================================================
-     RESPONSIVE
-  ===================================================== */
-  
-  @media (max-width: 1000px) {
-    .appointment-page > .sidebar {
-      width: 200px;
-      flex-basis: 200px;
-    }
-  
-    .appointment-page .appointment-content {
-      padding: 20px;
-    }
-  
-    .appointment-content .appointment-topbar h1 {
-      font-size: 28px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .appointment-page > .sidebar {
-      width: 75px;
-      flex-basis: 75px;
-    }
-  
-    .appointment-page .appointment-content {
-      padding: 15px;
-    }
-  
-    .appointment-content .appointment-topbar {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 12px;
-    }
-  
-    .appointment-content .appointment-topbar h1 {
-      font-size: 24px;
-    }
-  
-    .appointment-content .appointment-topbar-right {
-      width: 100%;
-      justify-content: flex-start;
-    }
-  
-    .appointment-content .appointment-create-btn {
-      height: 38px;
-      padding: 0 14px;
-      font-size: 13px;
-    }
-  
-    .appointment-content .appointment-create-btn span {
-      font-size: 20px;
-    }
-  
-    .appointment-content .appointment-icon-btn {
-      width: 34px;
-      height: 34px;
-      font-size: 13px;
-    }
-  
-    .appointment-content .appointment-avatar-icon {
-      width: 30px;
-      height: 30px;
-    }
-  
-    /* Hide comment icon on tablet */
-    .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(3) {
-      display: none;
-    }
-  
-    .appointment-content .schedule-container {
-      padding: 12px 16px 20px;
-      min-height: calc(100vh - 260px);
-    }
-  
-    .appointment-content .appointment-search-bar input {
-      max-width: 100%;
-      height: 36px;
-      font-size: 12px;
-    }
-  }
-  
-  @media (max-width: 500px) {
-    .appointment-page > .sidebar {
-      width: 60px;
-      flex-basis: 60px;
-    }
-  
-    .appointment-page .appointment-content {
-      padding: 10px;
-    }
-  
-    .appointment-content .appointment-topbar h1 {
-      font-size: 20px;
-    }
-  
-    .appointment-content .appointment-topbar-right {
-      gap: 8px;
-    }
-  
-    .appointment-content .appointment-create-btn {
-      height: 34px;
-      padding: 0 10px;
-      font-size: 12px;
-    }
-  
-    .appointment-content .appointment-create-btn span {
-      font-size: 18px;
-    }
-  
-    .appointment-content .appointment-icon-btn {
-      width: 30px;
-      height: 30px;
-      font-size: 12px;
-    }
-  
-    .appointment-content .appointment-avatar-icon {
-      width: 28px;
-      height: 28px;
-    }
-  
-    .appointment-content .appointment-avatar-chevron {
-      font-size: 9px;
-    }
-  
-    .appointment-content .appointment-notification-dot {
-      width: 6px;
-      height: 6px;
-      top: 6px;
-      right: 6px;
-    }
-  
-    .appointment-content .schedule-container {
-      padding: 10px 12px 16px;
-      min-height: calc(100vh - 220px);
-    }
-  
-    .appointment-content .appointment-search-bar input {
-      height: 32px;
-      font-size: 11px;
-      padding: 0 12px;
-    }
-  
-    /* Hide comment and notification on mobile */
-    .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(2),
-    .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(3) {
-      display: none;
-    }
-  }
-  
-  /* =====================================================
-     SCROLLBAR STYLING
-  ===================================================== */
-  
-  .appointment-page .appointment-content::-webkit-scrollbar {
+
+  .appointment-content .appointment-notification-dot {
     width: 6px;
+    height: 6px;
+    top: 6px;
+    right: 6px;
   }
-  
-  .appointment-page .appointment-content::-webkit-scrollbar-track {
-    background: transparent;
+
+  .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(2),
+  .appointment-content .appointment-topbar-icons .appointment-icon-btn:nth-child(3) {
+    display: none;
   }
-  
-  .appointment-page .appointment-content::-webkit-scrollbar-thumb {
-    background: #d1d5db;
-    border-radius: 10px;
+
+  .appointment-content .schedule-container {
+    padding: 10px 12px 16px;
+    min-height: calc(100vh - 200px);
   }
-  
-  .appointment-page .appointment-content::-webkit-scrollbar-thumb:hover {
-    background: #b8bbc1;
+
+  .appointment-content .appointment-search-bar input {
+    height: 32px;
+    font-size: 11px;
+    padding: 0 12px;
   }
+}
+
+@media (max-width: 400px) {
+  .appointment-page .appointment-content {
+    padding: 6px;
+  }
+
+  .appointment-content .appointment-topbar h1 {
+    font-size: 17px;
+    max-width: 30%;
+  }
+
+  .appointment-content .appointment-topbar-right {
+    gap: 4px;
+  }
+
+  .appointment-content .appointment-create-btn {
+    height: 30px;
+    padding: 0 8px;
+    font-size: 10px;
+    border-radius: 6px;
+  }
+
+  .appointment-content .appointment-create-btn span {
+    font-size: 15px;
+  }
+
+  .appointment-content .appointment-icon-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 11px;
+  }
+
+  .appointment-content .appointment-avatar-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .appointment-content .appointment-avatar-chevron {
+    font-size: 8px;
+  }
+
+  .appointment-content .schedule-container {
+    padding: 8px 10px 12px;
+    border-radius: 8px;
+    min-height: calc(100vh - 180px);
+  }
+
+  .appointment-content .appointment-search-bar input {
+    height: 28px;
+    font-size: 10px;
+    padding: 0 10px;
+  }
+}
