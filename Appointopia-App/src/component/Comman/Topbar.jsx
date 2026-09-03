@@ -1,4 +1,4 @@
-
+// src/component/Common/Topbar.jsx
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
@@ -36,21 +36,17 @@ export default function Topbar({
   const [searchTerm, setSearchTerm] = useState("");
   const [now, setNow] = useState(new Date());
 
-  // Get ALL notifications from context
   const { notifications: allNotifications, count: notificationCount } = useNotificationsContext();
 
-  // Update time every 30 seconds
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 30000);
     return () => clearInterval(timer);
   }, []);
 
-  // Toggle panels
   const togglePanel = (panel) => {
     setActivePanel((prev) => (prev === panel ? null : panel));
   };
 
-  // Close panel on outside click
   useEffect(() => {
     if (!activePanel) return;
     const handleClickOutside = (e) => {
@@ -62,7 +58,6 @@ export default function Topbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [activePanel]);
 
-  // Handle search
   const handleSearchChange = (e) => {
     const value = e.target.value;
     setSearchTerm(value);
@@ -79,19 +74,16 @@ export default function Topbar({
     }
   };
 
-  // Get notification label
   const getLabel = (diffMinutes) => {
     return getNotificationLabel(diffMinutes);
   };
 
-  // Format notifications with labels and source
   const notificationsWithTime = allNotifications.map((item) => ({
     ...item,
     label: getLabel(item.diffMinutes),
     displayTitle: `${item.sourceLabel}: ${item.title}`,
   }));
 
-  //  Get user display name
   const getUserDisplayName = () => {
     if (currentUser?.name) return currentUser.name;
     if (currentUser?.displayName) return currentUser.displayName;
@@ -140,15 +132,11 @@ export default function Topbar({
                 </div>
 
                 {searchTerm.trim() === "" && (
-                  <div className="topbar-dropdown-empty">
-                    Type to search...
-                  </div>
+                  <div className="topbar-dropdown-empty">Type to search...</div>
                 )}
 
                 {searchTerm.trim() !== "" && searchResults.length === 0 && (
-                  <div className="topbar-dropdown-empty">
-                    No results found
-                  </div>
+                  <div className="topbar-dropdown-empty">No results found</div>
                 )}
 
                 {searchResults.length > 0 && (
@@ -171,7 +159,7 @@ export default function Topbar({
             )}
           </div>
 
-          {/* NOTIFICATIONS - ALL SOURCES COMBINED */}
+          {/* NOTIFICATIONS */}
           <div className="topbar-icon-wrap">
             <button
               className="topbar-icon-btn"
@@ -188,9 +176,7 @@ export default function Topbar({
               <div className="topbar-dropdown topbar-notification-dropdown">
                 <h4>Notifications ({notificationCount})</h4>
                 {notificationsWithTime.length === 0 ? (
-                  <div className="topbar-dropdown-empty">
-                    No notifications
-                  </div>
+                  <div className="topbar-dropdown-empty">No notifications</div>
                 ) : (
                   <div className="topbar-search-result-list">
                     {notificationsWithTime.map((item) => (
@@ -199,13 +185,12 @@ export default function Topbar({
                         className="topbar-search-result-item"
                         onClick={() => {
                           setActivePanel(null);
-
-                          if(item.source === 'calendar'){
-                            navigate('/calendar')
-                          }else if(item.source === 'schedule'){
-                            navigate('/appointment-schedule');
-                          }else if(item.source === 'workflows'){
-                            navigate('/workflows');
+                          if (item.source === "calendar") {
+                            navigate("/calendar");
+                          } else if (item.source === "schedule") {
+                            navigate("/appointment-schedule");
+                          } else if (item.source === "workflows") {
+                            navigate("/workflows");
                           }
                         }}
                       >
@@ -254,12 +239,10 @@ export default function Topbar({
 
           {/* Custom Actions */}
           {customActions && (
-            <div className="topbar-custom-actions">
-              {customActions}
-            </div>
+            <div className="topbar-custom-actions">{customActions}</div>
           )}
 
-          {/* PROFILE - UPDATED WITH CURRENT USER INFO */}
+          {/* PROFILE */}
           <div
             className="topbar-icon-wrap topbar-avatar-wrap"
             onClick={() => togglePanel("profile")}
@@ -272,9 +255,7 @@ export default function Topbar({
                 <div className="topbar-profile-dropdown-header">
                   <FaUserCircle className="topbar-profile-avatar" />
                   <div>
-                    {/*  Show current user name */}
                     <h4>{getUserDisplayName()}</h4>
-                    {/* Show current user email */}
                     <span>{getUserEmail()}</span>
                   </div>
                 </div>

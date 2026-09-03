@@ -12,13 +12,18 @@
     margin-bottom: 18px;
     flex-shrink: 0;
     box-sizing: border-box;
+    padding: 0;
+    min-height: 56px;
 }
 
 .topbar h1 {
     font-size: 32px;
     font-weight: 700;
     color: #171A1F;
-    margin-left: 20px;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* =====================================================
@@ -29,6 +34,7 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    flex-shrink: 0;
 }
 
 /* =====================================================
@@ -49,6 +55,8 @@
     font-size: 14px;
     cursor: pointer;
     transition: 0.2s ease;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .topbar-create-btn span {
@@ -69,6 +77,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    flex-shrink: 0;
 }
 
 /* =====================================================
@@ -77,6 +86,7 @@
 
 .topbar-icon-wrap {
     position: relative;
+    flex-shrink: 0;
 }
 
 .topbar-icon-btn {
@@ -188,6 +198,15 @@
     overflow-y: auto;
 }
 
+.topbar-search-result-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.topbar-search-result-list::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 10px;
+}
+
 .topbar-search-result-item {
     padding: 8px 8px;
     border-radius: 6px;
@@ -209,6 +228,28 @@
     font-size: 10px;
     color: #9aa1ad;
     flex-shrink: 0;
+}
+
+/* =====================================================
+   NOTIFICATION ITEMS
+===================================================== */
+
+.notification-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    width: 100%;
+}
+
+.notification-title {
+    font-size: 12px;
+    color: #374151;
+    font-weight: 500;
+}
+
+.notification-date {
+    font-size: 10px;
+    color: #9aa1ad;
 }
 
 /* =====================================================
@@ -295,6 +336,7 @@
     gap: 4px;
     cursor: pointer;
     margin-left: 4px;
+    flex-shrink: 0;
 }
 
 .topbar-avatar-icon {
@@ -316,10 +358,11 @@
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 /* =====================================================
-   RESPONSIVE
+   RESPONSIVE - TABLET (768px)
 ===================================================== */
 
 @media (max-width: 768px) {
@@ -328,37 +371,271 @@
     }
 
     .topbar-dropdown {
-        width: 240px;
+        width: 250px;
         right: -10px;
     }
 
+    .topbar-profile-dropdown {
+        width: 200px;
+    }
+
+    .topbar-search-dropdown {
+        width: 250px;
+    }
+
+    .topbar-notification-dropdown {
+        width: 260px;
+    }
+
+    /* ✅ Hide comment icon on tablet */
     .topbar-icons .topbar-icon-wrap:nth-child(3) {
         display: none;
     }
 }
 
+/* =====================================================
+   RESPONSIVE - MOBILE (500px)
+===================================================== */
+
 @media (max-width: 500px) {
     .topbar {
-        align-items: flex-start;
-        gap: 10px;
-        flex-direction: column;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        padding: 0;
+        min-height: 48px;
+        gap: 8px;
+        flex-wrap: nowrap;
     }
-   
 
     .topbar h1 {
-        font-size: 22px;
-        margin-left: 30px;
+        font-size: 20px;
+        margin: 0;
+        padding: 0;
+        flex-shrink: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 35%;
+    }
+
+    .topbar-right {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        flex-shrink: 0;
+        flex-wrap: nowrap;
     }
 
     .topbar-create-btn {
-        height: 38px;
-        padding: 0 12px;
+        height: 34px;
+        padding: 0 10px;
+        font-size: 12px;
+        border-radius: 8px;
+        margin: 0;
+    }
+
+    .topbar-create-btn span {
+        font-size: 18px;
+    }
+
+    .topbar-icons {
+        gap: 4px;
+    }
+
+    .topbar-icon-btn {
+        width: 32px;
+        height: 32px;
         font-size: 13px;
-        margin-left: 30px;
+    }
+
+    .topbar-avatar-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .topbar-avatar-chevron {
+        font-size: 9px;
+    }
+
+    .topbar-icon-badge {
+        width: 7px;
+        height: 7px;
+        top: 1px;
+        right: 1px;
+        border-width: 1.5px;
+    }
+
+    /* ✅ Hide comment and notification on mobile (if too crowded) */
+    .topbar-icons .topbar-icon-wrap:nth-child(2),
+    .topbar-icons .topbar-icon-wrap:nth-child(3) {
+        display: none;
+    }
+
+    /* ✅ Keep Search, Profile visible */
+    .topbar-icons .topbar-icon-wrap:first-child {
+        display: block;
+    }
+
+    .topbar-icons .topbar-avatar-wrap {
+        display: flex;
     }
 
     .topbar-dropdown {
         width: 220px;
         right: -20px;
+        padding: 12px;
+        top: 40px;
+    }
+
+    .topbar-profile-dropdown {
+        width: 190px;
+        right: -10px;
+    }
+
+    .topbar-search-dropdown {
+        width: 220px;
+        right: -20px;
+    }
+
+    .topbar-notification-dropdown {
+        width: 220px;
+        right: -20px;
+    }
+
+    .topbar-dropdown h4 {
+        font-size: 12px;
+    }
+
+    .topbar-search-result-item {
+        font-size: 11px;
+        padding: 6px 8px;
+    }
+
+    .topbar-profile-menu-item {
+        font-size: 11px;
+        height: 32px;
+    }
+
+    .topbar-profile-dropdown-header {
+        padding: 10px 12px;
+    }
+
+    .topbar-profile-dropdown-header h4 {
+        font-size: 11px;
+    }
+}
+
+/* =====================================================
+   RESPONSIVE - VERY SMALL (400px)
+===================================================== */
+
+@media (max-width: 400px) {
+    .topbar {
+        gap: 4px;
+        min-height: 44px;
+    }
+
+    .topbar h1 {
+        font-size: 17px;
+        max-width: 30%;
+    }
+
+    .topbar-right {
+        gap: 4px;
+    }
+
+    .topbar-create-btn {
+        height: 30px;
+        padding: 0 8px;
+        font-size: 10px;
+        border-radius: 6px;
+    }
+
+    .topbar-create-btn span {
+        font-size: 15px;
+    }
+
+    .topbar-icons {
+        gap: 2px;
+    }
+
+    .topbar-icon-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 11px;
+    }
+
+    .topbar-avatar-icon {
+        width: 24px;
+        height: 24px;
+    }
+
+    .topbar-avatar-chevron {
+        font-size: 8px;
+    }
+
+    .topbar-dropdown {
+        width: 190px;
+        right: -15px;
+        padding: 10px;
+        top: 36px;
+    }
+
+    .topbar-profile-dropdown {
+        width: 170px;
+        right: -8px;
+    }
+
+    .topbar-search-dropdown {
+        width: 190px;
+        right: -15px;
+    }
+
+    .topbar-notification-dropdown {
+        width: 190px;
+        right: -15px;
+    }
+
+    .topbar-dropdown h4 {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .topbar-search-input-wrap input {
+        height: 30px;
+        font-size: 11px;
+    }
+
+    .topbar-search-result-item {
+        font-size: 10px;
+        padding: 4px 6px;
+    }
+
+    .topbar-search-result-date {
+        font-size: 9px;
+    }
+
+    .topbar-profile-menu-item {
+        font-size: 10px;
+        height: 28px;
+        padding: 0 8px;
+    }
+
+    .topbar-profile-dropdown-header {
+        padding: 8px 10px;
+    }
+
+    .topbar-profile-dropdown-header h4 {
+        font-size: 10px;
+    }
+
+    .topbar-profile-dropdown-header span {
+        font-size: 9px;
+    }
+
+    .topbar-profile-avatar {
+        width: 28px;
+        height: 28px;
     }
 }
