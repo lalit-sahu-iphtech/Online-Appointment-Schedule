@@ -153,10 +153,10 @@ export default function MonthView({
 
             return (
               <div 
-                key={dayIndex} 
-                ref={(el) => (dayCellRefs.current[dateStr] = el)}
-                className={`month-day ${!isCurrentMonth ? 'previous' : ''}`}
-              >
+              key={dayIndex} 
+              ref={(el) => (dayCellRefs.current[dateStr] = el)}
+              className={`month-day ${!isCurrentMonth ? 'previous' : ''} ${isTodayDate ? 'today-date' : ''}`}
+            >
                 <span className={isTodayDate ? 'month-selected-date' : ''}>
                   {day.date.getDate()}
                 </span>

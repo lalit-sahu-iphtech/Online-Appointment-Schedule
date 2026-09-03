@@ -850,6 +850,8 @@
    MONTH DAY CELL
 ===================================================== */
 
+
+
 .month-day {
     min-width: 0;
     position: relative;
@@ -872,6 +874,20 @@
     font-weight: 500;
     flex-shrink: 0;
 }
+/* =====================================================
+   TODAY DATE - BACKGROUND COLOR
+===================================================== */
+
+.month-day.today-date {
+    background-color: #d1d5db;
+    border-radius: 0;
+}
+
+/* Optional: If you want the date number to stand out */
+.month-day.today-date > span {
+    color: #171a1f;
+    font-weight: 700;
+}
 
 /* =====================================================
    PREVIOUS / NEXT MONTH DATE
@@ -890,6 +906,7 @@
     color: #8555d5;
     text-decoration: underline;
     font-weight: 700;
+    
 }
 
 /* =====================================================
