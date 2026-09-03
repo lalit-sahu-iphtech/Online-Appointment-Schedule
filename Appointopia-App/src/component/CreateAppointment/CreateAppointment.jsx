@@ -251,9 +251,7 @@ export default function CreateAppointment({ onClose, onSave }) {
     setStep(1);
   };
 
-  // =========================================
   // handleShare with automatic scheduling
-  // =========================================
   const handleShare = async () => {
     // Validate all fields before sharing
     if (!formData.eventName.trim()) {

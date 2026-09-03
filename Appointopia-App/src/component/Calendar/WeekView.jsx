@@ -16,7 +16,7 @@ export default function WeekView({
   const weekDays = getWeekDays(currentDate);
   const weekdays = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
 
-  // ✅ State to track expanded meetings per day
+  // State to track expanded meetings per day
   const [expandedMeetings, setExpandedMeetings] = useState({});
 
   const toggleExpand = (key) => {
@@ -26,7 +26,7 @@ export default function WeekView({
     }));
   };
 
-  // ✅ 24-hour format without AM/PM
+  //  24-hour format without AM/PM
   const timeSlots = [];
   for (let i = 0; i <24; i++) {
     // const hour = i > 12 ? i - 12 : i;
@@ -40,7 +40,7 @@ export default function WeekView({
   const headerHeight = 62;
   const totalHeight = headerHeight + timeSlots.length * 58;
 
-  // ✅ Group events by day and start time
+  //  Group events by day and start time
   const getGroupedEvents = (dayEvents) => {
     const groups = {};
     dayEvents.forEach(event => {
@@ -53,7 +53,7 @@ export default function WeekView({
     return groups;
   };
 
-  // ✅ Render events with +X more for a day
+  //  Render events with +X more for a day
   const renderDayEvents = (dayEvents, dayIndex, isTodayDate) => {
     if (dayEvents.length === 0) {
       return null;
@@ -117,7 +117,7 @@ export default function WeekView({
               <span style={{ fontSize: '9px' }}>{item.startTime}</span>
             </div>
 
-            {/* ✅ "+X more" pill — bottom-right corner of the event box */}
+            {/*  "+X more" pill — bottom-right corner of the event box */}
             {!isExpanded && hiddenCount > 0 && index === 0 && (
               <button
                 className="more-events-btn"
@@ -147,7 +147,7 @@ export default function WeekView({
               </button>
             )}
 
-            {/* ✅ "Show less" pill — bottom-right corner of the last expanded event */}
+            {/*  "Show less" pill — bottom-right corner of the last expanded event */}
             {isExpanded && hiddenCount > 0 && index === visibleEvents.length - 1 && (
               <button
                 className="show-less-btn"
@@ -207,7 +207,7 @@ export default function WeekView({
 
             <div className="week-grid" style={{ height: `${timeSlots.length * 58}px` }}></div>
 
-            {/* ✅ Render events with +X more */}
+            {/* Render events with +X more */}
             {renderDayEvents(dayEvents, dayIndex, isTodayDate)}
           </div>
         );

@@ -66,7 +66,7 @@ export default function SignIn() {
       };
       localStorage.setItem("currentUser", JSON.stringify(userData));
 
-      // ✅ Success toast
+      //  Success toast
       toast.success(
         " Welcome Back!",
         `Hello ${userData.name}! You have been signed in successfully.`
@@ -78,7 +78,7 @@ export default function SignIn() {
         navigate("/calendar");
       }, 1500);
     } catch (error) {
-      // ✅ Handle Firebase errors
+      //  Handle Firebase errors
       let errorMessage = "Something went wrong. Please try again.";
       let toastTitle = " Sign In Failed";
       

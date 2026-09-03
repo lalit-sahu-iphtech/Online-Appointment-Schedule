@@ -84,7 +84,7 @@ export default function SignUp() {
 
       window.dispatchEvent(new Event("userLoggedIn"));
 
-      // ✅ Success toast
+      //  Success toast
       toast.success(
         " Account Created!",
         `Welcome ${formData.name.trim()}! Your account has been created successfully.`

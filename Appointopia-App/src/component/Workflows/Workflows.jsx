@@ -99,7 +99,7 @@ const DEFAULT_WORKFLOWS = [
   },
 ];
 
-// ✅ Default workflow IDs for quick reference
+//  Default workflow IDs for quick reference
 const DEFAULT_WORKFLOW_IDS = [1, 2, 3, 4, 5];
 
 export default function Workflows({ onWorkflowsChange, onDateChange }) {
@@ -125,17 +125,17 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
 
   const { addNotifications } = useNotificationsContext();
   
-  // ✅ Refs to prevent infinite loop
+  //  Refs to prevent infinite loop
   const prevDateRef = useRef(null);
   const onDateChangeRef = useRef(onDateChange);
   const isFirstRender = useRef(true);
 
-  // ✅ Update ref when prop changes
+  //  Update ref when prop changes
   useEffect(() => {
     onDateChangeRef.current = onDateChange;
   }, [onDateChange]);
 
-  // ✅ Notify parent when date changes (without infinite loop)
+  //  Notify parent when date changes (without infinite loop)
   useEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -185,7 +185,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
       const templates = data.filter(w => w.isTemplate === true);
       const userWorkflows = data.filter(w => w.isTemplate === false);
       
-      // ✅ Merge default templates with Firebase templates
+      //  Merge default templates with Firebase templates
       const mergedTemplates = DEFAULT_WORKFLOWS.map(template => {
         const existing = templates.find(w => w.id === template.id);
         return existing || template;
@@ -209,7 +209,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     }
   };
 
-  // ✅ Check if workflow is a default template (read-only)
+  //  Check if workflow is a default template (read-only)
   const isDefaultTemplate = (workflow) => {
     return DEFAULT_WORKFLOW_IDS.includes(workflow.id) && workflow.isTemplate === true;
   };
@@ -248,7 +248,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
   };
 
   const handleUpdateWorkflow = async (id, data) => {
-    // ✅ Check if it's a default template
+    //  Check if it's a default template
     const workflow = workflows.find(w => w.id === id);
     if (isDefaultTemplate(workflow)) {
       toast.warning('Cannot Edit', 'Default templates cannot be edited.');
@@ -277,11 +277,11 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     }
   };
 
-  // ✅ DELETE workflow - Modified to prevent deleting default templates
+  //  DELETE workflow - Modified to prevent deleting default templates
   const handleDeleteWorkflow = async (id) => {
     const workflow = workflows.find(w => w.id === id);
     
-    // ✅ Check if it's a default template
+    // Check if it's a default template
     if (isDefaultTemplate(workflow)) {
       toast.warning('Cannot Delete', 'Default templates cannot be deleted.');
       return;
@@ -482,7 +482,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     toast.success('Workflow Activated', `"${workflow?.title}" has been activated successfully.`);
   };
 
-  // ✅ EDIT workflow - Modified to check if default template
+  //  EDIT workflow - Modified to check if default template
   const handleEditWorkflow = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     if (workflow) {
@@ -495,7 +495,7 @@ export default function Workflows({ onWorkflowsChange, onDateChange }) {
     }
   };
 
-  // ✅ DELETE click handler - Modified
+  //  DELETE click handler - Modified
   const handleDeleteWorkflowClick = (id) => {
     const workflow = workflows.find((w) => w.id === id);
     
