@@ -15,6 +15,11 @@
   box-sizing: border-box;
   position: relative;
   z-index: 100;
+
+  /* Tracks the navbar's actual height at each breakpoint.
+     .mobile-menu-overlay reads this so it always starts
+     exactly where the navbar ends — no overlap, no gap. */
+  --nav-height: 42px;
 }
 
 .logo-link {
@@ -78,7 +83,7 @@
   white-space: nowrap;
 }
 
-/* ✅ React Router Links */
+/* React Router Links */
 .nav-mid a {
   text-decoration: none;
   color: #292929;
@@ -91,7 +96,7 @@
   color: #8555d5;
 }
 
-/* ✅ Active Link Underline */
+/* Active Link Underline */
 .nav-mid a.active {
   color: #8555d5;
 }
@@ -210,6 +215,11 @@
   padding: 4px;
   margin-top: -2px;
   transition: color 0.2s ease;
+
+  /* keep the toggle button above the overlay so it always
+     stays clickable/visible to close the menu */
+  position: relative;
+  z-index: 1001;
 }
 
 .mobile-menu-toggle:hover {
@@ -223,7 +233,9 @@
 .mobile-menu-overlay {
   display: none;
   position: fixed;
-  top: 42px;
+  /* was hardcoded 42px — now always matches the navbar's
+     real height at the current breakpoint */
+  top: var(--nav-height, 42px);
   left: 0;
   right: 0;
   bottom: 0;
@@ -383,6 +395,7 @@
     padding: 5px 16px 0 12px;
     align-items: center;
     height: 56px;
+    --nav-height: 56px;
   }
 
   .nav-left h1 {
@@ -394,6 +407,7 @@
   .navbar {
     height: 52px;
     padding: 5px 12px 0 12px;
+    --nav-height: 52px;
   }
 
   .nav-left h1 {
@@ -428,7 +442,7 @@
   .mobile-menu-toggle {
     display: none !important;
   }
-  
+
   .mobile-menu-overlay {
     display: none !important;
   }
