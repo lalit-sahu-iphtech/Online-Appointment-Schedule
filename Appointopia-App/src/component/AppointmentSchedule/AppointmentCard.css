@@ -14,7 +14,7 @@
 }
 
 
-/* ✅ Edit mode - Card expands */
+/*  Edit mode - Card expands */
 .appointment-card.edit-mode {
   height: auto;
   min-height: 320px;

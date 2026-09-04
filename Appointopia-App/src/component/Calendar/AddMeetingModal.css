@@ -173,7 +173,7 @@
 }
 
 /* =====================================================
-   ICON INPUT - FIXED (Date icon properly positioned)
+   ICON INPUT
 ===================================================== */
 
 .input-icon {
@@ -202,7 +202,7 @@
     color: #8555d5;
 }
 
-/* ✅ Date input - hide default calendar icon */
+/* Date input - hide default calendar icon */
 .input-icon input[type="date"]::-webkit-calendar-picker-indicator {
     opacity: 0;
     position: absolute;
@@ -224,7 +224,114 @@
 }
 
 /* =====================================================
-   TIME - FIXED (No double AM/PM)
+   ONLINE LINK WITH ACTIONS - NEW
+===================================================== */
+
+.input-with-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.input-with-actions .input-icon {
+    flex: 1;
+    min-width: 0;
+}
+
+.input-with-actions .input-icon input {
+    padding-right: 38px;
+    width: 100%;
+}
+
+.link-actions {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+/* Generate Meet Button */
+.generate-meet-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #8659d3, #6d3fb0);
+    color: #ffffff;
+    font-family: "Poppins", sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    white-space: nowrap;
+}
+
+.generate-meet-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(134, 89, 211, 0.35);
+}
+
+.generate-meet-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.generate-meet-btn svg {
+    font-size: 14px;
+}
+
+/* Test Meeting Button */
+.test-meet-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.test-meet-btn:hover {
+    background: #f3f0ff;
+    border-color: #8659d3;
+    color: #8659d3;
+}
+
+/* Link Preview */
+.link-preview {
+    margin-top: 6px;
+    padding: 4px 10px;
+    background: #f0fdf4;
+    border-radius: 6px;
+    border: 1px solid #dcfce7;
+    display: inline-block;
+}
+
+.link-preview-text {
+    font-size: 12px;
+    color: #16a34a;
+    font-weight: 500;
+    word-break: break-all;
+}
+
+/* Spinner Icon */
+.spinner-icon {
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* =====================================================
+   TIME
 ===================================================== */
 
 .time-inputs-wrapper {
@@ -266,7 +373,6 @@
     font-size: 13px;
 }
 
-/* ✅ Hide default time picker arrow */
 .time-input-group input::-webkit-calendar-picker-indicator {
     opacity: 0.4;
     cursor: pointer;
@@ -275,17 +381,6 @@
 
 .time-input-group input::-webkit-calendar-picker-indicator:hover {
     opacity: 1;
-}
-
-.time-ampm {
-    padding-right: 12px;
-    font-size: 12px;
-    font-weight: 600;
-    color: #8555d5;
-    flex-shrink: 0;
-    user-select: none;
-    min-width: 28px;
-    text-align: center;
 }
 
 .time-separator {
@@ -310,10 +405,6 @@
     flex-wrap: wrap;
     gap: 8px;
 }
-
-/* =====================================================
-   INVITEE CHIP WITH AVATAR
-===================================================== */
 
 .invitee-chip-with-avatar {
     display: flex;
@@ -381,36 +472,6 @@
     display: flex;
     align-items: center;
     gap: 6px;
-}
-
-.add-invitee input {
-    width: 100px;
-    height: 34px;
-    padding: 0 12px;
-    border: 1.5px solid #e5e7eb;
-    border-radius: 8px;
-    outline: none;
-    font-size: 12px;
-    font-family: "Poppins", sans-serif;
-    transition: all 0.25s ease;
-    background: #fafbfc;
-    color: #1a1a2e;
-}
-
-.add-invitee input:hover {
-    border-color: #c5cbd6;
-    background: #ffffff;
-}
-
-.add-invitee input:focus {
-    border-color: #8555d5;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(133, 85, 213, 0.1);
-}
-
-.add-invitee input::placeholder {
-    color: #b0b5c0;
-    font-size: 11px;
 }
 
 .add-invitee button {
@@ -609,7 +670,31 @@
         min-width: 80px;
     }
 
-    .add-invitee input {
-        width: 80px;
+    /* ✅ Mobile Link Actions */
+    .input-with-actions {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+
+    .input-with-actions .input-icon {
+        width: 100%;
+        flex: none;
+    }
+
+    .link-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .generate-meet-btn {
+        flex: 1;
+        justify-content: center;
+        padding: 8px 12px;
+        font-size: 11px;
+    }
+
+    .test-meet-btn {
+        width: 32px;
+        height: 32px;
     }
 }

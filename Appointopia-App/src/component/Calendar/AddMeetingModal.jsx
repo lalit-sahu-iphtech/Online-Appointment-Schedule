@@ -1,5 +1,4 @@
-
-
+// src/component/Calendar/AddMeetingModal.jsx
 import { useState, useEffect } from "react";
 import {
     FaTimes,
@@ -7,11 +6,15 @@ import {
     FaMapMarkerAlt,
     FaPlus,
     FaLink,
+    FaVideo,
+    FaSync,
+    FaSpinner,
 } from "react-icons/fa";
 import "./AddMeetingModal.css";
 import { useNavigate } from "react-router-dom";
 import AddInviteeModal from "./AddInviteeModal";
 import { useToast } from "../Toast";
+import { createMeetingLink } from "../../utils/meetingLinkGenerator";
 
 const AVATAR_COLORS = [
     '#8755D5', '#16A6AD', '#FF7800', '#2F80D7', 
@@ -40,6 +43,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     const [formData, setFormData] = useState(buildFormData);
     const [errors, setErrors] = useState({});
     const [showInviteeModal, setShowInviteeModal] = useState(false);
+    const [isGeneratingLink, setIsGeneratingLink] = useState(false);
 
     const navigate = useNavigate();
 
@@ -60,6 +64,59 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         if (errors[name]) {
             setErrors({ ...errors, [name]: null });
         }
+    };
+
+    /**
+     * ✅ Generate Google Meet Link
+     */
+    const handleGenerateMeetLink = () => {
+        // Check if meeting name is entered
+        if (!formData.meetingName.trim()) {
+            toast.warning('Meeting Name Required', 'Please enter a meeting name first.');
+            return;
+        }
+
+        setIsGeneratingLink(true);
+
+        try {
+            // Generate meeting link
+            const meetingLink = createMeetingLink(
+                formData.meetingName,
+                formData.date || new Date().toISOString().split('T')[0],
+                formData.startTime || "10:00"
+            );
+
+            // Set the link in form
+            setFormData(prev => ({
+                ...prev,
+                onlineLink: meetingLink.fullLink
+            }));
+
+            toast.success(
+                'Meet Link Generated!',
+                `Your Google Meet link: ${meetingLink.displayText}`
+            );
+
+        } catch (error) {
+            console.error('Error generating meet link:', error);
+            toast.error('Generation Failed', 'Could not generate meeting link. Please try again.');
+        } finally {
+            setIsGeneratingLink(false);
+        }
+    };
+
+    /**
+     * ✅ Validate and open Google Meet in new tab
+     */
+    const handleJoinMeeting = () => {
+        if (!formData.onlineLink) {
+            toast.warning('No Link', 'Please generate or enter a meeting link first.');
+            return;
+        }
+
+        // Open the link in new tab
+        window.open(formData.onlineLink, '_blank');
+        toast.info('Opening Meeting', 'Redirecting to Google Meet...');
     };
 
     const addInvitee = ({ name, email }) => {
@@ -88,7 +145,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    //  SIRF SAVE - EMAIL NAHI BHEJNA
+    // SIRF SAVE - EMAIL NAHI BHEJNA
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -108,7 +165,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             return;
         }
 
-        //  Sirf save karo - email Calendar.jsx bhejega
+        // Sirf save karo - email Calendar.jsx bhejega
         onSave(formData);
         onClose();
         
@@ -142,6 +199,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
                 <form onSubmit={handleSubmit}>
                     <div className="meeting-form-body">
+                        {/* MEETING NAME */}
                         <div className="form-group full-width">
                             <label>Meeting Name <span className="required-star">*</span></label>
                             <input
@@ -155,6 +213,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             {errors.meetingName && <span className="error-text">{errors.meetingName}</span>}
                         </div>
 
+                        {/* DATE + TIME */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Date <span className="required-star">*</span></label>
@@ -195,6 +254,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
+                        {/* LOCATION + ONLINE LINK (WITH GENERATE BUTTON) */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Location</label>
@@ -212,19 +272,57 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
                             <div className="form-group">
                                 <label>Online Link</label>
-                                <div className="input-icon">
-                                    <input
-                                        type="text"
-                                        name="onlineLink"
-                                        value={formData.onlineLink}
-                                        onChange={handleChange}
-                                        placeholder="https://meet.com/..."
-                                    />
-                                    <FaLink />
+                                <div className="input-with-actions">
+                                    <div className="input-icon">
+                                        <input
+                                            type="text"
+                                            name="onlineLink"
+                                            value={formData.onlineLink}
+                                            onChange={handleChange}
+                                            placeholder="https://meet.google.com/..."
+                                            className={errors.onlineLink ? 'input-error' : ''}
+                                        />
+                                        <FaLink />
+                                    </div>
+                                    <div className="link-actions">
+                                        <button
+                                            type="button"
+                                            className="generate-meet-btn"
+                                            onClick={handleGenerateMeetLink}
+                                            disabled={isGeneratingLink}
+                                        >
+                                            {isGeneratingLink ? (
+                                                <FaSpinner className="spinner-icon" />
+                                            ) : (
+                                                <>
+                                                    <FaVideo />
+                                                    Generate Meet
+                                                </>
+                                            )}
+                                        </button>
+                                        {formData.onlineLink && (
+                                            <button
+                                                type="button"
+                                                className="test-meet-btn"
+                                                onClick={handleJoinMeeting}
+                                                title="Test meeting link"
+                                            >
+                                                <FaSync />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
+                                {formData.onlineLink && (
+                                    <div className="link-preview">
+                                        <span className="link-preview-text">
+                                            🔗 {formData.onlineLink.replace(/^https?:\/\//, '')}
+                                        </span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
+                        {/* INVITEES */}
                         <div className="invitees-section">
                             <label>Invitees</label>
                             <div className="invitee-list">
@@ -255,6 +353,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
+                        {/* QUICK TIMES */}
                         <div className="quick-times">
                             <span className="quick-times-label">Quick:</span>
                             {['30 min', '1 hour', '2 hours'].map((duration) => (
