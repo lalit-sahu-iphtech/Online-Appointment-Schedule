@@ -67,10 +67,9 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     };
 
     /**
-     * ✅ Generate Google Meet Link
+     * ✅ Generate Google Meet Link - Redirects to CREATE page
      */
     const handleGenerateMeetLink = () => {
-        // Check if meeting name is entered
         if (!formData.meetingName.trim()) {
             toast.warning('Meeting Name Required', 'Please enter a meeting name first.');
             return;
@@ -79,14 +78,12 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         setIsGeneratingLink(true);
 
         try {
-            // Generate meeting link
             const meetingLink = createMeetingLink(
                 formData.meetingName,
                 formData.date || new Date().toISOString().split('T')[0],
                 formData.startTime || "10:00"
             );
 
-            // Set the link in form
             setFormData(prev => ({
                 ...prev,
                 onlineLink: meetingLink.fullLink
@@ -94,7 +91,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
 
             toast.success(
                 'Meet Link Generated!',
-                `Your Google Meet link: ${meetingLink.displayText}`
+                'Click the link to create your Google Meet session.'
             );
 
         } catch (error) {
@@ -106,7 +103,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
     };
 
     /**
-     * ✅ Validate and open Google Meet in new tab
+     * ✅ Open Google Meet in new tab
      */
     const handleJoinMeeting = () => {
         if (!formData.onlineLink) {
@@ -114,9 +111,8 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             return;
         }
 
-        // Open the link in new tab
         window.open(formData.onlineLink, '_blank');
-        toast.info('Opening Meeting', 'Redirecting to Google Meet...');
+        toast.info('Creating Meeting', 'Google Meet will open to create your meeting.');
     };
 
     const addInvitee = ({ name, email }) => {
@@ -145,7 +141,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
         }
     };
 
-    // SIRF SAVE - EMAIL NAHI BHEJNA
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -165,7 +160,6 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
             return;
         }
 
-        // Sirf save karo - email Calendar.jsx bhejega
         onSave(formData);
         onClose();
         
@@ -254,7 +248,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                             </div>
                         </div>
 
-                        {/* LOCATION + ONLINE LINK (WITH GENERATE BUTTON) */}
+                        {/* LOCATION + ONLINE LINK */}
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Location</label>
@@ -305,7 +299,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                                 type="button"
                                                 className="test-meet-btn"
                                                 onClick={handleJoinMeeting}
-                                                title="Test meeting link"
+                                                title="Create Google Meet session"
                                             >
                                                 <FaSync />
                                             </button>
@@ -315,7 +309,7 @@ export default function AddMeetingModal({ onClose, onSave, defaultDate, initialD
                                 {formData.onlineLink && (
                                     <div className="link-preview">
                                         <span className="link-preview-text">
-                                            🔗 {formData.onlineLink.replace(/^https?:\/\//, '')}
+                                            🔗 Create meeting: {formData.onlineLink}
                                         </span>
                                     </div>
                                 )}
